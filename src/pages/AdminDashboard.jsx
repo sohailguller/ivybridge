@@ -1,0 +1,585 @@
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { base44 } from "@/api/base44Client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  Users, 
+  DollarSign,
+  AlertCircle,
+  CheckCircle,
+  X,
+  Eye,
+  Shield,
+  TrendingUp,
+  MessageSquare
+} from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+export default function AdminDashboard() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [selectedMentor, setSelectedMentor] = useState(null);
+  const [selectedReport, setSelectedReport] = useState(null);
+
+  useEffect(() => {
+    loadUser();
+  }, []);
+
+  const loadUser = async () => {
+    try {
+      const currentUser = await base44.auth.me();
+      if (currentUser.role !== "admin") {
+        navigate(createPageUrl("Home"));
+        return;
+      }
+      setUser(currentUser);
+    } catch (error) {
+      base44.auth.redirectToLogin();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const { data: pendingMentors = [] } = useQuery({
+    queryKey: ['pending-mentors'],
+    queryFn: () => base44.entities.MentorProfile.filter({ verification_status: "pending" }),
+  });
+
+  const { data: approvedMentors = [] } = useQuery({
+    queryKey: ['approved-mentors-admin'],
+    queryFn: () => base44.entities.MentorProfile.filter({ verification_status: "approved" }),
+  });
+
+  const { data: subscriptions = [] } = useQuery({
+    queryKey: ['all-subscriptions'],
+    queryFn: () => base44.entities.Subscription.list(),
+  });
+
+  const { data: reports = [] } = useQuery({
+    queryKey: ['all-reports'],
+    queryFn: () => base44.entities.Report.list("-created_date"),
+  });
+
+  const { data: allUsers = [] } = useQuery({
+    queryKey: ['all-users'],
+    queryFn: () => base44.entities.User.list(),
+  });
+
+  const approveMentorMutation = useMutation({
+    mutationFn: ({ id, status }) => base44.entities.MentorProfile.update(id, { verification_status: status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['pending-mentors']);
+      queryClient.invalidateQueries(['approved-mentors-admin']);
+      setSelectedMentor(null);
+    },
+  });
+
+  const updateReportMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.Report.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['all-reports']);
+      setSelectedReport(null);
+    },
+  });
+
+  const handleApproveMentor = async (mentorId, approve) => {
+    await approveMentorMutation.mutateAsync({
+      id: mentorId,
+      status: approve ? "approved" : "rejected"
+    });
+  };
+
+  const handleResolveReport = async (reportId, action) => {
+    await updateReportMutation.mutateAsync({
+      id: reportId,
+      data: {
+        status: "resolved",
+        action_taken: action
+      }
+    });
+  };
+
+  const getMentorUser = (userId) => allUsers.find(u => u.id === userId);
+
+  const totalRevenue = subscriptions.reduce((sum, sub) => sum + sub.amount, 0);
+  const platformRevenue = totalRevenue * 0.3;
+  const activeSubscriptions = subscriptions.filter(s => s.status === "active").length;
+  const pendingReports = reports.filter(r => r.status === "pending").length;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF6B5C] mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading admin dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#FAFAFA] py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+            Admin Dashboard
+          </h1>
+          <p className="text-gray-600">Manage mentors, monitor activity, and oversee platform operations</p>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid md:grid-cols-4 gap-6 mb-8">
+          <Card className="rounded-2xl border-0 shadow-lg bg-gradient-to-br from-[#FF6B5C] to-[#E55A4C] text-white">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-3">
+                <Users className="w-8 h-8 opacity-80" />
+                {pendingMentors.length > 0 && (
+                  <Badge className="bg-white text-[#FF6B5C]">{pendingMentors.length}</Badge>
+                )}
+              </div>
+              <div className="text-3xl font-bold mb-1">{approvedMentors.length}</div>
+              <div className="text-sm opacity-90">Active Mentors</div>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-2xl border-0 shadow-lg">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-3">
+                <DollarSign className="w-8 h-8 text-green-500" />
+              </div>
+              <div className="text-3xl font-bold mb-1">${platformRevenue.toFixed(0)}</div>
+              <div className="text-sm text-gray-600">Platform Revenue (30%)</div>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-2xl border-0 shadow-lg">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-3">
+                <TrendingUp className="w-8 h-8 text-blue-500" />
+              </div>
+              <div className="text-3xl font-bold mb-1">{activeSubscriptions}</div>
+              <div className="text-sm text-gray-600">Active Subscriptions</div>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-2xl border-0 shadow-lg">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-3">
+                <AlertCircle className="w-8 h-8 text-orange-500" />
+                {pendingReports > 0 && (
+                  <Badge className="bg-red-100 text-red-800">{pendingReports}</Badge>
+                )}
+              </div>
+              <div className="text-3xl font-bold mb-1">{reports.length}</div>
+              <div className="text-sm text-gray-600">Total Reports</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="bg-white border rounded-2xl p-1 shadow-sm">
+            <TabsTrigger value="overview" className="rounded-xl data-[state=active]:bg-[#FF6B5C] data-[state=active]:text-white">
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="mentors" className="rounded-xl data-[state=active]:bg-[#FF6B5C] data-[state=active]:text-white">
+              Mentor Applications
+              {pendingMentors.length > 0 && (
+                <Badge className="ml-2 bg-red-500 text-white">{pendingMentors.length}</Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="reports" className="rounded-xl data-[state=active]:bg-[#FF6B5C] data-[state=active]:text-white">
+              Reports
+              {pendingReports > 0 && (
+                <Badge className="ml-2 bg-red-500 text-white">{pendingReports}</Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="rounded-xl data-[state=active]:bg-[#FF6B5C] data-[state=active]:text-white">
+              Analytics
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card className="rounded-3xl border-0 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>Pending Mentor Applications</span>
+                    <Badge variant="outline">{pendingMentors.length}</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {pendingMentors.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <CheckCircle className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                      <p>No pending applications</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {pendingMentors.slice(0, 5).map(mentor => {
+                        const mentorUser = getMentorUser(mentor.user_id);
+                        return (
+                          <div key={mentor.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                            <div className="flex items-center gap-3">
+                              <Avatar>
+                                <AvatarImage src={mentor.profile_photo_url} />
+                                <AvatarFallback className="bg-[#B3E5FC]">
+                                  {mentorUser?.full_name?.charAt(0) || 'M'}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-medium">{mentorUser?.full_name}</p>
+                                <p className="text-sm text-gray-600">{mentor.university}</p>
+                              </div>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setSelectedMentor(mentor)}
+                            >
+                              <Eye className="w-4 h-4 mr-1" />
+                              Review
+                            </Button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card className="rounded-3xl border-0 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>Recent Reports</span>
+                    <Badge variant="outline">{pendingReports}</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {reports.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <Shield className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                      <p>No reports filed</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {reports.slice(0, 5).map(report => (
+                        <div key={report.id} className="p-3 bg-gray-50 rounded-xl">
+                          <div className="flex items-center justify-between mb-2">
+                            <Badge className={`text-xs ${
+                              report.status === "pending" ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"
+                            }`}>
+                              {report.status}
+                            </Badge>
+                            <span className="text-xs text-gray-500">
+                              {new Date(report.created_date).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <p className="text-sm font-medium mb-1">{report.report_type.replace(/_/g, ' ')}</p>
+                          <p className="text-xs text-gray-600 line-clamp-2">{report.description}</p>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="mt-2 w-full"
+                            onClick={() => setSelectedReport(report)}
+                          >
+                            View Details
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="mentors">
+            <Card className="rounded-3xl border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle>Pending Mentor Applications</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {pendingMentors.length === 0 ? (
+                  <div className="text-center py-12 text-gray-500">
+                    <CheckCircle className="w-16 h-16 mx-auto mb-4 opacity-30" />
+                    <p className="text-lg font-medium mb-2">All caught up!</p>
+                    <p className="text-sm">No pending mentor applications to review</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {pendingMentors.map(mentor => {
+                      const mentorUser = getMentorUser(mentor.user_id);
+                      return (
+                        <Card key={mentor.id} className="border-2">
+                          <CardContent className="p-6">
+                            <div className="flex flex-col md:flex-row gap-6">
+                              <Avatar className="w-20 h-20">
+                                <AvatarImage src={mentor.profile_photo_url} />
+                                <AvatarFallback className="bg-[#B3E5FC] text-2xl">
+                                  {mentorUser?.full_name?.charAt(0) || 'M'}
+                                </AvatarFallback>
+                              </Avatar>
+
+                              <div className="flex-1">
+                                <h3 className="text-xl font-bold mb-2">{mentorUser?.full_name}</h3>
+                                <div className="flex flex-wrap gap-2 mb-3">
+                                  <Badge>{mentor.university}</Badge>
+                                  <Badge variant="outline">{mentor.year}</Badge>
+                                  <Badge variant="outline">{mentor.major}</Badge>
+                                </div>
+                                <p className="text-sm text-gray-700 mb-4">{mentor.bio}</p>
+                                
+                                <div className="flex flex-wrap gap-2 mb-4">
+                                  {mentor.expertise_areas?.map((area, idx) => (
+                                    <Badge key={idx} className="bg-[#B3E5FC]/30 text-[#222222] border-0 text-xs">
+                                      {area}
+                                    </Badge>
+                                  ))}
+                                </div>
+
+                                <div className="flex gap-3">
+                                  {mentor.transcript_url && (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => window.open(mentor.transcript_url, '_blank')}
+                                    >
+                                      View Transcript
+                                    </Button>
+                                  )}
+                                  <Button
+                                    size="sm"
+                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                    onClick={() => handleApproveMentor(mentor.id, true)}
+                                    disabled={approveMentorMutation.isPending}
+                                  >
+                                    <CheckCircle className="w-4 h-4 mr-1" />
+                                    Approve
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={() => handleApproveMentor(mentor.id, false)}
+                                    disabled={approveMentorMutation.isPending}
+                                  >
+                                    <X className="w-4 h-4 mr-1" />
+                                    Reject
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="reports">
+            <Card className="rounded-3xl border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle>Trust & Safety Reports</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Reporter</TableHead>
+                      <TableHead>Reported User</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {reports.map(report => {
+                      const reporter = allUsers.find(u => u.id === report.reporter_id);
+                      const reported = allUsers.find(u => u.id === report.reported_user_id);
+                      
+                      return (
+                        <TableRow key={report.id}>
+                          <TableCell className="text-sm">
+                            {new Date(report.created_date).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="text-xs">
+                              {report.report_type.replace(/_/g, ' ')}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-sm">{reporter?.full_name || reporter?.email}</TableCell>
+                          <TableCell className="text-sm">{reported?.full_name || reported?.email}</TableCell>
+                          <TableCell>
+                            <Badge className={`text-xs ${
+                              report.status === "pending" ? "bg-red-100 text-red-800" :
+                              report.status === "resolved" ? "bg-green-100 text-green-800" :
+                              "bg-yellow-100 text-yellow-800"
+                            }`}>
+                              {report.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setSelectedReport(report)}
+                            >
+                              Review
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card className="rounded-3xl border-0 shadow-lg">
+                <CardHeader>
+                  <CardTitle>Revenue Breakdown</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <span className="text-sm text-gray-600">Total Revenue</span>
+                      <span className="font-bold text-xl">${totalRevenue.toFixed(2)}</span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-[#FF6B5C]" style={{ width: '100%' }} />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <span className="text-sm text-gray-600">Platform Share (30%)</span>
+                      <span className="font-bold text-xl text-green-600">${platformRevenue.toFixed(2)}</span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-green-500" style={{ width: '30%' }} />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <span className="text-sm text-gray-600">Mentor Earnings (70%)</span>
+                      <span className="font-bold text-xl">${(totalRevenue * 0.7).toFixed(2)}</span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-[#B3E5FC]" style={{ width: '70%' }} />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="rounded-3xl border-0 shadow-lg">
+                <CardHeader>
+                  <CardTitle>Platform Stats</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center p-4 bg-gray-50 rounded-xl">
+                    <span className="text-gray-700">Total Mentors</span>
+                    <span className="text-2xl font-bold">{approvedMentors.length}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-4 bg-gray-50 rounded-xl">
+                    <span className="text-gray-700">Active Subscriptions</span>
+                    <span className="text-2xl font-bold">{activeSubscriptions}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-4 bg-gray-50 rounded-xl">
+                    <span className="text-gray-700">Total Users</span>
+                    <span className="text-2xl font-bold">{allUsers.length}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-4 bg-gray-50 rounded-xl">
+                    <span className="text-gray-700">Avg. Revenue per Subscription</span>
+                    <span className="text-2xl font-bold">
+                      ${subscriptions.length > 0 ? (totalRevenue / subscriptions.length).toFixed(0) : 0}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* Report Details Dialog */}
+      {selectedReport && (
+        <Dialog open={!!selectedReport} onOpenChange={() => setSelectedReport(null)}>
+          <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Report Details</DialogTitle>
+              <DialogDescription>
+                Review and take action on this report
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="p-4 bg-gray-50 rounded-lg space-y-3">
+                <div>
+                  <span className="text-sm font-medium text-gray-600">Type:</span>
+                  <p className="font-medium">{selectedReport.report_type.replace(/_/g, ' ')}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-gray-600">Description:</span>
+                  <p className="text-sm">{selectedReport.description}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-gray-600">Status:</span>
+                  <Badge className="ml-2">{selectedReport.status}</Badge>
+                </div>
+              </div>
+
+              {selectedReport.status === "pending" && (
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => handleResolveReport(selectedReport.id, "Dismissed as minor issue")}
+                  >
+                    Dismiss
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="flex-1"
+                    onClick={() => handleResolveReport(selectedReport.id, "User warned")}
+                  >
+                    Warn User
+                  </Button>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </div>
+  );
+}
