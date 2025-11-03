@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -64,9 +65,16 @@ export default function ApplyAsMentor() {
   const loadUser = async () => {
     try {
       const currentUser = await base44.auth.me();
+      
+      // Check if user is logged in - if not, redirect to login
+      if (!currentUser) {
+        // Store intended destination
+        base44.auth.redirectToLogin(window.location.pathname + "?mentor=true");
+        return;
+      }
+      
       setUser(currentUser);
       
-      // Check if user already has a mentor profile
       if (currentUser.mentor_profile_id) {
         const profiles = await base44.entities.MentorProfile.filter({ id: currentUser.mentor_profile_id });
         if (profiles.length > 0) {
@@ -77,7 +85,8 @@ export default function ApplyAsMentor() {
         }
       }
     } catch (error) {
-      base44.auth.redirectToLogin(window.location.pathname);
+      // Not logged in - redirect to login with mentor signup flow
+      base44.auth.redirectToLogin(window.location.pathname + "?mentor=true");
     } finally {
       setIsLoading(false);
     }
