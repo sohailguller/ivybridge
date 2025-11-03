@@ -18,11 +18,11 @@ import {
   ArrowLeft,
   ExternalLink,
   AlertCircle,
-  Award,       // Added Award icon
-  Lightbulb,   // Added Lightbulb icon
-  Target,      // Added Target icon
-  Heart,       // Added Heart icon
-  BookOpen     // Added BookOpen icon
+  Award,
+  Lightbulb,
+  Target,
+  Heart,
+  BookOpen
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -66,7 +66,9 @@ export default function MentorProfile() {
   });
 
   const handleSubscribe = async (planType, amount) => {
+    // Check if user is logged in
     if (!user) {
+      // Redirect to login page with return URL
       base44.auth.redirectToLogin(window.location.pathname);
       return;
     }
