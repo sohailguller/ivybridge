@@ -91,7 +91,7 @@ export default function ApplyAsMentor() {
       setIsLoading(false);
     }
   };
-
+  
   const universities = [
     { name: "Harvard", domain: "harvard.edu" },
     { name: "Yale", domain: "yale.edu" },
@@ -195,7 +195,6 @@ export default function ApplyAsMentor() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validate email domain
     const emailValidation = validateEmail();
     if (!emailValidation.valid) {
       setError(emailValidation.message);
@@ -206,7 +205,6 @@ export default function ApplyAsMentor() {
     setError(null);
 
     try {
-      // Create mentor profile
       const profile = await base44.entities.MentorProfile.create({
         user_id: user.id,
         ...formData,
@@ -214,7 +212,6 @@ export default function ApplyAsMentor() {
         total_students: 0
       });
 
-      // Update user with mentor profile ID
       await base44.auth.updateMe({
         mentor_profile_id: profile.id,
         account_type: "mentor"

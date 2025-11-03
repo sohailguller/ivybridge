@@ -68,8 +68,8 @@ export default function MentorProfile() {
   const handleSubscribe = async (planType, amount) => {
     // Check if user is logged in
     if (!user) {
-      // Redirect to login page with return URL
-      base44.auth.redirectToLogin(window.location.pathname);
+      // Redirect to login page
+      base44.auth.redirectToLogin();
       return;
     }
 

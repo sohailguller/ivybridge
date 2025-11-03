@@ -52,10 +52,9 @@ export default function Layout({ children, currentPageName }) {
     navigate(createPageUrl("Home"));
   };
 
-  const handleAuthAction = (targetUrl) => {
-    // Store where user was trying to go
-    const nextUrl = targetUrl || location.pathname;
-    base44.auth.redirectToLogin(nextUrl);
+  const handleAuthAction = () => {
+    // Base44 will handle the redirect automatically
+    base44.auth.redirectToLogin();
   };
 
   const getDashboardUrl = () => {
@@ -182,13 +181,13 @@ export default function Layout({ children, currentPageName }) {
                     <>
                       <Button 
                         variant="ghost" 
-                        onClick={() => handleAuthAction()}
+                        onClick={handleAuthAction}
                         className="text-sm font-medium"
                       >
                         Sign In
                       </Button>
                       <Button 
-                        onClick={() => handleAuthAction()}
+                        onClick={handleAuthAction}
                         className="btn-primary text-white rounded-full px-6"
                       >
                         Get Started
