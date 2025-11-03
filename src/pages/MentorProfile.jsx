@@ -19,14 +19,14 @@ import {
   ExternalLink
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-
+// Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle are removed as per the changes.
 
 export default function MentorProfile() {
   const navigate = useNavigate();
   const urlParams = new URLSearchParams(window.location.search);
   const mentorId = urlParams.get('id');
   const [user, setUser] = useState(null);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isSubscribing, setIsSubscribing] = useState(false); // New state variable
 
   useEffect(() => {
     loadUser();
@@ -65,7 +65,7 @@ export default function MentorProfile() {
       return;
     }
 
-    setIsProcessing(true);
+    setIsSubscribing(true); // Set subscribing state to true
 
     try {
       const startDate = new Date().toISOString().split('T')[0];
@@ -90,21 +90,23 @@ export default function MentorProfile() {
       localStorage.setItem('pending_subscription_id', subscription.id);
       localStorage.setItem('mentor_profile_id', mentor.id);
 
-      // Redirect to Stripe Payment Links
+      // Redirect to Stripe Checkout
       const stripeUrls = {
-        monthly: `https://buy.stripe.com/test_eVqfZj1uJg5l50e0pH1Fe00`,
-        annual: `https://buy.stripe.com/test_6oUcN78Xb8CT0JY4FX1Fe01`
+        monthly: `https://buy.stripe.com/test_eVqfZj1uJg5l50e0pH1Fe00`, // Replace with your Stripe Payment Link
+        annual: `https://buy.stripe.com/test_6oUcN78Xb8CT0JY4FX1Fe01`   // Replace with your Stripe Payment Link
       };
 
-      // Redirect to appropriate Stripe checkout
+      // Direct redirect to Stripe Payment Link
       window.location.href = stripeUrls[planType];
 
     } catch (error) {
       console.error("Error creating subscription:", error);
-      alert("There was an error. Please try again.");
-      setIsProcessing(false);
+      alert("There was an error starting your subscription. Please try again.");
+      setIsSubscribing(false); // Reset subscribing state on error
     }
   };
+
+  // proceedToPayment function is removed as per the changes.
 
   if (isLoading) {
     return (
@@ -255,9 +257,9 @@ export default function MentorProfile() {
                 <Button 
                   className="w-full btn-primary text-white rounded-xl mb-2"
                   onClick={() => handleSubscribe("monthly", 425)}
-                  disabled={isProcessing}
+                  disabled={isSubscribing} // Disable button when subscribing
                 >
-                  {isProcessing ? "Processing..." : "Subscribe Monthly"}
+                  {isSubscribing ? "Processing..." : "Subscribe Monthly"} {/* Dynamic text */}
                 </Button>
               </CardContent>
             </Card>
@@ -274,9 +276,9 @@ export default function MentorProfile() {
                 <Button 
                   className="w-full bg-[#FF6B5C] hover:bg-[#E55A4C] text-white rounded-xl mb-2"
                   onClick={() => handleSubscribe("annual", 5000)}
-                  disabled={isProcessing}
+                  disabled={isSubscribing} // Disable button when subscribing
                 >
-                  {isProcessing ? "Processing..." : "Subscribe Annually"}
+                  {isSubscribing ? "Processing..." : "Subscribe Annually"} {/* Dynamic text */}
                 </Button>
               </CardContent>
             </Card>
@@ -306,6 +308,8 @@ export default function MentorProfile() {
           </div>
         </div>
       </div>
+
+      {/* Subscribe Dialog is removed as per the changes */}
     </div>
   );
 }
