@@ -18,11 +18,11 @@ import {
   ArrowLeft,
   ExternalLink,
   AlertCircle,
-  Award,       // Added Award icon
-  Lightbulb,   // Added Lightbulb icon
-  Target,      // Added Target icon
-  Heart,       // Added Heart icon
-  BookOpen     // Added BookOpen icon
+  Award,
+  Lightbulb,
+  Target,
+  Heart,
+  BookOpen
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -67,7 +67,8 @@ export default function MentorProfile() {
 
   const handleSubscribe = async (planType, amount) => {
     if (!user) {
-      base44.auth.redirectToLogin(window.location.pathname);
+      // Redirect to signup with return URL
+      navigate(createPageUrl("Signup") + `?redirect=${window.location.pathname}`);
       return;
     }
 
@@ -166,6 +167,16 @@ export default function MentorProfile() {
             <AlertCircle className="h-4 w-4 text-orange-600" />
             <AlertDescription className="text-orange-800">
               <strong>Note:</strong> As a mentor, you cannot subscribe to other mentors. This platform is designed for mentors to guide students.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Not Logged In Alert */}
+        {!user && (
+          <Alert className="mb-6 border-blue-200 bg-blue-50">
+            <AlertCircle className="h-4 w-4 text-blue-600" />
+            <AlertDescription className="text-blue-800">
+              <strong>Ready to start?</strong> Create a free account to subscribe and connect with this mentor.
             </AlertDescription>
           </Alert>
         )}
@@ -369,7 +380,7 @@ export default function MentorProfile() {
                   onClick={() => handleSubscribe("monthly", 425)}
                   disabled={isSubscribing || isMentor}
                 >
-                  {isSubscribing ? "Processing..." : "Subscribe Monthly"}
+                  {isSubscribing ? "Processing..." : user ? "Subscribe Monthly" : "Sign Up to Subscribe"}
                 </Button>
               </CardContent>
             </Card>
@@ -388,7 +399,7 @@ export default function MentorProfile() {
                   onClick={() => handleSubscribe("annual", 5000)}
                   disabled={isSubscribing || isMentor}
                 >
-                  {isSubscribing ? "Processing..." : "Subscribe Annually"}
+                  {isSubscribing ? "Processing..." : user ? "Subscribe Annually" : "Sign Up to Subscribe"}
                 </Button>
               </CardContent>
             </Card>

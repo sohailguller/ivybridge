@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -47,6 +48,7 @@ export default function Layout({ children, currentPageName }) {
 
   const handleLogout = async () => {
     await base44.auth.logout();
+    setUser(null); // Set user to null after logout
     navigate(createPageUrl("Home"));
   };
 
@@ -55,6 +57,14 @@ export default function Layout({ children, currentPageName }) {
     if (user.role === "admin") return createPageUrl("AdminDashboard");
     if (user.account_type === "mentor") return createPageUrl("MentorDashboard");
     return createPageUrl("StudentDashboard");
+  };
+
+  const handleSignIn = () => {
+    navigate(createPageUrl("Login") + `?redirect=${location.pathname}`);
+  };
+
+  const handleGetStarted = () => {
+    navigate(createPageUrl("Signup") + `?redirect=${createPageUrl("BrowseMentors")}`);
   };
 
   const navItems = user ? [
@@ -174,13 +184,13 @@ export default function Layout({ children, currentPageName }) {
                     <>
                       <Button 
                         variant="ghost" 
-                        onClick={() => base44.auth.redirectToLogin(location.pathname)}
+                        onClick={handleSignIn}
                         className="text-sm font-medium"
                       >
                         Sign In
                       </Button>
                       <Button 
-                        onClick={() => base44.auth.redirectToLogin(location.pathname)}
+                        onClick={handleGetStarted}
                         className="btn-primary text-white rounded-full px-6"
                       >
                         Get Started
@@ -243,15 +253,27 @@ export default function Layout({ children, currentPageName }) {
                       </button>
                     </>
                   ) : (
-                    <Button
-                      onClick={() => {
-                        base44.auth.redirectToLogin(location.pathname);
-                        setMobileMenuOpen(false);
-                      }}
-                      className="w-full btn-primary text-white rounded-full"
-                    >
-                      Get Started
-                    </Button>
+                    <>
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          handleSignIn();
+                          setMobileMenuOpen(false);
+                        }}
+                        className="w-full justify-start"
+                      >
+                        Sign In
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          handleGetStarted();
+                          setMobileMenuOpen(false);
+                        }}
+                        className="w-full btn-primary text-white rounded-full"
+                      >
+                        Get Started
+                      </Button>
+                    </>
                   )}
                 </>
               )}
