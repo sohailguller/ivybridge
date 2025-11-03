@@ -30,25 +30,33 @@ export default function StudentDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [checkingPayment, setCheckingPayment] = useState(false); // Added state
 
   useEffect(() => {
     loadUser();
     checkPaymentSuccess();
   }, []);
 
-  const checkPaymentSuccess = () => {
+  const checkPaymentSuccess = async () => { // Made async
     // Check if user just completed payment
     const urlParams = new URLSearchParams(window.location.search);
     const paymentSuccess = urlParams.get('payment_success');
     
     if (paymentSuccess === 'true') {
       setShowSuccessAlert(true);
+      setCheckingPayment(true); // Set checkingPayment to true
+      
       // Clear the URL parameter
       window.history.replaceState({}, '', window.location.pathname);
+      
+      // Wait a bit for webhook to process and activate subscription
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Added delay
       
       // Clear localStorage
       localStorage.removeItem('pending_subscription_id');
       localStorage.removeItem('mentor_profile_id');
+      
+      setCheckingPayment(false); // Set checkingPayment to false
     }
   };
 
@@ -71,10 +79,16 @@ export default function StudentDashboard() {
     }
   };
 
+  // Check for both active AND pending subscriptions
   const { data: subscriptions = [] } = useQuery({
     queryKey: ['my-subscriptions', user?.id],
-    queryFn: () => base44.entities.Subscription.filter({ student_id: user.id, status: "active" }),
-    enabled: !!user
+    queryFn: async () => { // Modified queryFn to be async and fetch both statuses
+      const active = await base44.entities.Subscription.filter({ student_id: user.id, status: "active" });
+      const pending = await base44.entities.Subscription.filter({ student_id: user.id, status: "pending" });
+      return [...active, ...pending];
+    },
+    enabled: !!user,
+    refetchInterval: checkingPayment ? 2000 : false, // Poll every 2 seconds if checking payment
   });
 
   const { data: mentorProfiles = [] } = useQuery({
@@ -109,7 +123,7 @@ export default function StudentDashboard() {
     enabled: !!user
   });
 
-  const activeSub = subscriptions[0];
+  const activeSub = subscriptions[0]; // activeSub refers to the first subscription found, whether active or pending
   const mentor = mentorProfiles.find(p => p.id === activeSub?.mentor_profile_id);
   const mentorUser = mentorUsers.find(u => u.id === mentor?.user_id);
 
@@ -123,6 +137,26 @@ export default function StudentDashboard() {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF6B5C] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading your dashboard...</p>
         </div>
+      </div>
+    );
+  }
+
+  // Show loading state while waiting for webhook to activate subscription
+  if (checkingPayment && activeSub?.status === "pending") { // Added new loading state
+    return (
+      <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
+        <Card className="max-w-md mx-4 rounded-3xl border-0 shadow-xl">
+          <CardContent className="p-12 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF6B5C] mx-auto mb-6"></div>
+            <h2 className="text-2xl font-bold mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+              Activating Your Subscription
+            </h2>
+            <p className="text-gray-600 mb-4">
+              Please wait while we confirm your payment and activate your mentorship...
+            </p>
+            <p className="text-sm text-gray-500">This usually takes just a few seconds.</p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -168,6 +202,18 @@ export default function StudentDashboard() {
           </Alert>
         )}
 
+        {/* Pending Subscription Alert */}
+        {activeSub?.status === "pending" && ( // Added pending subscription alert
+          <Alert className="mb-6 border-yellow-200 bg-yellow-50">
+            <AlertDescription className="text-yellow-800 flex items-center gap-2">
+              <Clock className="w-5 h-5" />
+              <span>
+                Your subscription is being processed. Full access will be available shortly.
+              </span>
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Georgia, serif' }}>
@@ -203,7 +249,9 @@ export default function StudentDashboard() {
               <div className="flex items-center justify-between mb-3">
                 <MessageSquare className="w-8 h-8 text-[#B3E5FC]" />
               </div>
-              <div className="text-3xl font-bold mb-1">Active</div>
+              <div className="text-3xl font-bold mb-1">
+                {activeSub.status === "active" ? "Active" : "Pending"} {/* Updated mentorship status display */}
+              </div>
               <div className="text-sm text-gray-600">Mentorship Status</div>
             </CardContent>
           </Card>

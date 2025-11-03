@@ -16,9 +16,11 @@ import {
   MessageSquare,
   CheckCircle,
   ArrowLeft,
-  ExternalLink
+  ExternalLink,
+  AlertCircle // Added AlertCircle icon
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert"; // Added Alert components
 // Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle are removed as per the changes.
 
 export default function MentorProfile() {
@@ -65,6 +67,12 @@ export default function MentorProfile() {
       return;
     }
 
+    // Check if user is a mentor - mentors can't subscribe to other mentors
+    if (user.account_type === "mentor") {
+      alert("Mentors cannot subscribe to other mentors. This platform is for mentors to guide students.");
+      return;
+    }
+
     setIsSubscribing(true); // Set subscribing state to true
 
     try {
@@ -83,7 +91,7 @@ export default function MentorProfile() {
         start_date: startDate,
         end_date: endDate.toISOString().split('T')[0],
         months_remaining: 12,
-        stripe_subscription_id: `pending_${Date.now()}`
+        stripe_subscription_id: `pending_${Date.now()}_${user.id}` // Added user.id for uniqueness
       });
 
       // Store subscription ID in localStorage to track after payment
@@ -140,6 +148,9 @@ export default function MentorProfile() {
     );
   }
 
+  // Check if user is a mentor for conditional rendering and disabling buttons
+  const isMentor = user?.account_type === "mentor";
+
   return (
     <div className="min-h-screen bg-[#FAFAFA] py-12">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -152,6 +163,16 @@ export default function MentorProfile() {
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Mentors
         </Button>
+
+        {/* Mentor Alert */}
+        {isMentor && (
+          <Alert className="mb-6 border-orange-200 bg-orange-50">
+            <AlertCircle className="h-4 w-4 text-orange-600" />
+            <AlertDescription className="text-orange-800">
+              <strong>Note:</strong> As a mentor, you cannot subscribe to other mentors. This platform is designed for mentors to guide students.
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Hero Card */}
         <Card className="rounded-3xl border-0 shadow-xl mb-8 overflow-hidden">
@@ -257,7 +278,7 @@ export default function MentorProfile() {
                 <Button 
                   className="w-full btn-primary text-white rounded-xl mb-2"
                   onClick={() => handleSubscribe("monthly", 425)}
-                  disabled={isSubscribing} // Disable button when subscribing
+                  disabled={isSubscribing || isMentor} // Disable if mentor
                 >
                   {isSubscribing ? "Processing..." : "Subscribe Monthly"} {/* Dynamic text */}
                 </Button>
@@ -276,7 +297,7 @@ export default function MentorProfile() {
                 <Button 
                   className="w-full bg-[#FF6B5C] hover:bg-[#E55A4C] text-white rounded-xl mb-2"
                   onClick={() => handleSubscribe("annual", 5000)}
-                  disabled={isSubscribing} // Disable button when subscribing
+                  disabled={isSubscribing || isMentor} // Disable if mentor
                 >
                   {isSubscribing ? "Processing..." : "Subscribe Annually"} {/* Dynamic text */}
                 </Button>
