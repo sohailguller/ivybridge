@@ -14,7 +14,8 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { mentorProfileId, planType } = await req.json();
+    const body = await req.json();
+    const { mentorProfileId, planType } = body;
 
     if (!mentorProfileId || !planType) {
       return Response.json({ error: 'Missing required fields: mentorProfileId and planType' }, { status: 400 });
