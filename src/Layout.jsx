@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -48,13 +47,7 @@ export default function Layout({ children, currentPageName }) {
 
   const handleLogout = async () => {
     await base44.auth.logout();
-    setUser(null); // Clear user state after logout
     navigate(createPageUrl("Home"));
-  };
-
-  const handleAuthAction = () => {
-    // Base44 will handle the redirect automatically
-    base44.auth.redirectToLogin();
   };
 
   const getDashboardUrl = () => {
@@ -181,13 +174,13 @@ export default function Layout({ children, currentPageName }) {
                     <>
                       <Button 
                         variant="ghost" 
-                        onClick={handleAuthAction}
+                        onClick={() => base44.auth.redirectToLogin(location.pathname)}
                         className="text-sm font-medium"
                       >
                         Sign In
                       </Button>
                       <Button 
-                        onClick={handleAuthAction}
+                        onClick={() => base44.auth.redirectToLogin(location.pathname)}
                         className="btn-primary text-white rounded-full px-6"
                       >
                         Get Started
@@ -252,7 +245,7 @@ export default function Layout({ children, currentPageName }) {
                   ) : (
                     <Button
                       onClick={() => {
-                        handleAuthAction();
+                        base44.auth.redirectToLogin(location.pathname);
                         setMobileMenuOpen(false);
                       }}
                       className="w-full btn-primary text-white rounded-full"
