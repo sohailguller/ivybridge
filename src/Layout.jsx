@@ -60,11 +60,11 @@ export default function Layout({ children, currentPageName }) {
   };
 
   const handleSignIn = () => {
-    navigate(createPageUrl("Login") + `?redirect=${location.pathname}`);
+    base44.auth.redirectToLogin(location.pathname);
   };
 
   const handleGetStarted = () => {
-    navigate(createPageUrl("Signup") + `?redirect=${createPageUrl("BrowseMentors")}`);
+    base44.auth.redirectToLogin(createPageUrl("BrowseMentors"));
   };
 
   const navItems = user ? [

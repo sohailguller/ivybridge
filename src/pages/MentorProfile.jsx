@@ -67,8 +67,8 @@ export default function MentorProfile() {
 
   const handleSubscribe = async (planType, amount) => {
     if (!user) {
-      // Redirect to signup with return URL
-      navigate(createPageUrl("Signup") + `?redirect=${window.location.pathname}`);
+      // Redirect to Base44's built-in login
+      base44.auth.redirectToLogin(window.location.pathname);
       return;
     }
 
