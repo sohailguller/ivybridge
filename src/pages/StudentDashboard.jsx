@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -18,6 +19,7 @@ import {
   ExternalLink
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import ChatBox from "../components/dashboard/ChatBox";
 import TaskList from "../components/dashboard/TaskList";
 import ProgressTimeline from "../components/dashboard/ProgressTimeline";
@@ -27,10 +29,28 @@ export default function StudentDashboard() {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
   useEffect(() => {
     loadUser();
+    checkPaymentSuccess();
   }, []);
+
+  const checkPaymentSuccess = () => {
+    // Check if user just completed payment
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentSuccess = urlParams.get('payment_success');
+    
+    if (paymentSuccess === 'true') {
+      setShowSuccessAlert(true);
+      // Clear the URL parameter
+      window.history.replaceState({}, '', window.location.pathname);
+      
+      // Clear localStorage
+      localStorage.removeItem('pending_subscription_id');
+      localStorage.removeItem('mentor_profile_id');
+    }
+  };
 
   const loadUser = async () => {
     try {
@@ -136,6 +156,18 @@ export default function StudentDashboard() {
   return (
     <div className="min-h-screen bg-[#FAFAFA] py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Success Alert */}
+        {showSuccessAlert && (
+          <Alert className="mb-6 border-green-200 bg-green-50">
+            <AlertDescription className="text-green-800 flex items-center gap-2">
+              <CheckCircle className="w-5 h-5" />
+              <span>
+                <strong>Payment successful!</strong> Your mentorship has been activated. Welcome to IvyBridge!
+              </span>
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Georgia, serif' }}>
