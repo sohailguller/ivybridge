@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -34,6 +35,7 @@ export default function MentorProfile() {
   const [showSubscribeDialog, setShowSubscribeDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState(null); // Added error state
 
   useEffect(() => {
     loadUser();
@@ -74,10 +76,13 @@ export default function MentorProfile() {
 
     setSelectedPlan({ planType, amount });
     setShowSubscribeDialog(true);
+    setError(null); // Reset error when opening dialog
   };
 
   const confirmSubscription = async () => {
     setIsProcessing(true);
+    setError(null); // Reset error at the start of confirmation
+    
     try {
       // Call backend function to create Stripe checkout session
       const response = await base44.functions.invoke('createCheckoutSession', {
@@ -85,15 +90,15 @@ export default function MentorProfile() {
         planType: selectedPlan.planType
       });
 
-      if (response.data.url) {
+      if (response.data && response.data.url) { // Updated condition
         // Redirect to Stripe Checkout
         window.location.href = response.data.url;
       } else {
-        throw new Error('No checkout URL returned');
+        throw new Error('No checkout URL returned from server'); // Updated error message
       }
     } catch (error) {
       console.error("Error creating checkout session:", error);
-      alert("There was an error processing your subscription. Please try again.");
+      setError(error.response?.data?.error || error.message || "Failed to create checkout session. Please try again."); // Display error in dialog
       setIsProcessing(false);
     }
   };
@@ -271,25 +276,8 @@ export default function MentorProfile() {
               </CardContent>
             </Card>
 
-            {/* Calendly Link */}
-            {mentor.calendly_link && (
-              <Card className="rounded-3xl border-0 shadow-lg">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Calendar className="w-5 h-5 text-[#FF6B5C]" />
-                    <h3 className="font-bold">Schedule a Meeting</h3>
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    className="w-full rounded-xl"
-                    onClick={() => window.open(mentor.calendly_link, '_blank')}
-                  >
-                    Book via Calendly
-                    <ExternalLink className="w-4 h-4 ml-2" />
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
+            {/* Calendly Link - REMOVED, only shown after subscription */}
+            {/* The Calendly Link card was removed from here as per instructions */}
 
             {/* Stats */}
             <Card className="rounded-3xl border-0 shadow-lg bg-gradient-to-br from-[#FF6B5C]/5 to-[#B3E5FC]/10">
@@ -325,6 +313,12 @@ export default function MentorProfile() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
+            {error && ( // Display error message if present
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
+                <strong>Error:</strong> {error}
+              </div>
+            )}
+
             <div className="p-4 bg-gray-50 rounded-lg">
               <div className="flex justify-between mb-2">
                 <span className="font-medium">Plan:</span>
@@ -348,7 +342,10 @@ export default function MentorProfile() {
               <Button 
                 variant="outline" 
                 className="flex-1"
-                onClick={() => setShowSubscribeDialog(false)}
+                onClick={() => {
+                  setShowSubscribeDialog(false);
+                  setError(null); // Reset error when canceling dialog
+                }}
                 disabled={isProcessing}
               >
                 Cancel
