@@ -83,6 +83,7 @@ export default function MentorProfile() {
       const endDate = new Date();
       endDate.setMonth(endDate.getMonth() + 12);
 
+      // Create pending subscription
       const subscription = await base44.entities.Subscription.create({
         student_id: user.id,
         mentor_id: mentor.user_id,
@@ -96,15 +97,21 @@ export default function MentorProfile() {
         stripe_subscription_id: `pending_${Date.now()}_${user.id}`
       });
 
+      // Store for reference
       localStorage.setItem('pending_subscription_id', subscription.id);
       localStorage.setItem('mentor_profile_id', mentor.id);
 
-      const stripeUrls = {
-        monthly: `https://buy.stripe.com/test_eVqfZj1uJg5l50e0pH1Fe00`,
-        annual: `https://buy.stripe.com/test_6oUcN78Xb8CT0JY4FX1Fe01`
-      };
+      // Call checkout session function with metadata (NOT hardcoded payment links)
+      const response = await base44.functions.invoke('createCheckoutSession', {
+        mentorProfileId: mentor.id,
+        planType: planType
+      });
 
-      window.location.href = stripeUrls[planType];
+      if (response.data.url) {
+        window.location.href = response.data.url;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
 
     } catch (error) {
       console.error("Error creating subscription:", error);
