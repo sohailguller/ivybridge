@@ -99,8 +99,8 @@ export default function MentorProfile() {
       // Redirect to Stripe Checkout
       // TEMPORARY: Using a simple payment page - you'll replace these with your Stripe Payment Links
       const stripeUrls = {
-        monthly: `https://buy.stripe.com/test_XXXXX`, // Replace with your Stripe Payment Link
-        annual: `https://buy.stripe.com/test_YYYYY`   // Replace with your Stripe Payment Link
+        monthly: `https://buy.stripe.com/test_eVqfZj1uJg5l50e0pH1Fe00`, // Replace with your Stripe Payment Link
+        annual: `https://buy.stripe.com/test_6oUcN78Xb8CT0JY4FX1Fe01`   // Replace with your Stripe Payment Link
       };
 
       // For now, show dialog to set up Stripe Payment Links
