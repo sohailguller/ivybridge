@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -15,9 +16,11 @@ import {
   DollarSign,
   Clock,
   AlertCircle,
-  Plus
+  Plus,
+  ExternalLink
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import ChatBox from "../components/dashboard/ChatBox";
 import CreateTaskDialog from "../components/dashboard/CreateTaskDialog";
 import CreateProgressNoteDialog from "../components/dashboard/CreateProgressNoteDialog";
@@ -26,6 +29,8 @@ import StudentCard from "../components/dashboard/StudentCard";
 export default function MentorDashboard() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const urlParams = new URLSearchParams(window.location.search);
+  const connectSuccess = urlParams.get('connect_success');
   const [user, setUser] = useState(null);
   const [mentorProfile, setMentorProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,6 +38,7 @@ export default function MentorDashboard() {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showTaskDialog, setShowTaskDialog] = useState(false);
   const [showNoteDialog, setShowNoteDialog] = useState(false);
+  const [connectingStripe, setConnectingStripe] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -85,6 +91,21 @@ export default function MentorDashboard() {
     queryFn: () => base44.entities.Task.filter({ mentor_id: user.id }),
     enabled: !!user
   });
+
+  const handleConnectStripe = async () => {
+    setConnectingStripe(true);
+    try {
+      const response = await base44.functions.invoke('connectMentorStripe', {});
+      
+      if (response.data.onboardingUrl) {
+        window.location.href = response.data.onboardingUrl;
+      }
+    } catch (error) {
+      console.error('Error connecting Stripe:', error);
+      alert('Failed to connect Stripe. Please try again.');
+    }
+    setConnectingStripe(false);
+  };
 
   const totalRevenue = subscriptions.reduce((sum, sub) => sum + sub.amount, 0);
   const monthlyRevenue = totalRevenue * 0.7; // After 30% commission
@@ -176,6 +197,35 @@ export default function MentorDashboard() {
           </h1>
           <p className="text-gray-600">Manage your students and track your mentorship</p>
         </div>
+
+        {/* Stripe Connect Success Alert */}
+        {connectSuccess && (
+          <Alert className="mb-6 border-green-200 bg-green-50">
+            <AlertDescription className="text-green-800">
+              ✓ Stripe account connected successfully! You can now receive payouts.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Stripe Connect Warning */}
+        {!mentorProfile.stripe_connect_id && (
+          <Alert className="mb-6 border-orange-200 bg-orange-50">
+            <AlertDescription className="flex items-center justify-between">
+              <span className="text-orange-800">
+                Connect your Stripe account to receive monthly payouts for your mentorship earnings.
+              </span>
+              <Button 
+                size="sm" 
+                onClick={handleConnectStripe}
+                disabled={connectingStripe}
+                className="bg-orange-600 hover:bg-orange-700 text-white ml-4"
+              >
+                {connectingStripe ? "Connecting..." : "Connect Stripe"}
+                <ExternalLink className="w-4 h-4 ml-2" />
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Quick Stats */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
@@ -292,7 +342,7 @@ export default function MentorDashboard() {
                       Earnings are paid monthly via Stripe Connect. 
                       {mentorProfile.stripe_connect_id ? 
                         " Your account is connected." : 
-                        " Connect your account in settings to receive payments."
+                        " Connect your account above to receive payments."
                       }
                     </p>
                   </div>

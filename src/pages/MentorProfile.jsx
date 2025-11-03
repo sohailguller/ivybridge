@@ -79,33 +79,23 @@ export default function MentorProfile() {
   const confirmSubscription = async () => {
     setIsProcessing(true);
     try {
-      const startDate = new Date().toISOString().split('T')[0];
-      const endDate = new Date();
-      endDate.setMonth(endDate.getMonth() + 12);
-      
-      await base44.entities.Subscription.create({
-        student_id: user.id,
-        mentor_id: mentor.user_id,
-        mentor_profile_id: mentor.id,
-        plan_type: selectedPlan.planType,
-        amount: selectedPlan.amount,
-        status: "active",
-        start_date: startDate,
-        end_date: endDate.toISOString().split('T')[0],
-        months_remaining: 12
+      // Call backend function to create Stripe checkout session
+      const response = await base44.functions.invoke('createCheckoutSession', {
+        mentorProfileId: mentor.id,
+        planType: selectedPlan.planType
       });
 
-      // Update mentor's student count
-      await base44.entities.MentorProfile.update(mentor.id, {
-        total_students: (mentor.total_students || 0) + 1
-      });
-
-      navigate(createPageUrl("StudentDashboard"));
+      if (response.data.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = response.data.url;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
     } catch (error) {
-      console.error("Error creating subscription:", error);
+      console.error("Error creating checkout session:", error);
       alert("There was an error processing your subscription. Please try again.");
+      setIsProcessing(false);
     }
-    setIsProcessing(false);
   };
 
   if (isLoading) {
@@ -368,7 +358,7 @@ export default function MentorProfile() {
                 onClick={confirmSubscription}
                 disabled={isProcessing}
               >
-                {isProcessing ? "Processing..." : "Confirm & Subscribe"}
+                {isProcessing ? "Processing..." : "Continue to Payment"}
               </Button>
             </div>
           </div>
