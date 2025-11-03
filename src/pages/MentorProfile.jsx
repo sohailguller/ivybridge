@@ -34,8 +34,6 @@ export default function MentorProfile() {
   const [user, setUser] = useState(null);
   const [showSubscribeDialog, setShowSubscribeDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState(null); // Added error state
 
   useEffect(() => {
     loadUser();
@@ -74,33 +72,59 @@ export default function MentorProfile() {
       return;
     }
 
-    setSelectedPlan({ planType, amount });
-    setShowSubscribeDialog(true);
-    setError(null); // Reset error when opening dialog
-  };
-
-  const confirmSubscription = async () => {
-    setIsProcessing(true);
-    setError(null); // Reset error at the start of confirmation
-    
+    // Create subscription record before redirecting to Stripe
     try {
-      // Call backend function to create Stripe checkout session
-      const response = await base44.functions.invoke('createCheckoutSession', {
-        mentorProfileId: mentor.id,
-        planType: selectedPlan.planType
+      const startDate = new Date().toISOString().split('T')[0];
+      const endDate = new Date();
+      endDate.setMonth(endDate.getMonth() + 12);
+      
+      // Create pending subscription
+      const subscription = await base44.entities.Subscription.create({
+        student_id: user.id,
+        mentor_id: mentor.user_id,
+        mentor_profile_id: mentor.id,
+        plan_type: planType,
+        amount: amount,
+        status: "pending",
+        start_date: startDate,
+        end_date: endDate.toISOString().split('T')[0],
+        months_remaining: 12,
+        stripe_subscription_id: `pending_${Date.now()}`
       });
 
-      if (response.data && response.data.url) { // Updated condition
-        // Redirect to Stripe Checkout
-        window.location.href = response.data.url;
-      } else {
-        throw new Error('No checkout URL returned from server'); // Updated error message
-      }
+      // Store subscription ID in localStorage to track after payment
+      localStorage.setItem('pending_subscription_id', subscription.id);
+      localStorage.setItem('mentor_profile_id', mentor.id);
+
+      // Redirect to Stripe Checkout
+      // TEMPORARY: Using a simple payment page - you'll replace these with your Stripe Payment Links
+      const stripeUrls = {
+        monthly: `https://buy.stripe.com/test_XXXXX`, // Replace with your Stripe Payment Link
+        annual: `https://buy.stripe.com/test_YYYYY`   // Replace with your Stripe Payment Link
+      };
+
+      // For now, show dialog to set up Stripe Payment Links
+      setSelectedPlan({ planType, amount, subscriptionId: subscription.id });
+      setShowSubscribeDialog(true);
+
     } catch (error) {
-      console.error("Error creating checkout session:", error);
-      setError(error.response?.data?.error || error.message || "Failed to create checkout session. Please try again."); // Display error in dialog
-      setIsProcessing(false);
+      console.error("Error creating subscription:", error);
+      alert("There was an error. Please try again.");
     }
+  };
+
+  const proceedToPayment = () => {
+    alert(
+      `To complete Stripe integration:\n\n` +
+      `1. Go to Stripe Dashboard → Products → Add Product\n` +
+      `2. Create two products:\n` +
+      `   - Monthly: $425/month recurring\n` +
+      `   - Annual: $5,000 one-time\n` +
+      `3. For each product, click "Create payment link"\n` +
+      `4. Copy the payment link URLs\n` +
+      `5. Update the code in MentorProfile.js with those URLs\n\n` +
+      `Once configured, students will be redirected to Stripe's hosted checkout page.`
+    );
   };
 
   if (isLoading) {
@@ -277,7 +301,6 @@ export default function MentorProfile() {
             </Card>
 
             {/* Calendly Link - REMOVED, only shown after subscription */}
-            {/* The Calendly Link card was removed from here as per instructions */}
 
             {/* Stats */}
             <Card className="rounded-3xl border-0 shadow-lg bg-gradient-to-br from-[#FF6B5C]/5 to-[#B3E5FC]/10">
@@ -307,17 +330,23 @@ export default function MentorProfile() {
       <Dialog open={showSubscribeDialog} onOpenChange={setShowSubscribeDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Confirm Subscription</DialogTitle>
+            <DialogTitle>Setup Required</DialogTitle>
             <DialogDescription>
-              You're about to subscribe to {mentorUser?.full_name}'s mentorship program
+              Stripe Payment Links need to be configured
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            {error && ( // Display error message if present
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
-                <strong>Error:</strong> {error}
-              </div>
-            )}
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm">
+              <p className="font-semibold mb-2">📝 Quick Setup Steps:</p>
+              <ol className="list-decimal list-inside space-y-1 text-xs">
+                <li>Go to your Stripe Dashboard</li>
+                <li>Navigate to Products → Create Product</li>
+                <li>Create a ${selectedPlan?.planType === 'monthly' ? '425/month recurring' : '5,000 one-time'} product</li>
+                <li>Click "Create payment link" for that product</li>
+                <li>Copy the payment link URL</li>
+                <li>Add it to your code</li>
+              </ol>
+            </div>
 
             <div className="p-4 bg-gray-50 rounded-lg">
               <div className="flex justify-between mb-2">
@@ -328,36 +357,14 @@ export default function MentorProfile() {
                 <span className="font-medium">Amount:</span>
                 <span className="text-xl font-bold">${selectedPlan?.amount}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="font-medium">Duration:</span>
-                <span>12 months</span>
-              </div>
-            </div>
-            
-            <div className="text-sm text-gray-600 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-              ⚠️ <strong>Important:</strong> This is a 12-month commitment. Subscriptions are non-cancellable once started.
             </div>
 
-            <div className="flex gap-3">
-              <Button 
-                variant="outline" 
-                className="flex-1"
-                onClick={() => {
-                  setShowSubscribeDialog(false);
-                  setError(null); // Reset error when canceling dialog
-                }}
-                disabled={isProcessing}
-              >
-                Cancel
-              </Button>
-              <Button 
-                className="flex-1 btn-primary text-white"
-                onClick={confirmSubscription}
-                disabled={isProcessing}
-              >
-                {isProcessing ? "Processing..." : "Continue to Payment"}
-              </Button>
-            </div>
+            <Button 
+              className="w-full btn-primary text-white"
+              onClick={proceedToPayment}
+            >
+              View Setup Instructions
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
