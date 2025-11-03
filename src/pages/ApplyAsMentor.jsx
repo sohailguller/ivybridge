@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -36,9 +37,14 @@ export default function ApplyAsMentor() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-  const [currentSection, setCurrentSection] = useState(1);
+  const [currentSection, setCurrentSection] = useState(0); // Start at 0 for account creation
   
   const [formData, setFormData] = useState({
+    // Account creation fields
+    email: "",
+    password: "",
+    full_name: "",
+    // Mentor profile fields
     university: "",
     major: "",
     year: "",
@@ -58,26 +64,39 @@ export default function ApplyAsMentor() {
   const [uploadingTranscript, setUploadingTranscript] = useState(false);
 
   useEffect(() => {
-    loadUser();
+    checkExistingUser();
   }, []);
 
-  const loadUser = async () => {
+  const checkExistingUser = async () => {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       
-      // Check if user already has a mentor profile
+      // If user already has a mentor profile
       if (currentUser.mentor_profile_id) {
         const profiles = await base44.entities.MentorProfile.filter({ id: currentUser.mentor_profile_id });
         if (profiles.length > 0) {
           const profile = profiles[0];
-          if (profile.verification_status === "pending") {
+          if (profile.verification_status === "pending" || profile.verification_status === "approved") {
+            // If already a mentor (pending or approved), redirect to dashboard
             navigate(createPageUrl("MentorDashboard"));
+            return;
           }
         }
       }
+      
+      // User is logged in but does not have a mentor profile (or it's not pending/approved)
+      // Skip the account creation section (currentSection 0)
+      setCurrentSection(1); // Set to the index corresponding to Basic Info
+      setFormData(prev => ({
+        ...prev,
+        email: currentUser.email,
+        full_name: currentUser.full_name || ""
+      }));
     } catch (error) {
-      base44.auth.redirectToLogin(window.location.pathname);
+      // Not logged in, start from account creation (currentSection 0)
+      setUser(null);
+      setCurrentSection(0);
     } finally {
       setIsLoading(false);
     }
@@ -140,16 +159,18 @@ export default function ApplyAsMentor() {
   ];
 
   const validateEmail = () => {
-    if (!user?.email || !formData.university) return { valid: false, message: "" };
+    // If not logged in, use formData.email. If logged in, use user.email.
+    const emailToValidate = user?.email || formData.email;
+    if (!emailToValidate || !formData.university) return { valid: false, message: "" };
     
     const university = universities.find(u => u.name === formData.university);
     if (!university) return { valid: false, message: "" };
     
-    const emailDomain = user.email.split('@')[1];
+    const emailDomain = emailToValidate.split('@')[1];
     if (emailDomain !== university.domain) {
       return { 
         valid: false, 
-        message: `Your email (${user.email}) must be a ${university.name} email (@${university.domain}) to apply as a mentor from ${university.name}.`
+        message: `Your email (${emailToValidate}) must be a ${university.name} email (@${university.domain}) to apply as a mentor from ${university.name}.`
       };
     }
     
@@ -197,15 +218,55 @@ export default function ApplyAsMentor() {
     setError(null);
 
     try {
+      let userId = user?.id;
+      
+      // Create account if not logged in
+      if (!user) {
+        try {
+          // Attempt to sign up
+          await base44.auth.signUp({
+            email: formData.email,
+            password: formData.password,
+            full_name: formData.full_name
+          });
+          
+          // Login after successful signup
+          await base44.auth.signIn({
+            email: formData.email,
+            password: formData.password
+          });
+          
+          const newUser = await base44.auth.me();
+          userId = newUser.id;
+          setUser(newUser); // Update user state
+        } catch (authError) {
+          setError(`Failed to create account: ${authError.message || "This email may already be in use."}`);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       // Create mentor profile
       const profile = await base44.entities.MentorProfile.create({
-        user_id: user.id,
-        ...formData,
+        user_id: userId,
+        university: formData.university,
+        major: formData.major,
+        year: formData.year,
+        bio: formData.bio,
+        expertise_areas: formData.expertise_areas,
+        greatest_achievement: formData.greatest_achievement,
+        advice_to_younger_self: formData.advice_to_younger_self,
+        dream_job: formData.dream_job,
+        why_major: formData.why_major,
+        lifetime_goal: formData.lifetime_goal,
+        profile_photo_url: formData.profile_photo_url,
+        transcript_url: formData.transcript_url,
+        calendly_link: formData.calendly_link,
         verification_status: "pending",
         total_students: 0
       });
 
-      // Update user with mentor profile ID
+      // Update user with mentor profile ID and account type
       await base44.auth.updateMe({
         mentor_profile_id: profile.id,
         account_type: "mentor"
@@ -216,6 +277,7 @@ export default function ApplyAsMentor() {
         navigate(createPageUrl("MentorDashboard"));
       }, 2000);
     } catch (error) {
+      console.error("Application error:", error);
       setError("Failed to submit application. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -223,19 +285,20 @@ export default function ApplyAsMentor() {
   };
 
   const canProceedToNextSection = () => {
-    switch(currentSection) {
-      case 1:
+    // currentSection is 0-indexed overall (0-4)
+    if (!user && currentSection === 0) { // Account Creation
+        return formData.email && formData.password && formData.password.length >= 8 && formData.full_name;
+    } else if (currentSection === 1) { // Basic Info
         return formData.university && formData.year && formData.major && validateEmail().valid;
-      case 2:
+    } else if (currentSection === 2) { // Expertise & Bio
         return formData.bio.length >= 100 && formData.expertise_areas.length > 0;
-      case 3:
+    } else if (currentSection === 3) { // Personal Essays
         return formData.greatest_achievement && formData.advice_to_younger_self && 
                formData.dream_job && formData.why_major && formData.lifetime_goal;
-      case 4:
+    } else if (currentSection === 4) { // Verification Documents
         return formData.profile_photo_url && formData.transcript_url && formData.calendly_link;
-      default:
-        return false;
     }
+    return false;
   };
 
   if (isLoading) {
@@ -271,6 +334,16 @@ export default function ApplyAsMentor() {
   }
 
   const emailValidation = validateEmail();
+  
+  // Define all possible section indices (0-4)
+  const allSectionIndices = [0, 1, 2, 3, 4];
+  // Filter based on user login status to get visible sections
+  const visibleSectionIndices = user ? allSectionIndices.filter(idx => idx !== 0) : allSectionIndices;
+  const totalSections = visibleSectionIndices.length;
+
+  const sectionLabels = user ? 
+    ["Basic Info", "Expertise", "About You", "Verification"] :
+    ["Account", "Basic Info", "Expertise", "About You", "Verification"];
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] py-12">
@@ -291,26 +364,27 @@ export default function ApplyAsMentor() {
         {/* Progress Indicator */}
         <div className="mb-8">
           <div className="flex items-center justify-between max-w-2xl mx-auto">
-            {[1, 2, 3, 4].map((section) => (
-              <div key={section} className="flex items-center">
+            {visibleSectionIndices.map((sectionIndex, i) => (
+              <div key={sectionIndex} className="flex items-center">
                 <div className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold ${
-                  currentSection === section ? 'bg-[#FF6B5C] text-white' :
-                  currentSection > section ? 'bg-green-500 text-white' :
+                  currentSection === sectionIndex ? 'bg-[#FF6B5C] text-white' :
+                  currentSection > sectionIndex ? 'bg-green-500 text-white' :
                   'bg-gray-200 text-gray-500'
                 }`}>
-                  {currentSection > section ? <CheckCircle className="w-5 h-5" /> : section}
+                  {currentSection > sectionIndex ? <CheckCircle className="w-5 h-5" /> : i + 1}
                 </div>
-                {section < 4 && (
-                  <div className={`w-16 h-1 mx-2 ${currentSection > section ? 'bg-green-500' : 'bg-gray-200'}`} />
+                {i < visibleSectionIndices.length - 1 && (
+                  <div className={`w-16 h-1 mx-2 ${currentSection > sectionIndex ? 'bg-green-500' : 'bg-gray-200'}`} />
                 )}
               </div>
             ))}
           </div>
           <div className="flex justify-between max-w-2xl mx-auto mt-3 text-xs text-gray-600 px-2">
-            <span>Basic Info</span>
-            <span>Expertise</span>
-            <span>About You</span>
-            <span>Verification</span>
+            {sectionLabels.map((label, idx) => (
+              <span key={idx} className={idx === 0 || idx === sectionLabels.length - 1 ? "" : "text-center"}>
+                {label}
+              </span>
+            ))}
           </div>
         </div>
 
@@ -324,6 +398,58 @@ export default function ApplyAsMentor() {
         <Card className="rounded-3xl border-0 shadow-xl">
           <CardContent className="p-8">
             <form onSubmit={handleSubmit}>
+              {/* Section 0: Account Creation (only if not logged in) */}
+              {!user && currentSection === 0 && (
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-2xl font-bold mb-2">Create Your Account</h2>
+                    <p className="text-gray-600 text-sm">First, let's set up your mentor account</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Full Name *</Label>
+                    <Input
+                      value={formData.full_name}
+                      onChange={(e) => setFormData({...formData, full_name: e.target.value})}
+                      placeholder="Your full name"
+                      className="h-12 rounded-xl"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>University Email *</Label>
+                    <Input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      placeholder="your.name@university.edu"
+                      className="h-12 rounded-xl"
+                      required
+                    />
+                    <p className="text-xs text-gray-500">
+                      Use your official university email (@harvard.edu, @yale.edu, etc.)
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Password *</Label>
+                    <Input
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({...formData, password: e.target.value})}
+                      placeholder="Create a strong password"
+                      className="h-12 rounded-xl"
+                      required
+                      minLength={8}
+                    />
+                    <p className="text-xs text-gray-500">
+                      Must be at least 8 characters
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Section 1: Basic Information */}
               {currentSection === 1 && (
                 <div className="space-y-6">
@@ -332,17 +458,25 @@ export default function ApplyAsMentor() {
                     <p className="text-gray-600 text-sm">Tell us about your university and academic background</p>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label>Your University Email</Label>
-                    <Input
-                      value={user?.email || ""}
-                      disabled
-                      className="h-12 rounded-xl bg-gray-50"
-                    />
-                    <p className="text-xs text-gray-500">
-                      You must use your official university email (@harvard.edu, @yale.edu, etc.)
-                    </p>
-                  </div>
+                  {user ? (
+                    <div className="space-y-2">
+                      <Label>Your University Email</Label>
+                      <Input
+                        value={user?.email || ""}
+                        disabled
+                        className="h-12 rounded-xl bg-gray-50"
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Label>Your Email</Label>
+                      <Input
+                        value={formData.email}
+                        disabled
+                        className="h-12 rounded-xl bg-gray-50"
+                      />
+                    </div>
+                  )}
 
                   <div className="space-y-2">
                     <Label>University *</Label>
@@ -663,18 +797,18 @@ export default function ApplyAsMentor() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setCurrentSection(Math.max(1, currentSection - 1))}
-                  disabled={currentSection === 1}
+                  onClick={() => setCurrentSection(Math.max(user ? 1 : 0, currentSection - 1))}
+                  disabled={currentSection === (user ? 1 : 0)}
                   className="rounded-xl"
                 >
                   Previous
                 </Button>
 
                 <div className="text-sm text-gray-500">
-                  Section {currentSection} of 4
+                  Section {currentSection - (user ? 0 : 0) + 1} of {totalSections}
                 </div>
 
-                {currentSection < 4 ? (
+                {currentSection < (user ? 4 : 4) ? ( // (totalSections - 1) is the last index
                   <Button
                     type="button"
                     onClick={() => setCurrentSection(currentSection + 1)}
