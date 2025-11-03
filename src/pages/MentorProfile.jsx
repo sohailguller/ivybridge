@@ -19,21 +19,14 @@ import {
   ExternalLink
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+
 
 export default function MentorProfile() {
   const navigate = useNavigate();
   const urlParams = new URLSearchParams(window.location.search);
   const mentorId = urlParams.get('id');
   const [user, setUser] = useState(null);
-  const [showSubscribeDialog, setShowSubscribeDialog] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -72,7 +65,8 @@ export default function MentorProfile() {
       return;
     }
 
-    // Create subscription record before redirecting to Stripe
+    setIsProcessing(true);
+
     try {
       const startDate = new Date().toISOString().split('T')[0];
       const endDate = new Date();
@@ -96,35 +90,20 @@ export default function MentorProfile() {
       localStorage.setItem('pending_subscription_id', subscription.id);
       localStorage.setItem('mentor_profile_id', mentor.id);
 
-      // Redirect to Stripe Checkout
-      // TEMPORARY: Using a simple payment page - you'll replace these with your Stripe Payment Links
+      // Redirect to Stripe Payment Links
       const stripeUrls = {
-        monthly: `https://buy.stripe.com/test_eVqfZj1uJg5l50e0pH1Fe00`, // Replace with your Stripe Payment Link
-        annual: `https://buy.stripe.com/test_6oUcN78Xb8CT0JY4FX1Fe01`   // Replace with your Stripe Payment Link
+        monthly: `https://buy.stripe.com/test_eVqfZj1uJg5l50e0pH1Fe00`,
+        annual: `https://buy.stripe.com/test_6oUcN78Xb8CT0JY4FX1Fe01`
       };
 
-      // For now, show dialog to set up Stripe Payment Links
-      setSelectedPlan({ planType, amount, subscriptionId: subscription.id });
-      setShowSubscribeDialog(true);
+      // Redirect to appropriate Stripe checkout
+      window.location.href = stripeUrls[planType];
 
     } catch (error) {
       console.error("Error creating subscription:", error);
       alert("There was an error. Please try again.");
+      setIsProcessing(false);
     }
-  };
-
-  const proceedToPayment = () => {
-    alert(
-      `To complete Stripe integration:\n\n` +
-      `1. Go to Stripe Dashboard → Products → Add Product\n` +
-      `2. Create two products:\n` +
-      `   - Monthly: $425/month recurring\n` +
-      `   - Annual: $5,000 one-time\n` +
-      `3. For each product, click "Create payment link"\n` +
-      `4. Copy the payment link URLs\n` +
-      `5. Update the code in MentorProfile.js with those URLs\n\n` +
-      `Once configured, students will be redirected to Stripe's hosted checkout page.`
-    );
   };
 
   if (isLoading) {
@@ -276,8 +255,9 @@ export default function MentorProfile() {
                 <Button 
                   className="w-full btn-primary text-white rounded-xl mb-2"
                   onClick={() => handleSubscribe("monthly", 425)}
+                  disabled={isProcessing}
                 >
-                  Subscribe Monthly
+                  {isProcessing ? "Processing..." : "Subscribe Monthly"}
                 </Button>
               </CardContent>
             </Card>
@@ -294,8 +274,9 @@ export default function MentorProfile() {
                 <Button 
                   className="w-full bg-[#FF6B5C] hover:bg-[#E55A4C] text-white rounded-xl mb-2"
                   onClick={() => handleSubscribe("annual", 5000)}
+                  disabled={isProcessing}
                 >
-                  Subscribe Annually
+                  {isProcessing ? "Processing..." : "Subscribe Annually"}
                 </Button>
               </CardContent>
             </Card>
@@ -325,49 +306,6 @@ export default function MentorProfile() {
           </div>
         </div>
       </div>
-
-      {/* Subscribe Dialog */}
-      <Dialog open={showSubscribeDialog} onOpenChange={setShowSubscribeDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Setup Required</DialogTitle>
-            <DialogDescription>
-              Stripe Payment Links need to be configured
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm">
-              <p className="font-semibold mb-2">📝 Quick Setup Steps:</p>
-              <ol className="list-decimal list-inside space-y-1 text-xs">
-                <li>Go to your Stripe Dashboard</li>
-                <li>Navigate to Products → Create Product</li>
-                <li>Create a ${selectedPlan?.planType === 'monthly' ? '425/month recurring' : '5,000 one-time'} product</li>
-                <li>Click "Create payment link" for that product</li>
-                <li>Copy the payment link URL</li>
-                <li>Add it to your code</li>
-              </ol>
-            </div>
-
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <div className="flex justify-between mb-2">
-                <span className="font-medium">Plan:</span>
-                <span className="capitalize">{selectedPlan?.planType}</span>
-              </div>
-              <div className="flex justify-between mb-2">
-                <span className="font-medium">Amount:</span>
-                <span className="text-xl font-bold">${selectedPlan?.amount}</span>
-              </div>
-            </div>
-
-            <Button 
-              className="w-full btn-primary text-white"
-              onClick={proceedToPayment}
-            >
-              View Setup Instructions
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
