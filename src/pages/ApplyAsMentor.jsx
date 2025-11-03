@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -37,10 +36,9 @@ export default function ApplyAsMentor() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-  const [currentSection, setCurrentSection] = useState(1); // Start at 1, as account creation is removed
+  const [currentSection, setCurrentSection] = useState(1);
   
   const [formData, setFormData] = useState({
-    // Mentor profile fields (account creation fields removed)
     university: "",
     major: "",
     year: "",
@@ -73,16 +71,12 @@ export default function ApplyAsMentor() {
         const profiles = await base44.entities.MentorProfile.filter({ id: currentUser.mentor_profile_id });
         if (profiles.length > 0) {
           const profile = profiles[0];
-          // Redirect if already a mentor (pending or approved)
-          // The outline specifies redirecting if 'pending'
-          if (profile.verification_status === "pending" || profile.verification_status === "approved") { 
+          if (profile.verification_status === "pending") {
             navigate(createPageUrl("MentorDashboard"));
-            return;
           }
         }
       }
     } catch (error) {
-      // Not logged in - redirect to signup/login page
       base44.auth.redirectToLogin(window.location.pathname);
     } finally {
       setIsLoading(false);
@@ -146,7 +140,6 @@ export default function ApplyAsMentor() {
   ];
 
   const validateEmail = () => {
-    // User is guaranteed to be logged in and `user` state should be populated
     if (!user?.email || !formData.university) return { valid: false, message: "" };
     
     const university = universities.find(u => u.name === formData.university);
@@ -204,28 +197,15 @@ export default function ApplyAsMentor() {
     setError(null);
 
     try {
-      // User is guaranteed to be logged in at this point
       // Create mentor profile
       const profile = await base44.entities.MentorProfile.create({
-        user_id: user.id, // Directly use user.id
-        university: formData.university,
-        major: formData.major,
-        year: formData.year,
-        bio: formData.bio,
-        expertise_areas: formData.expertise_areas,
-        greatest_achievement: formData.greatest_achievement,
-        advice_to_younger_self: formData.advice_to_younger_self,
-        dream_job: formData.dream_job,
-        why_major: formData.why_major,
-        lifetime_goal: formData.lifetime_goal,
-        profile_photo_url: formData.profile_photo_url,
-        transcript_url: formData.transcript_url,
-        calendly_link: formData.calendly_link,
+        user_id: user.id,
+        ...formData,
         verification_status: "pending",
         total_students: 0
       });
 
-      // Update user with mentor profile ID and account type
+      // Update user with mentor profile ID
       await base44.auth.updateMe({
         mentor_profile_id: profile.id,
         account_type: "mentor"
@@ -236,7 +216,6 @@ export default function ApplyAsMentor() {
         navigate(createPageUrl("MentorDashboard"));
       }, 2000);
     } catch (error) {
-      console.error("Application error:", error);
       setError("Failed to submit application. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -245,14 +224,14 @@ export default function ApplyAsMentor() {
 
   const canProceedToNextSection = () => {
     switch(currentSection) {
-      case 1: // Basic Info
+      case 1:
         return formData.university && formData.year && formData.major && validateEmail().valid;
-      case 2: // Expertise & Bio
+      case 2:
         return formData.bio.length >= 100 && formData.expertise_areas.length > 0;
-      case 3: // Personal Essays
+      case 3:
         return formData.greatest_achievement && formData.advice_to_younger_self && 
                formData.dream_job && formData.why_major && formData.lifetime_goal;
-      case 4: // Verification Documents
+      case 4:
         return formData.profile_photo_url && formData.transcript_url && formData.calendly_link;
       default:
         return false;
@@ -292,9 +271,6 @@ export default function ApplyAsMentor() {
   }
 
   const emailValidation = validateEmail();
-  
-  // As account creation is removed, we now have 4 fixed sections (1-4)
-  const sectionLabels = ["Basic Info", "Expertise", "About You", "Verification"];
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] py-12">
