@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -251,21 +252,21 @@ export default function ApplyAsMentor() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
-        <Card className="max-w-md mx-4 rounded-3xl border-0 shadow-xl">
-          <CardContent className="p-12 text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-10 h-10 text-green-600" />
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md bg-white border border-gray-200 rounded shadow-sm p-8">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
-            <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+            <h2 className="text-2xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
               Application Submitted!
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 mb-4">
               Your application is now under review. We'll notify you via email once it's been approved.
             </p>
             <p className="text-sm text-gray-500">Redirecting to dashboard...</p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     );
   }
@@ -273,17 +274,13 @@ export default function ApplyAsMentor() {
   const emailValidation = validateEmail();
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] py-12">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#FF6B5C]/10 rounded-2xl mb-4">
-            <GraduationCap className="w-8 h-8 text-[#FF6B5C]" />
-          </div>
-          <h1 className="text-4xl font-bold mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+        <div className="text-center mb-8 border-b border-gray-200 pb-6">
+          <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
             Become a Mentor
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-gray-600">
             Share your Ivy League experience and help aspiring students achieve their dreams
           </p>
         </div>
@@ -293,20 +290,20 @@ export default function ApplyAsMentor() {
           <div className="flex items-center justify-between max-w-2xl mx-auto">
             {[1, 2, 3, 4].map((section) => (
               <div key={section} className="flex items-center">
-                <div className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold ${
-                  currentSection === section ? 'bg-[#FF6B5C] text-white' :
-                  currentSection > section ? 'bg-green-500 text-white' :
+                <div className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm ${
+                  currentSection === section ? 'bg-[#FE6C3A] text-white' :
+                  currentSection > section ? 'bg-[#0D3B33] text-white' :
                   'bg-gray-200 text-gray-500'
                 }`}>
-                  {currentSection > section ? <CheckCircle className="w-5 h-5" /> : section}
+                  {currentSection > section ? <CheckCircle className="w-4 h-4" /> : section}
                 </div>
                 {section < 4 && (
-                  <div className={`w-16 h-1 mx-2 ${currentSection > section ? 'bg-green-500' : 'bg-gray-200'}`} />
+                  <div className={`w-12 h-1 mx-2 ${currentSection > section ? 'bg-[#0D3B33]' : 'bg-gray-200'}`} />
                 )}
               </div>
             ))}
           </div>
-          <div className="flex justify-between max-w-2xl mx-auto mt-3 text-xs text-gray-600 px-2">
+          <div className="flex justify-between max-w-2xl mx-auto mt-2 text-xs text-gray-600 px-2">
             <span>Basic Info</span>
             <span>Expertise</span>
             <span>About You</span>
@@ -321,15 +318,15 @@ export default function ApplyAsMentor() {
           </Alert>
         )}
 
-        <Card className="rounded-3xl border-0 shadow-xl">
-          <CardContent className="p-8">
+        <div className="bg-white border border-gray-200 rounded shadow-sm">
+          <div className="p-6">
             <form onSubmit={handleSubmit}>
               {/* Section 1: Basic Information */}
               {currentSection === 1 && (
                 <div className="space-y-6">
-                  <div>
-                    <h2 className="text-2xl font-bold mb-2">Basic Information</h2>
-                    <p className="text-gray-600 text-sm">Tell us about your university and academic background</p>
+                  <div className="border-b border-gray-200 pb-4">
+                    <h2 className="text-xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>Basic Information</h2>
+                    <p className="text-sm text-gray-600">Tell us about your university and academic background</p>
                   </div>
 
                   <div className="space-y-2">
@@ -337,7 +334,7 @@ export default function ApplyAsMentor() {
                     <Input
                       value={user?.email || ""}
                       disabled
-                      className="h-12 rounded-xl bg-gray-50"
+                      className="h-10 rounded bg-gray-50"
                     />
                     <p className="text-xs text-gray-500">
                       You must use your official university email (@harvard.edu, @yale.edu, etc.)
@@ -354,7 +351,7 @@ export default function ApplyAsMentor() {
                       }}
                       required
                     >
-                      <SelectTrigger className="h-12 rounded-xl">
+                      <SelectTrigger className="h-10 rounded">
                         <SelectValue placeholder="Select your university" />
                       </SelectTrigger>
                       <SelectContent>
@@ -381,7 +378,7 @@ export default function ApplyAsMentor() {
                     )}
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Year *</Label>
                       <Select 
@@ -389,7 +386,7 @@ export default function ApplyAsMentor() {
                         onValueChange={(value) => setFormData({...formData, year: value})}
                         required
                       >
-                        <SelectTrigger className="h-12 rounded-xl">
+                        <SelectTrigger className="h-10 rounded">
                           <SelectValue placeholder="Select your year" />
                         </SelectTrigger>
                         <SelectContent>
@@ -406,7 +403,7 @@ export default function ApplyAsMentor() {
                         value={formData.major}
                         onChange={(e) => setFormData({...formData, major: e.target.value})}
                         placeholder="e.g., Computer Science, Economics"
-                        className="h-12 rounded-xl"
+                        className="h-10 rounded"
                         required
                       />
                     </div>
@@ -417,9 +414,9 @@ export default function ApplyAsMentor() {
               {/* Section 2: Expertise & Bio */}
               {currentSection === 2 && (
                 <div className="space-y-6">
-                  <div>
-                    <h2 className="text-2xl font-bold mb-2">Your Expertise</h2>
-                    <p className="text-gray-600 text-sm">Select the areas where you can help students</p>
+                  <div className="border-b border-gray-200 pb-4">
+                    <h2 className="text-xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>Your Expertise</h2>
+                    <p className="text-sm text-gray-600">Select the areas where you can help students</p>
                   </div>
 
                   <div className="space-y-2">
@@ -428,7 +425,7 @@ export default function ApplyAsMentor() {
                       value={formData.bio}
                       onChange={(e) => setFormData({...formData, bio: e.target.value})}
                       placeholder="Tell students about your background, achievements, and how you can help them. What makes you a great mentor?"
-                      className="h-32 rounded-xl"
+                      className="h-28 rounded"
                       required
                     />
                     <p className="text-xs text-gray-500">
@@ -439,9 +436,9 @@ export default function ApplyAsMentor() {
                   <div className="space-y-4">
                     <Label>Areas of Expertise * (Select at least one)</Label>
                     {expertiseOptions.map((category, idx) => (
-                      <div key={idx} className="border rounded-xl p-4">
-                        <h3 className="font-semibold mb-3 text-[#FF6B5C]">{category.category}</h3>
-                        <div className="grid md:grid-cols-2 gap-3">
+                      <div key={idx} className="border border-gray-200 rounded p-4">
+                        <h3 className="font-semibold mb-3 text-sm text-[#0D3B33]">{category.category}</h3>
+                        <div className="grid md:grid-cols-2 gap-2">
                           {category.options.map((option, optIdx) => (
                             <div key={optIdx} className="flex items-center space-x-2">
                               <Checkbox
@@ -461,10 +458,10 @@ export default function ApplyAsMentor() {
                       </div>
                     ))}
                     {formData.expertise_areas.length > 0 && (
-                      <div className="flex flex-wrap gap-2 p-4 bg-[#B3E5FC]/10 rounded-xl">
-                        <span className="text-sm font-medium">Selected ({formData.expertise_areas.length}):</span>
+                      <div className="flex flex-wrap gap-2 p-4 bg-gray-50 border border-gray-200 rounded">
+                        <span className="text-sm font-medium w-full mb-1">Selected ({formData.expertise_areas.length}):</span>
                         {formData.expertise_areas.map((area, idx) => (
-                          <Badge key={idx} className="bg-[#B3E5FC]/30 text-[#222222]">
+                          <Badge key={idx} className="bg-[#E6EFEA] text-[#0D3B33] border-0">
                             {area}
                             <button
                               type="button"
@@ -484,9 +481,9 @@ export default function ApplyAsMentor() {
               {/* Section 3: Personal Essays */}
               {currentSection === 3 && (
                 <div className="space-y-6">
-                  <div>
-                    <h2 className="text-2xl font-bold mb-2">Get Personal</h2>
-                    <p className="text-gray-600 text-sm">
+                  <div className="border-b border-gray-200 pb-4">
+                    <h2 className="text-xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>Get Personal</h2>
+                    <p className="text-sm text-gray-600">
                       Help students get to know you better with these thoughtful responses
                     </p>
                   </div>
@@ -497,7 +494,7 @@ export default function ApplyAsMentor() {
                       value={formData.greatest_achievement}
                       onChange={(e) => setFormData({...formData, greatest_achievement: e.target.value})}
                       placeholder="Share an accomplishment you're proud of..."
-                      className="h-24 rounded-xl"
+                      className="h-20 rounded"
                       required
                     />
                   </div>
@@ -508,7 +505,7 @@ export default function ApplyAsMentor() {
                       value={formData.advice_to_younger_self}
                       onChange={(e) => setFormData({...formData, advice_to_younger_self: e.target.value})}
                       placeholder="If you could go back in time..."
-                      className="h-24 rounded-xl"
+                      className="h-20 rounded"
                       required
                     />
                   </div>
@@ -519,7 +516,7 @@ export default function ApplyAsMentor() {
                       value={formData.dream_job}
                       onChange={(e) => setFormData({...formData, dream_job: e.target.value})}
                       placeholder="e.g., Software Engineer at Google, Investment Banker, Doctor"
-                      className="h-12 rounded-xl"
+                      className="h-10 rounded"
                       required
                     />
                   </div>
@@ -530,7 +527,7 @@ export default function ApplyAsMentor() {
                       value={formData.why_major}
                       onChange={(e) => setFormData({...formData, why_major: e.target.value})}
                       placeholder="What drew you to your field of study?"
-                      className="h-24 rounded-xl"
+                      className="h-20 rounded"
                       required
                     />
                   </div>
@@ -541,7 +538,7 @@ export default function ApplyAsMentor() {
                       value={formData.lifetime_goal}
                       onChange={(e) => setFormData({...formData, lifetime_goal: e.target.value})}
                       placeholder="Your biggest life goal or aspiration..."
-                      className="h-24 rounded-xl"
+                      className="h-20 rounded"
                       required
                     />
                   </div>
@@ -551,24 +548,24 @@ export default function ApplyAsMentor() {
               {/* Section 4: Verification Documents */}
               {currentSection === 4 && (
                 <div className="space-y-6">
-                  <div>
-                    <h2 className="text-2xl font-bold mb-2">Verification & Setup</h2>
-                    <p className="text-gray-600 text-sm">Upload required documents and set up your scheduling</p>
+                  <div className="border-b border-gray-200 pb-4">
+                    <h2 className="text-xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>Verification & Setup</h2>
+                    <p className="text-sm text-gray-600">Upload required documents and set up your scheduling</p>
                   </div>
 
                   <div className="space-y-2">
                     <Label>Profile Photo</Label>
-                    <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-[#FF6B5C] transition-colors">
+                    <div className="border border-gray-200 rounded p-4 text-center hover:border-[#FE6C3A] transition-colors">
                       {formData.profile_photo_url ? (
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <img 
                               src={formData.profile_photo_url} 
                               alt="Profile" 
-                              className="w-16 h-16 rounded-full object-cover"
+                              className="w-12 h-12 rounded-full object-cover"
                             />
                             <div className="text-left">
-                              <p className="font-medium">Photo uploaded</p>
+                              <p className="font-medium text-sm">Photo uploaded</p>
                               <p className="text-xs text-gray-500">Click to change</p>
                             </div>
                           </div>
@@ -590,8 +587,8 @@ export default function ApplyAsMentor() {
                             className="hidden"
                             disabled={uploadingPhoto}
                           />
-                          <ImageIcon className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                          <p className="font-medium mb-1">
+                          <ImageIcon className="w-10 h-10 mx-auto mb-2 text-gray-400" />
+                          <p className="font-medium text-sm mb-1">
                             {uploadingPhoto ? "Uploading..." : "Click to upload photo"}
                           </p>
                           <p className="text-xs text-gray-500">JPG, PNG up to 5MB</p>
@@ -602,15 +599,15 @@ export default function ApplyAsMentor() {
 
                   <div className="space-y-2">
                     <Label>University Transcript *</Label>
-                    <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-[#FF6B5C] transition-colors">
+                    <div className="border border-gray-200 rounded p-4 text-center hover:border-[#FE6C3A] transition-colors">
                       {formData.transcript_url ? (
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-[#B3E5FC]/30 rounded-lg flex items-center justify-center">
-                              <FileText className="w-6 h-6 text-[#222222]" />
+                            <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center">
+                              <FileText className="w-5 h-5 text-gray-600" />
                             </div>
                             <div className="text-left">
-                              <p className="font-medium">Transcript uploaded</p>
+                              <p className="font-medium text-sm">Transcript uploaded</p>
                               <p className="text-xs text-gray-500">Click to change</p>
                             </div>
                           </div>
@@ -632,8 +629,8 @@ export default function ApplyAsMentor() {
                             className="hidden"
                             disabled={uploadingTranscript}
                           />
-                          <Upload className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                          <p className="font-medium mb-1">
+                          <Upload className="w-10 h-10 mx-auto mb-2 text-gray-400" />
+                          <p className="font-medium text-sm mb-1">
                             {uploadingTranscript ? "Uploading..." : "Click to upload transcript"}
                           </p>
                           <p className="text-xs text-gray-500">PDF or image file required for verification</p>
@@ -648,7 +645,7 @@ export default function ApplyAsMentor() {
                       value={formData.calendly_link}
                       onChange={(e) => setFormData({...formData, calendly_link: e.target.value})}
                       placeholder="https://calendly.com/your-link"
-                      className="h-12 rounded-xl"
+                      className="h-10 rounded"
                       required
                     />
                     <p className="text-xs text-gray-500">
@@ -659,13 +656,13 @@ export default function ApplyAsMentor() {
               )}
 
               {/* Navigation Buttons */}
-              <div className="flex justify-between items-center pt-8 border-t mt-8">
+              <div className="flex justify-between items-center pt-6 border-t border-gray-200 mt-6">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setCurrentSection(Math.max(1, currentSection - 1))}
                   disabled={currentSection === 1}
-                  className="rounded-xl"
+                  className="rounded"
                 >
                   Previous
                 </Button>
@@ -679,7 +676,7 @@ export default function ApplyAsMentor() {
                     type="button"
                     onClick={() => setCurrentSection(currentSection + 1)}
                     disabled={!canProceedToNextSection()}
-                    className="btn-primary text-white rounded-xl"
+                    className="btn-primary text-white rounded"
                   >
                     Next
                     <ChevronRight className="w-4 h-4 ml-1" />
@@ -688,16 +685,16 @@ export default function ApplyAsMentor() {
                   <Button 
                     type="submit" 
                     disabled={isSubmitting || !canProceedToNextSection()}
-                    className="btn-primary text-white rounded-xl"
+                    className="btn-primary text-white rounded"
                   >
                     {isSubmitting ? "Submitting..." : "Submit Application"}
-                    <ArrowRight className="w-5 h-5 ml-2" />
+                    <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 )}
               </div>
             </form>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
