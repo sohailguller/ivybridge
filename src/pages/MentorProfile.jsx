@@ -175,336 +175,240 @@ export default function MentorProfile() {
   const isMentor = user?.account_type === "mentor";
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] py-12">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Back Button */}
         <Button
           variant="ghost"
           onClick={() => navigate(createPageUrl("BrowseMentors"))}
-          className="mb-6"
+          className="mb-6 hover:bg-gray-100"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Mentors
+          Back to All Mentors
         </Button>
 
-        {/* Mentor Alert */}
         {isMentor && (
-          <Alert className="mb-6 border-orange-200 bg-orange-50">
-            <AlertCircle className="h-4 w-4 text-orange-600" />
-            <AlertDescription className="text-orange-800">
-              <strong>Note:</strong> As a mentor, you cannot subscribe to other mentors. This platform is designed for mentors to guide students.
-            </AlertDescription>
-          </Alert>
+          <div className="bg-blue-50 border border-blue-200 rounded p-4 mb-6">
+            <p className="text-sm text-blue-800">
+              <strong>Note:</strong> This is how students see your profile. You cannot subscribe to your own profile.
+            </p>
+          </div>
         )}
 
-        {/* Hero Card */}
-        <Card className="rounded-3xl border-0 shadow-xl mb-8 overflow-hidden">
-          <div className="h-48 bg-gradient-to-br from-[#FF6B5C] to-[#E55A4C] relative">
-            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200')] opacity-20 bg-cover bg-center" />
-          </div>
+        <div className="bg-white border border-gray-200 rounded shadow-sm mb-6 overflow-hidden">
+          <div className="h-32 bg-gradient-to-r from-[#0D3B33] to-[#1a5a4e]" />
 
-          <CardContent className="p-8 -mt-16">
-            <div className="flex flex-col md:flex-row gap-6">
-              <Avatar className="w-32 h-32 border-4 border-white shadow-xl">
+          <div className="p-8 -mt-16">
+            <div className="flex flex-col md:flex-row gap-6 mb-6">
+              <Avatar className="w-32 h-32 border-4 border-white shadow-sm">
                 <AvatarImage src={mentor.profile_photo_url || mentorUser?.profile_photo_url} />
-                <AvatarFallback className="bg-[#B3E5FC] text-4xl">
+                <AvatarFallback className="bg-[#E6EFEA] text-4xl text-[#0D3B33]">
                   {mentorUser?.full_name?.charAt(0) || 'M'}
                 </AvatarFallback>
               </Avatar>
 
               <div className="flex-1">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Georgia, serif' }}>
-                      {mentorUser?.full_name || 'Mentor'}
-                    </h1>
-                    <div className="flex items-center gap-2 text-gray-600 mb-3">
-                      <GraduationCap className="w-5 h-5" />
-                      <span className="text-lg">{mentor.university} • {mentor.year}</span>
-                    </div>
-                    <Badge className="bg-[#B3E5FC]/30 text-[#222222] border-0">
-                      {mentor.major}
-                    </Badge>
-                  </div>
-
-                  <div className="text-right">
-                    <div className="flex items-center gap-1 mb-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className={`w-5 h-5 ${
-                          i < Math.round(averageRating)
-                            ? 'fill-[#FF6B5C] text-[#FF6B5C]'
-                            : 'text-gray-300'
-                        }`} />
-                      ))}
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      {averageRating} ({reviews.length} {reviews.length === 1 ? 'review' : 'reviews'})
-                    </p>
-                  </div>
+                <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+                  {mentorUser?.full_name || 'Mentor'}
+                </h1>
+                <div className="flex items-center gap-2 text-gray-600 mb-3">
+                  <GraduationCap className="w-5 h-5" />
+                  <span className="text-lg">{mentor.university} • {mentor.year}</span>
                 </div>
+                <Badge className="bg-[#E6EFEA] text-[#0D3B33] border-0 mb-4">
+                  {mentor.major}
+                </Badge>
 
-                <div className="flex flex-wrap gap-2">
-                  {mentor.expertise_areas?.slice(0, 4).map((area, idx) => (
-                    <Badge key={idx} variant="outline">
-                      {area}
-                    </Badge>
-                  ))}
-                  {mentor.expertise_areas?.length > 4 && (
-                    <Badge variant="outline" className="text-gray-500">
-                      +{mentor.expertise_areas.length - 4} more
-                    </Badge>
-                  )}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="md:col-span-2 space-y-8">
-            {/* About Me */}
-            <Card className="rounded-3xl border-0 shadow-lg">
-              <CardContent className="p-8">
-                <h2 className="text-2xl font-bold mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-                  About Me
-                </h2>
-                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                  {mentor.bio}
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Personal Insights */}
-            <Card className="rounded-3xl border-0 shadow-lg">
-              <CardContent className="p-8">
-                <h2 className="text-2xl font-bold mb-6" style={{ fontFamily: 'Georgia, serif' }}>
-                  Get to Know Me
-                </h2>
-                <div className="space-y-6">
-                  {mentor.greatest_achievement && (
-                    <div className="flex gap-4">
-                      <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <Award className="w-6 h-6 text-yellow-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold mb-2 text-gray-900">My Greatest Achievement</div>
-                        <p className="text-gray-600 leading-relaxed">{mentor.greatest_achievement}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {mentor.advice_to_younger_self && (
-                    <div className="flex gap-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <Lightbulb className="w-6 h-6 text-blue-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold mb-2 text-gray-900">Advice to My Younger Self</div>
-                        <p className="text-gray-600 leading-relaxed">{mentor.advice_to_younger_self}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {mentor.dream_job && (
-                    <div className="flex gap-4">
-                      <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <Target className="w-6 h-6 text-purple-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold mb-2 text-gray-900">My Dream Job</div>
-                        <p className="text-gray-600 leading-relaxed">{mentor.dream_job}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {mentor.why_major && (
-                    <div className="flex gap-4">
-                      <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <BookOpen className="w-6 h-6 text-green-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold mb-2 text-gray-900">Why I Chose {mentor.major}</div>
-                        <p className="text-gray-600 leading-relaxed">{mentor.why_major}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {mentor.lifetime_goal && (
-                    <div className="flex gap-4">
-                      <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <Heart className="w-6 h-6 text-red-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold mb-2 text-gray-900">My Lifetime Goal</div>
-                        <p className="text-gray-600 leading-relaxed">{mentor.lifetime_goal}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Expertise Areas */}
-            {mentor.expertise_areas && mentor.expertise_areas.length > 0 && (
-              <Card className="rounded-3xl border-0 shadow-lg">
-                <CardContent className="p-8">
-                  <h2 className="text-2xl font-bold mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-                    Areas of Expertise
-                  </h2>
-                  <div className="flex flex-wrap gap-2">
-                    {mentor.expertise_areas.map((area, idx) => (
-                      <Badge key={idx} className="bg-[#B3E5FC]/30 text-[#222222] border-0 py-2 px-4">
-                        {area}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* What You'll Get */}
-            <Card className="rounded-3xl border-0 shadow-lg">
-              <CardContent className="p-8">
-                <h2 className="text-2xl font-bold mb-6" style={{ fontFamily: 'Georgia, serif' }}>
-                  What You'll Get
-                </h2>
-                <div className="space-y-4">
-                  {[
-                    { icon: MessageSquare, title: "Unlimited 1-on-1 Messaging", desc: "Ask questions anytime and get personalized responses" },
-                    { icon: Calendar, title: "Weekly Video Sessions", desc: "Regular check-ins to review progress and plan next steps" },
-                    { icon: CheckCircle, title: "Essay Reviews", desc: "Detailed feedback on all your application essays" },
-                    { icon: GraduationCap, title: "Application Strategy", desc: "Expert guidance on university selection and deadlines" }
-                  ].map((item, idx) => (
-                    <div key={idx} className="flex gap-4">
-                      <div className="w-12 h-12 bg-[#FF6B5C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <item.icon className="w-6 h-6 text-[#FF6B5C]" />
-                      </div>
-                      <div>
-                        <div className="font-semibold mb-1">{item.title}</div>
-                        <div className="text-sm text-gray-600">{item.desc}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Reviews Section */}
-            {reviews.length > 0 && (
-              <Card className="rounded-3xl border-0 shadow-lg">
-                <CardContent className="p-8">
-                  <h2 className="text-2xl font-bold mb-6" style={{ fontFamily: 'Georgia, serif' }}>
-                    Student Reviews
-                  </h2>
-                  <div className="space-y-6">
-                    {reviews.map((review) => {
-                      const student = reviewStudents.find(s => s.id === review.student_id);
-                      return (
-                        <div key={review.id} className="border-b border-gray-100 last:border-0 pb-6 last:pb-0">
-                          <div className="flex items-start gap-4">
-                            <Avatar className="w-12 h-12">
-                              <AvatarImage src={student?.profile_photo_url} />
-                              <AvatarFallback className="bg-[#B3E5FC]">
-                                {student?.full_name?.charAt(0) || 'S'}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1">
-                              <div className="flex items-center justify-between mb-2">
-                                <div>
-                                  <p className="font-semibold">{student?.full_name?.split(' ')[0] || 'Student'}</p>
-                                  <div className="flex items-center gap-1">
-                                    {[...Array(5)].map((_, i) => (
-                                      <Star key={i} className={`w-4 h-4 ${
-                                        i < review.rating
-                                          ? 'fill-[#FF6B5C] text-[#FF6B5C]'
-                                          : 'text-gray-300'
-                                      }`} />
-                                    ))}
-                                  </div>
-                                </div>
-                                <span className="text-sm text-gray-500">
-                                  {new Date(review.created_date).toLocaleDateString()}
-                                </span>
-                              </div>
-                              {review.comment && (
-                                <p className="text-gray-700 leading-relaxed">{review.comment}</p>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Pricing Cards */}
-            <Card className="rounded-3xl border-0 shadow-lg">
-              <CardContent className="p-6">
-                <h3 className="font-bold text-lg mb-4">Monthly Plan</h3>
-                <div className="text-4xl font-bold mb-2">$425</div>
-                <div className="text-sm text-gray-600 mb-4">per month</div>
-                <div className="text-xs text-gray-500 mb-4">12-month commitment</div>
-                <Button
-                  className="w-full btn-primary text-white rounded-xl mb-2"
-                  onClick={() => handleSubscribe("monthly", 425)}
-                  disabled={isSubscribing || isMentor}
-                >
-                  {isSubscribing ? "Processing..." : "Subscribe Monthly"}
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="rounded-3xl border-2 border-[#FF6B5C] shadow-lg relative">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-[#FF6B5C] text-white px-4 py-1 rounded-full text-xs font-medium">
-                Best Value
-              </div>
-              <CardContent className="p-6">
-                <h3 className="font-bold text-lg mb-4">Annual Plan</h3>
-                <div className="text-4xl font-bold mb-2">$5,000</div>
-                <div className="text-sm text-gray-600 mb-4">one-time payment</div>
-                <div className="text-xs text-green-600 font-medium mb-4">Save $1,100!</div>
-                <Button
-                  className="w-full bg-[#FF6B5C] hover:bg-[#E55A4C] text-white rounded-xl mb-2"
-                  onClick={() => handleSubscribe("annual", 5000)}
-                  disabled={isSubscribing || isMentor}
-                >
-                  {isSubscribing ? "Processing..." : "Subscribe Annually"}
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Stats */}
-            <Card className="rounded-3xl border-0 shadow-lg bg-gradient-to-br from-[#FF6B5C]/5 to-[#B3E5FC]/10">
-              <CardContent className="p-6">
-                <div className="text-center mb-4">
-                  <div className="text-4xl font-bold text-[#FF6B5C] mb-1">
-                    {mentor.total_students || 0}
-                  </div>
-                  <div className="text-sm text-gray-600">Current Students</div>
-                </div>
-                <div className="border-t border-gray-200 pt-4 text-center">
-                  <div className="text-2xl font-bold mb-1">{averageRating}</div>
-                  <div className="flex justify-center gap-1 mb-2">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className={`w-4 h-4 ${
+                      <Star key={i} className={`w-5 h-5 ${
                         i < Math.round(averageRating)
-                          ? 'fill-[#FF6B5C] text-[#FF6B5C]'
+                          ? 'fill-[#FE6C3A] text-[#FE6C3A]'
                           : 'text-gray-300'
                       }`} />
                     ))}
                   </div>
-                  <div className="text-xs text-gray-600">
-                    {reviews.length} {reviews.length === 1 ? 'Review' : 'Reviews'}
-                  </div>
+                  <span className="text-sm text-gray-600">
+                    {averageRating} ({reviews.length} {reviews.length === 1 ? 'review' : 'reviews'})
+                  </span>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
+
+            {mentor.expertise_areas && mentor.expertise_areas.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-6">
+                {mentor.expertise_areas.map((area, idx) => (
+                  <Badge key={idx} variant="outline" className="text-xs">
+                    {area}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="md:col-span-2 space-y-6">
+            <div className="bg-white border border-gray-200 rounded shadow-sm p-6 border-l-4 border-l-[#FE6C3A]">
+              <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+                About Me
+              </h2>
+              <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                {mentor.bio}
+              </p>
+            </div>
+
+            {mentor.personal_statement && (
+              <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
+                <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+                  Personal Insights
+                </h2>
+                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  {mentor.personal_statement}
+                </p>
+              </div>
+            )}
+
+            {mentor.expertise_description && (
+              <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
+                <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+                  Expertise Areas
+                </h2>
+                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  {mentor.expertise_description}
+                </p>
+              </div>
+            )}
+
+            <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
+              <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+                What You'll Get
+              </h2>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">Unlimited 1-on-1 messaging throughout your entire application process</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">Weekly video meetings for personalized guidance</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">Detailed essay reviews and edits with tracked feedback</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">Strategic application planning and deadline management</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">Mock interviews and comprehensive interview preparation</span>
+                </li>
+              </ul>
+            </div>
+
+            {reviews.length > 0 && (
+              <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
+                <h2 className="text-xl font-bold mb-6 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+                  Student Reviews
+                </h2>
+                <div className="space-y-6">
+                  {reviews.map((review) => {
+                    const student = reviewStudents.find(s => s.id === review.student_id);
+                    return (
+                      <div key={review.id} className="border-b border-gray-100 last:border-0 pb-6 last:pb-0">
+                        <div className="flex items-start gap-4">
+                          <Avatar className="w-12 h-12">
+                            <AvatarImage src={student?.profile_photo_url} />
+                            <AvatarFallback className="bg-[#E6EFEA] text-[#0D3B33]">
+                              {student?.full_name?.charAt(0) || 'S'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                              <div>
+                                <p className="font-semibold text-[#0D3B33]">{student?.full_name?.split(' ')[0] || 'Student'}</p>
+                                <div className="flex items-center gap-1">
+                                  {[...Array(5)].map((_, i) => (
+                                    <Star key={i} className={`w-4 h-4 ${
+                                      i < review.rating
+                                        ? 'fill-[#FE6C3A] text-[#FE6C3A]'
+                                        : 'text-gray-300'
+                                    }`} />
+                                  ))}
+                                </div>
+                              </div>
+                              <span className="text-sm text-gray-500">
+                                {new Date(review.created_date).toLocaleDateString()}
+                              </span>
+                            </div>
+                            {review.comment && (
+                              <p className="text-gray-700 leading-relaxed text-sm">{review.comment}</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-6">
+            <div className="bg-white border-2 border-[#FE6C3A] rounded shadow-sm p-6">
+              <div className="text-center mb-4">
+                <div className="text-sm font-medium text-gray-600 mb-1">Monthly Plan</div>
+                <div className="text-3xl font-bold mb-1 text-[#0D3B33]">$425</div>
+                <div className="text-sm text-gray-600 mb-2">per month</div>
+                <div className="text-xs text-gray-500 mb-4">12-month commitment</div>
+              </div>
+              <Button
+                onClick={() => handleSubscribe('monthly', 425)}
+                disabled={isMentor}
+                className="w-full btn-primary text-white rounded py-5 mb-3"
+              >
+                Subscribe Monthly
+              </Button>
+              <div className="text-center">
+                <div className="text-sm font-medium text-gray-600 mb-1">Annual Plan</div>
+                <div className="text-3xl font-bold mb-1 text-[#0D3B33]">$5,000</div>
+                <div className="text-sm text-gray-600 mb-2">one-time payment</div>
+                <div className="text-xs text-gray-500 mb-4">Save $1,100</div>
+              </div>
+              <Button
+                onClick={() => handleSubscribe('annual', 5000)}
+                disabled={isMentor}
+                className="w-full bg-[#FE6C3A] hover:bg-[#FF7B4A] text-white rounded py-5"
+              >
+                Subscribe Annually
+              </Button>
+            </div>
+
+            <div className="bg-gray-50 border border-gray-200 rounded shadow-sm p-6">
+              <div className="text-center mb-4">
+                <div className="text-3xl font-bold text-[#0D3B33] mb-1">
+                  {mentor.total_students || 0}
+                </div>
+                <div className="text-sm text-gray-600">Current Students</div>
+              </div>
+              <div className="border-t border-gray-200 pt-4 text-center">
+                <div className="text-2xl font-bold mb-1 text-[#0D3B33]">{averageRating}</div>
+                <div className="flex justify-center gap-1 mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className={`w-4 h-4 ${
+                      i < Math.round(averageRating)
+                        ? 'fill-[#FE6C3A] text-[#FE6C3A]'
+                        : 'text-gray-300'
+                    }`} />
+                  ))}
+                </div>
+                <div className="text-xs text-gray-600">
+                  {reviews.length} {reviews.length === 1 ? 'Review' : 'Reviews'}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
