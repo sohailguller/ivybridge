@@ -175,60 +175,60 @@ export default function MentorProfile() {
   const isMentor = user?.account_type === "mentor";
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 lg:py-12 w-full">
-      <div className="max-w-7xl lg:max-w-screen-xl xl:max-w-screen-2xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <Button
           variant="ghost"
           onClick={() => navigate(createPageUrl("BrowseMentors"))}
-          className="mb-6 lg:mb-8 hover:bg-gray-100"
+          className="mb-6 hover:bg-gray-100"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to All Mentors
         </Button>
 
         {isMentor && (
-          <div className="bg-blue-50 border border-blue-200 rounded p-4 mb-6 lg:mb-8">
+          <div className="bg-blue-50 border border-blue-200 rounded p-4 mb-6">
             <p className="text-sm text-blue-800">
               <strong>Note:</strong> This is how students see your profile. You cannot subscribe to your own profile.
             </p>
           </div>
         )}
 
-        <div className="bg-white border border-gray-200 rounded shadow-sm mb-6 lg:mb-8 overflow-hidden">
-          <div className="h-32 lg:h-40 bg-gradient-to-r from-[#0D3B33] to-[#1a5a4e]" />
+        <div className="bg-white border border-gray-200 rounded shadow-sm mb-6 overflow-hidden">
+          <div className="h-32 bg-gradient-to-r from-[#0D3B33] to-[#1a5a4e]" />
 
-          <div className="p-6 lg:p-8 -mt-16 lg:-mt-20">
-            <div className="flex flex-col md:flex-row gap-6 lg:gap-8 mb-6">
-              <Avatar className="w-32 h-32 lg:w-40 lg:h-40 border-4 border-white shadow-sm">
+          <div className="p-8 -mt-16">
+            <div className="flex flex-col md:flex-row gap-6 mb-6">
+              <Avatar className="w-32 h-32 border-4 border-white shadow-sm">
                 <AvatarImage src={mentor.profile_photo_url || mentorUser?.profile_photo_url} />
-                <AvatarFallback className="bg-[#E6EFEA] text-4xl lg:text-5xl text-[#0D3B33]">
+                <AvatarFallback className="bg-[#E6EFEA] text-4xl text-[#0D3B33]">
                   {mentorUser?.full_name?.charAt(0) || 'M'}
                 </AvatarFallback>
               </Avatar>
 
               <div className="flex-1">
-                <h1 className="text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 lg:mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+                <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
                   {mentorUser?.full_name || 'Mentor'}
                 </h1>
-                <div className="flex items-center gap-2 text-gray-600 mb-3 lg:mb-4">
-                  <GraduationCap className="w-5 h-5 lg:w-6 lg:h-6" />
-                  <span className="text-lg lg:text-xl">{mentor.university} • {mentor.year}</span>
+                <div className="flex items-center gap-2 text-gray-600 mb-3">
+                  <GraduationCap className="w-5 h-5" />
+                  <span className="text-lg">{mentor.university} • {mentor.year}</span>
                 </div>
-                <Badge className="bg-[#E6EFEA] text-[#0D3B33] border-0 mb-4 text-sm lg:text-base">
+                <Badge className="bg-[#E6EFEA] text-[#0D3B33] border-0 mb-4">
                   {mentor.major}
                 </Badge>
 
-                <div className="flex items-center gap-4 lg:gap-6">
+                <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className={`w-5 h-5 lg:w-6 lg:h-6 ${
+                      <Star key={i} className={`w-5 h-5 ${
                         i < Math.round(averageRating)
                           ? 'fill-[#FE6C3A] text-[#FE6C3A]'
                           : 'text-gray-300'
                       }`} />
                     ))}
                   </div>
-                  <span className="text-sm lg:text-base text-gray-600">
+                  <span className="text-sm text-gray-600">
                     {averageRating} ({reviews.length} {reviews.length === 1 ? 'review' : 'reviews'})
                   </span>
                 </div>
@@ -247,70 +247,70 @@ export default function MentorProfile() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
-          <div className="lg:col-span-2 space-y-6 lg:space-y-8">
-            <div className="bg-white border border-gray-200 rounded shadow-sm p-6 lg:p-8 border-l-4 border-l-[#FE6C3A]">
-              <h2 className="text-xl lg:text-2xl xl:text-3xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="md:col-span-2 space-y-6">
+            <div className="bg-white border border-gray-200 rounded shadow-sm p-6 border-l-4 border-l-[#FE6C3A]">
+              <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
                 About Me
               </h2>
-              <p className="text-gray-700 lg:text-lg leading-relaxed whitespace-pre-line">
+              <p className="text-gray-700 leading-relaxed whitespace-pre-line">
                 {mentor.bio}
               </p>
             </div>
 
             {mentor.personal_statement && (
-              <div className="bg-white border border-gray-200 rounded shadow-sm p-6 lg:p-8">
-                <h2 className="text-xl lg:text-2xl xl:text-3xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+              <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
+                <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
                   Personal Insights
                 </h2>
-                <p className="text-gray-700 lg:text-lg leading-relaxed whitespace-pre-line">
+                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
                   {mentor.personal_statement}
                 </p>
               </div>
             )}
 
             {mentor.expertise_description && (
-              <div className="bg-white border border-gray-200 rounded shadow-sm p-6 lg:p-8">
-                <h2 className="text-xl lg:text-2xl xl:text-3xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+              <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
+                <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
                   Expertise Areas
                 </h2>
-                <p className="text-gray-700 lg:text-lg leading-relaxed whitespace-pre-line">
+                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
                   {mentor.expertise_description}
                 </p>
               </div>
             )}
 
-            <div className="bg-white border border-gray-200 rounded shadow-sm p-6 lg:p-8">
-              <h2 className="text-xl lg:text-2xl xl:text-3xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+            <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
+              <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
                 What You'll Get
               </h2>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700 lg:text-lg">Unlimited 1-on-1 messaging throughout your entire application process</span>
+                  <span className="text-gray-700">Unlimited 1-on-1 messaging throughout your entire application process</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700 lg:text-lg">Weekly video meetings for personalized guidance</span>
+                  <span className="text-gray-700">Weekly video meetings for personalized guidance</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700 lg:text-lg">Detailed essay reviews and edits with tracked feedback</span>
+                  <span className="text-gray-700">Detailed essay reviews and edits with tracked feedback</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700 lg:text-lg">Strategic application planning and deadline management</span>
+                  <span className="text-gray-700">Strategic application planning and deadline management</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700 lg:text-lg">Mock interviews and comprehensive interview preparation</span>
+                  <span className="text-gray-700">Mock interviews and comprehensive interview preparation</span>
                 </li>
               </ul>
             </div>
 
             {reviews.length > 0 && (
-              <div className="bg-white border border-gray-200 rounded shadow-sm p-6 lg:p-8">
-                <h2 className="text-xl lg:text-2xl xl:text-3xl font-bold mb-6 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+              <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
+                <h2 className="text-xl font-bold mb-6 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
                   Student Reviews
                 </h2>
                 <div className="space-y-6">
@@ -356,7 +356,7 @@ export default function MentorProfile() {
             )}
           </div>
 
-          <div className="space-y-6 lg:space-y-8">
+          <div className="space-y-6">
             <div className="bg-white border-2 border-[#FE6C3A] rounded shadow-sm p-6">
               <div className="text-center mb-4">
                 <div className="text-sm font-medium text-gray-600 mb-1">Monthly Plan</div>

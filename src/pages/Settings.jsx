@@ -97,14 +97,14 @@ export default function Settings() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 lg:py-12 w-full">
-      <div className="max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-6 lg:mb-8 border-b border-gray-200 pb-4">
-          <h1 className="text-2xl lg:text-3xl xl:text-4xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+        <div className="mb-6 border-b border-gray-200 pb-4">
+          <h1 className="text-2xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
             Account Settings
           </h1>
-          <p className="text-gray-600 text-sm lg:text-base">Manage your profile and preferences</p>
+          <p className="text-gray-600 text-sm">Manage your profile and preferences</p>
         </div>
 
         {success && (
@@ -121,15 +121,15 @@ export default function Settings() {
           </Alert>
         )}
 
-        <div className="bg-white border border-gray-200 rounded shadow-sm mb-6 lg:mb-8">
-          <div className="p-6 lg:p-8 border-b border-gray-200">
-            <h3 className="font-bold flex items-center gap-2 text-[#0D3B33] lg:text-lg">
-              <User className="w-4 h-4 lg:w-5 lg:h-5" />
+        <div className="bg-white border border-gray-200 rounded shadow-sm mb-6">
+          <div className="p-6 border-b border-gray-200">
+            <h3 className="font-bold flex items-center gap-2 text-[#0D3B33]">
+              <User className="w-4 h-4" />
               Profile Information
             </h3>
           </div>
-          <div className="p-6 lg:p-8">
-            <form onSubmit={handleSubmit} className="space-y-6 lg:space-y-8">
+          <div className="p-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {/* Profile Photo */}
               <div className="flex flex-col items-center gap-3 pb-6 border-b border-gray-200">
                 <Avatar className="w-24 h-24">
@@ -244,10 +244,10 @@ export default function Settings() {
 
         {/* Additional Settings Card */}
         <div className="bg-white border border-gray-200 rounded shadow-sm">
-          <div className="p-6 lg:p-8 border-b border-gray-200">
-            <h3 className="font-bold text-[#0D3B33] lg:text-lg">Account Actions</h3>
+          <div className="p-6 border-b border-gray-200">
+            <h3 className="font-bold text-[#0D3B33]">Account Actions</h3>
           </div>
-          <div className="p-6 lg:p-8">
+          <div className="p-6">
             <div className="space-y-3">
               <div className="flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded">
                 <div>

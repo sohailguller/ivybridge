@@ -274,19 +274,19 @@ export default function ApplyAsMentor() {
   const emailValidation = validateEmail();
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 lg:py-12 w-full">
-      <div className="max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8 lg:mb-12 border-b border-gray-200 pb-6">
-          <h1 className="text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-8 border-b border-gray-200 pb-6">
+          <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
             Become a Mentor
           </h1>
-          <p className="text-gray-600 lg:text-lg">
+          <p className="text-gray-600">
             Share your Ivy League experience and help aspiring students achieve their dreams
           </p>
         </div>
 
         {/* Progress Indicator */}
-        <div className="mb-8 lg:mb-12">
+        <div className="mb-8">
           <div className="flex items-center justify-between max-w-2xl mx-auto">
             {[1, 2, 3, 4].map((section) => (
               <div key={section} className="flex items-center">
@@ -319,7 +319,7 @@ export default function ApplyAsMentor() {
         )}
 
         <div className="bg-white border border-gray-200 rounded shadow-sm">
-          <div className="p-6 lg:p-8 xl:p-10">
+          <div className="p-6">
             <form onSubmit={handleSubmit}>
               {/* Section 1: Basic Information */}
               {currentSection === 1 && (
@@ -656,7 +656,7 @@ export default function ApplyAsMentor() {
               )}
 
               {/* Navigation Buttons */}
-              <div className="flex justify-between items-center pt-6 lg:pt-8 border-t border-gray-200 mt-6 lg:mt-8">
+              <div className="flex justify-between items-center pt-6 border-t border-gray-200 mt-6">
                 <Button
                   type="button"
                   variant="outline"

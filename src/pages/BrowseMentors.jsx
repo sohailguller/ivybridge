@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -61,19 +60,19 @@ export default function BrowseMentors() {
   const allMajors = [...new Set(mentors.map(m => m.major).filter(Boolean))];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 lg:py-12 w-full">
-      <div className="max-w-7xl lg:max-w-screen-xl xl:max-w-screen-2xl 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 lg:mb-12 border-b border-gray-200 pb-6">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 border-b border-gray-200 pb-6">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
             Find Your Perfect Mentor
           </h1>
-          <p className="text-gray-600 lg:text-lg xl:text-xl">
+          <p className="text-gray-600">
             Browse verified Ivy League students ready to guide you through your admissions journey
           </p>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded shadow-sm mb-6 lg:mb-8 p-4 lg:p-6">
-          <div className="grid md:grid-cols-4 gap-4 lg:gap-6">
+        <div className="bg-white border border-gray-200 rounded shadow-sm mb-6 p-4">
+          <div className="grid md:grid-cols-4 gap-4">
             <div className="md:col-span-2 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input
@@ -109,15 +108,15 @@ export default function BrowseMentors() {
             </Select>
           </div>
 
-          <div className="mt-3 flex items-center gap-2 text-sm lg:text-base text-gray-600">
-            <Filter className="w-4 h-4 lg:w-5 lg:h-5" />
+          <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
+            <Filter className="w-4 h-4" />
             <span>Showing {filteredMentors.length} mentors</span>
           </div>
         </div>
 
         {isLoading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 lg:gap-8">
-            {[...Array(8)].map((_, i) => (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
               <div key={i} className="bg-white border border-gray-200 rounded shadow-sm p-6">
                 <div className="flex items-start gap-4 mb-4">
                   <Skeleton className="w-16 h-16 rounded-full" />
@@ -132,13 +131,13 @@ export default function BrowseMentors() {
             ))}
           </div>
         ) : filteredMentors.length === 0 ? (
-          <div className="bg-white border border-gray-200 rounded shadow-sm p-12 lg:p-16 text-center">
-            <Users className="w-16 h-16 lg:w-20 lg:h-20 mx-auto mb-4 text-gray-300" />
-            <h3 className="text-xl lg:text-2xl font-bold mb-2 text-[#0D3B33]">No mentors found</h3>
-            <p className="text-gray-600 lg:text-lg">Try adjusting your filters or search query</p>
+          <div className="bg-white border border-gray-200 rounded shadow-sm p-12 text-center">
+            <Users className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+            <h3 className="text-xl font-bold mb-2 text-[#0D3B33]">No mentors found</h3>
+            <p className="text-gray-600">Try adjusting your filters or search query</p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 lg:gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredMentors.map((mentor) => {
               const user = getMentorUser(mentor.user_id);
 
@@ -148,7 +147,7 @@ export default function BrowseMentors() {
                   className="bg-white border border-gray-200 rounded shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden"
                   onClick={() => navigate(createPageUrl(`MentorProfile?id=${mentor.id}`))}
                 >
-                  <div className="h-24 lg:h-28 bg-gradient-to-r from-[#0D3B33] to-[#1a5a4e]" />
+                  <div className="h-24 bg-gradient-to-r from-[#0D3B33] to-[#1a5a4e]" />
 
                   <div className="p-6 -mt-8">
                     <Avatar className="w-16 h-16 border-4 border-white shadow-sm mb-4">
@@ -158,8 +157,8 @@ export default function BrowseMentors() {
                       </AvatarFallback>
                     </Avatar>
 
-                    <h3 className="text-lg lg:text-xl font-bold mb-1 text-[#0D3B33]">{user?.full_name || 'Mentor'}</h3>
-                    <div className="flex items-center gap-2 text-xs lg:text-sm text-gray-600 mb-3">
+                    <h3 className="text-lg font-bold mb-1 text-[#0D3B33]">{user?.full_name || 'Mentor'}</h3>
+                    <div className="flex items-center gap-2 text-xs text-gray-600 mb-3">
                       <GraduationCap className="w-4 h-4" />
                       <span>{mentor.university} • {mentor.year}</span>
                     </div>
