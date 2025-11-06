@@ -112,7 +112,7 @@ export default function Home() {
         />
 
         {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0D3B33]/90 via-[#0D3B33]/80 to-[#0D3B33]/70" />
+        //<div className="absolute inset-0 bg-gradient-to-br from-[#0D3B33]/90 via-[#0D3B33]/80 to-[#0D3B33]/70" />
 
         {/* Content */}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
