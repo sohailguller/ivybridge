@@ -100,9 +100,9 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white w-full">
       {/* Hero Section */}
-      <section className="relative min-h-[75vh] flex items-center overflow-hidden">
+      <section className="relative min-h-[75vh] lg:min-h-[85vh] flex items-center overflow-hidden w-full">
         {/* Background Video */}
         <iframe
           src="https://player.cloudinary.com/embed/?cloud_name=dihudketx&public_id=AdobeStock_503416191_Video_4K_Preview_ii79ks&profile=cld-default&autoplay=true&loop=true&muted=true&controls=false"
@@ -118,30 +118,30 @@ export default function Home() {
         <div className="absolute inset-0 bg-black/30" />
 
         {/* Content */}
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-          <div className="max-w-4xl mx-auto space-y-6">
-            <h1 className="text-4xl md:text-6xl font-bold leading-tight text-white" style={{ fontFamily: 'Georgia, serif' }}>
+        <div className="relative max-w-7xl lg:max-w-screen-xl xl:max-w-screen-2xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 text-center w-full">
+          <div className="max-w-4xl xl:max-w-5xl mx-auto space-y-6 lg:space-y-8">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight text-white" style={{ fontFamily: 'Georgia, serif' }}>
               Get Into Your Dream School
             </h1>
 
-            <p className="text-lg md:text-xl text-white/95 leading-relaxed max-w-3xl mx-auto">
+            <p className="text-lg md:text-xl lg:text-2xl xl:text-3xl text-white/95 leading-relaxed max-w-3xl xl:max-w-4xl mx-auto">
               Connect with verified Ivy League mentors for personalized admissions guidance.
               From essay reviews to interview prep — get the insider advantage.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            <div className="flex flex-col sm:flex-row gap-4 lg:gap-6 justify-center pt-4 lg:pt-6">
               <Button
                 size="lg"
-                className="btn-primary text-white rounded px-8 py-5 text-base font-semibold"
+                className="btn-primary text-white rounded px-8 lg:px-10 py-5 lg:py-6 text-base lg:text-lg font-semibold"
                 onClick={() => user ? navigate(createPageUrl("BrowseMentors")) : base44.auth.redirectToLogin(createPageUrl("BrowseMentors"))}
               >
                 Find Your Mentor
-                <ArrowRight className="w-4 h-4 ml-2" />
+                <ArrowRight className="w-4 h-4 lg:w-5 lg:h-5 ml-2" />
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="rounded px-8 py-5 text-base font-semibold bg-white/95 border-white text-[#0D3B33] hover:bg-white"
+                className="rounded px-8 lg:px-10 py-5 lg:py-6 text-base lg:text-lg font-semibold bg-white/95 border-white text-[#0D3B33] hover:bg-white"
                 onClick={() => navigate(createPageUrl("ApplyAsMentor"))}
               >
                 Become a Mentor
@@ -152,44 +152,44 @@ export default function Home() {
       </section>
 
       {/* Orange Border Accent */}
-      <div className="border-b-4 border-[#FE6C3A]" />
+      <div className="border-b-4 border-[#FE6C3A] w-full" />
 
       {/* Track Record Section */}
-      <section className="py-12 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+      <section className="py-12 lg:py-16 bg-gray-50 w-full">
+        <div className="max-w-7xl lg:max-w-screen-xl xl:max-w-screen-2xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8 lg:mb-12">
+            <h2 className="text-2xl lg:text-3xl xl:text-4xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
               Our Track Record
             </h2>
-            <p className="text-gray-600">Trusted by students worldwide</p>
+            <p className="text-gray-600 lg:text-lg">Trusted by students worldwide</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white border border-gray-200 rounded p-6 text-center">
-              <div className="text-4xl font-bold text-[#0D3B33] mb-2">{stats.mentors}+</div>
-              <div className="text-sm text-gray-600 font-medium">Verified Ivy League Mentors</div>
+          <div className="grid md:grid-cols-3 gap-6 lg:gap-8 xl:gap-10">
+            <div className="bg-white border border-gray-200 rounded p-6 lg:p-8 text-center">
+              <div className="text-4xl lg:text-5xl xl:text-6xl font-bold text-[#0D3B33] mb-2">{stats.mentors}+</div>
+              <div className="text-sm lg:text-base text-gray-600 font-medium">Verified Ivy League Mentors</div>
             </div>
-            <div className="bg-white border border-gray-200 rounded p-6 text-center">
-              <div className="text-4xl font-bold text-[#0D3B33] mb-2">{stats.students}+</div>
-              <div className="text-sm text-gray-600 font-medium">Students Successfully Guided</div>
+            <div className="bg-white border border-gray-200 rounded p-6 lg:p-8 text-center">
+              <div className="text-4xl lg:text-5xl xl:text-6xl font-bold text-[#0D3B33] mb-2">{stats.students}+</div>
+              <div className="text-sm lg:text-base text-gray-600 font-medium">Students Successfully Guided</div>
             </div>
-            <div className="bg-white border border-gray-200 rounded p-6 text-center">
-              <div className="text-4xl font-bold text-[#0D3B33] mb-2">98%</div>
-              <div className="text-sm text-gray-600 font-medium">Client Satisfaction Rate</div>
+            <div className="bg-white border border-gray-200 rounded p-6 lg:p-8 text-center">
+              <div className="text-4xl lg:text-5xl xl:text-6xl font-bold text-[#0D3B33] mb-2">98%</div>
+              <div className="text-sm lg:text-base text-gray-600 font-medium">Client Satisfaction Rate</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Universities Ticker */}
-      <section className="py-16 bg-white border-y border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-sm text-gray-500 mb-8 tracking-wider">MENTORS FROM</p>
+      <section className="py-16 lg:py-20 bg-white border-y border-gray-200 w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-sm lg:text-base text-gray-500 mb-8 lg:mb-12 tracking-wider">MENTORS FROM</p>
           <div className="overflow-hidden">
             <div className="flex animate-scroll whitespace-nowrap">
               {[...universities, ...universities, ...universities, ...universities].map((uni, idx) => (
-                <div key={idx} className="inline-flex items-center mx-12">
-                  <span className="text-3xl font-semibold text-[#0D3B33]">{uni}</span>
+                <div key={idx} className="inline-flex items-center mx-12 lg:mx-16 xl:mx-20">
+                  <span className="text-3xl lg:text-4xl xl:text-5xl font-semibold text-[#0D3B33]">{uni}</span>
                 </div>
               ))}
             </div>
@@ -208,16 +208,16 @@ export default function Home() {
       `}</style>
 
       {/* How It Works */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+      <section className="py-16 lg:py-20 bg-gray-50 w-full">
+        <div className="max-w-7xl lg:max-w-screen-xl xl:max-w-screen-2xl 2xl:max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 lg:mb-16">
+            <h2 className="text-3xl lg:text-4xl xl:text-5xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
               How IvyBridge Works
             </h2>
-            <p className="text-gray-600">A proven process to get you into your dream school</p>
+            <p className="text-gray-600 lg:text-lg xl:text-xl">A proven process to get you into your dream school</p>
           </div>
 
-          <div className="space-y-6 max-w-4xl mx-auto">
+          <div className="space-y-6 lg:space-y-8 max-w-4xl xl:max-w-5xl mx-auto">
             <div className="bg-white border border-gray-200 rounded p-6 border-l-4 border-l-[#FE6C3A]">
               <div className="flex gap-6">
                 <div className="flex-shrink-0">
@@ -273,25 +273,25 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+      <section className="py-16 lg:py-20 bg-white w-full">
+        <div className="max-w-7xl lg:max-w-screen-xl xl:max-w-screen-2xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 lg:mb-16">
+            <h2 className="text-3xl lg:text-4xl xl:text-5xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
               Everything You Need to Succeed
             </h2>
-            <p className="text-gray-600">Comprehensive tools and support for your college journey</p>
+            <p className="text-gray-600 lg:text-lg xl:text-xl">Comprehensive tools and support for your college journey</p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-8">
             {features.map((feature, index) => (
-              <div key={index} className="bg-white border border-gray-200 rounded p-6">
+              <div key={index} className="bg-white border border-gray-200 rounded p-6 lg:p-8">
                 <div className="flex gap-4">
-                  <div className="w-12 h-12 bg-[#0D3B33]/5 rounded flex items-center justify-center flex-shrink-0">
-                    <feature.icon className="w-6 h-6 text-[#0D3B33]" />
+                  <div className="w-12 h-12 lg:w-14 lg:h-14 bg-[#0D3B33]/5 rounded flex items-center justify-center flex-shrink-0">
+                    <feature.icon className="w-6 h-6 lg:w-7 lg:h-7 text-[#0D3B33]" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold mb-2 text-[#0D3B33]">{feature.title}</h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+                    <h3 className="text-lg lg:text-xl font-bold mb-2 text-[#0D3B33]">{feature.title}</h3>
+                    <p className="text-gray-600 text-sm lg:text-base leading-relaxed">{feature.description}</p>
                   </div>
                 </div>
               </div>
@@ -301,18 +301,18 @@ export default function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+      <section className="py-16 lg:py-20 bg-gray-50 w-full">
+        <div className="max-w-7xl lg:max-w-screen-xl xl:max-w-screen-2xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 lg:mb-16">
+            <h2 className="text-3xl lg:text-4xl xl:text-5xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
               Success Stories
             </h2>
-            <p className="text-gray-600">Hear from students who got into their dream schools</p>
+            <p className="text-gray-600 lg:text-lg xl:text-xl">Hear from students who got into their dream schools</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 xl:grid-cols-3 gap-6 lg:gap-8">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white border border-gray-200 rounded p-6">
+              <div key={index} className="bg-white border border-gray-200 rounded p-6 lg:p-8">
                 <div className="flex gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-[#FE6C3A] text-[#FE6C3A]" />
@@ -332,16 +332,16 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section className="py-16 bg-white border-t-4 border-t-[#FE6C3A]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+      <section className="py-16 lg:py-20 bg-white border-t-4 border-t-[#FE6C3A] w-full">
+        <div className="max-w-7xl lg:max-w-screen-xl xl:max-w-screen-2xl 2xl:max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 lg:mb-16">
+            <h2 className="text-3xl lg:text-4xl xl:text-5xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
               Simple, Transparent Pricing
             </h2>
-            <p className="text-gray-600">Choose the plan that works best for you</p>
+            <p className="text-gray-600 lg:text-lg xl:text-xl">Choose the plan that works best for you</p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-4xl xl:max-w-5xl mx-auto">
             <div className="bg-white border border-gray-200 rounded p-8">
               <div className="text-center">
                 <div className="text-base font-medium text-gray-600 mb-2">Monthly Plan</div>
@@ -419,27 +419,27 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-[#0D3B33] text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+      <section className="py-16 lg:py-20 bg-[#0D3B33] text-white w-full">
+        <div className="max-w-4xl xl:max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 lg:mb-6" style={{ fontFamily: 'Georgia, serif' }}>
             Ready to Start Your Journey?
           </h2>
-          <p className="text-lg mb-6 opacity-90">
+          <p className="text-lg lg:text-xl xl:text-2xl mb-6 lg:mb-8 opacity-90">
             Join hundreds of students who got personalized guidance from Ivy League mentors
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 lg:gap-6 justify-center">
             <Button
               size="lg"
-              className="btn-primary text-white rounded px-8 py-5"
+              className="btn-primary text-white rounded px-8 lg:px-10 py-5 lg:py-6 text-base lg:text-lg"
               onClick={() => navigate(createPageUrl("BrowseMentors"))}
             >
               Browse Mentors
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowRight className="w-4 h-4 lg:w-5 lg:h-5 ml-2" />
             </Button>
             <Button
               size="lg"
               variant="outline"
-              className="border-2 border-white text-white hover:bg-white/10 rounded px-8 py-5"
+              className="border-2 border-white text-white hover:bg-white/10 rounded px-8 lg:px-10 py-5 lg:py-6 text-base lg:text-lg"
               onClick={() => navigate(createPageUrl("ApplyAsMentor"))}
             >
               Become a Mentor

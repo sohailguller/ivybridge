@@ -128,16 +128,16 @@ export default function Layout({ children, currentPageName }) {
       `}</style>
 
       {/* Navigation */}
-      <nav className="bg-white border-b border-[#E6EFEA] sticky top-0 z-50 backdrop-blur-sm bg-white/95 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav className="bg-white border-b border-[#E6EFEA] sticky top-0 z-50 backdrop-blur-sm bg-white/95 shadow-sm w-full">
+        <div className="max-w-7xl lg:max-w-screen-xl xl:max-w-screen-2xl 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             {/* Left: Desktop Navigation Links */}
-            <div className="hidden md:flex items-center gap-8 flex-1">
+            <div className="hidden md:flex items-center gap-6 lg:gap-8 xl:gap-10 flex-1">
               {navItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`text-sm font-semibold transition-colors hover:text-[#FE6C3A] uppercase tracking-wider ${
+                  className={`text-sm lg:text-base font-semibold transition-colors hover:text-[#FE6C3A] uppercase tracking-wider ${
                     location.pathname === item.path ? 'text-[#FE6C3A]' : 'text-[#0D3B33]'
                   }`}
                   style={{ fontFamily: 'Oswald, sans-serif' }}
@@ -152,12 +152,12 @@ export default function Layout({ children, currentPageName }) {
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/65bfd119d_Untitleddesign3.png"
                 alt="IvyBridge"
-                className="h-20"
+                className="h-20 lg:h-24"
               />
             </Link>
 
             {/* Right: User Menu / Auth Buttons */}
-            <div className="hidden md:flex items-center gap-4 flex-1 justify-end">
+            <div className="hidden md:flex items-center gap-3 lg:gap-4 flex-1 justify-end">
               {!isLoading && (
                 <>
                   {user ? (
@@ -289,45 +289,45 @@ export default function Layout({ children, currentPageName }) {
       </nav>
 
       {/* Main Content */}
-      <main className="min-h-[calc(100vh-80px)]">
+      <main className="min-h-[calc(100vh-80px)] w-full">
         {children}
       </main>
 
       {/* Footer */}
-      <footer className="bg-[#E6EFEA] border-t border-[#0D3B33]/10 mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid md:grid-cols-4 gap-8">
+      <footer className="bg-[#E6EFEA] border-t border-[#0D3B33]/10 mt-20 w-full">
+        <div className="max-w-7xl lg:max-w-screen-xl xl:max-w-screen-2xl 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+          <div className="grid md:grid-cols-4 gap-8 lg:gap-12">
             <div className="md:col-span-2">
               <div className="mb-4">
                 <img 
                   src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/65bfd119d_Untitleddesign3.png"
                   alt="IvyBridge"
-                  className="h-14 object-contain object-left"
+                  className="h-14 lg:h-16 object-contain object-left"
                 />
               </div>
-              <p className="text-[#0D3B33]/70 leading-relaxed max-w-md text-sm">
+              <p className="text-[#0D3B33]/70 leading-relaxed max-w-md text-sm lg:text-base">
                 Connecting ambitious international students with verified Ivy League mentors
                 for personalized admissions guidance and ongoing support.
               </p>
             </div>
             <div>
-              <h3 className="font-bold mb-3 text-[#0D3B33] text-sm" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>PLATFORM</h3>
-              <ul className="space-y-2 text-[#0D3B33]/70 text-sm">
+              <h3 className="font-bold mb-3 text-[#0D3B33] text-sm lg:text-base" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>PLATFORM</h3>
+              <ul className="space-y-2 text-[#0D3B33]/70 text-sm lg:text-base">
                 <li><Link to={createPageUrl("BrowseMentors")} className="hover:text-[#FE6C3A] transition-colors hover:underline">Find a Mentor</Link></li>
                 <li><Link to={createPageUrl("ApplyAsMentor")} className="hover:text-[#FE6C3A] transition-colors hover:underline">Become a Mentor</Link></li>
                 <li><Link to={createPageUrl("Home")} className="hover:text-[#FE6C3A] transition-colors hover:underline">How It Works</Link></li>
               </ul>
             </div>
             <div>
-              <h3 className="font-bold mb-3 text-[#0D3B33] text-sm" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>SUPPORT</h3>
-              <ul className="space-y-2 text-[#0D3B33]/70 text-sm">
+              <h3 className="font-bold mb-3 text-[#0D3B33] text-sm lg:text-base" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>SUPPORT</h3>
+              <ul className="space-y-2 text-[#0D3B33]/70 text-sm lg:text-base">
                 <li><a href="#" className="hover:text-[#FE6C3A] transition-colors hover:underline">Help Center</a></li>
                 <li><a href="#" className="hover:text-[#FE6C3A] transition-colors hover:underline">Terms of Service</a></li>
                 <li><a href="#" className="hover:text-[#FE6C3A] transition-colors hover:underline">Privacy Policy</a></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-[#0D3B33]/10 mt-8 pt-6 text-center text-xs text-[#0D3B33]/50">
+          <div className="border-t border-[#0D3B33]/10 mt-8 pt-6 text-center text-xs lg:text-sm text-[#0D3B33]/50">
             © 2025 IvyBridge. All rights reserved.
           </div>
         </div>

@@ -246,8 +246,8 @@ export default function StudentDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-8 lg:py-12 w-full">
+      <div className="max-w-7xl lg:max-w-screen-xl xl:max-w-screen-2xl 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Success Alert */}
         {showSuccessAlert && (
           <Alert className="mb-6 border-green-200 bg-green-50">
@@ -279,15 +279,15 @@ export default function StudentDashboard() {
         )}
 
         {/* Header */}
-        <div className="mb-6 border-b border-gray-200 pb-4">
-          <h1 className="text-2xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+        <div className="mb-6 lg:mb-8 border-b border-gray-200 pb-4">
+          <h1 className="text-2xl lg:text-3xl xl:text-4xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
             Welcome back, {user?.full_name?.split(' ')[0] || 'Student'}!
           </h1>
-          <p className="text-gray-600 text-sm">Track your progress and stay connected with your mentor</p>
+          <p className="text-gray-600 text-sm lg:text-base">Track your progress and stay connected with your mentor</p>
         </div>
 
         {/* Quick Stats */}
-        <div className="grid md:grid-cols-4 gap-4 mb-6">
+        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
           <div className="bg-white border-l-4 border-l-[#FE6C3A] border border-gray-200 rounded shadow-sm p-4">
             <div className="flex items-center justify-between mb-2">
               <Clock className="w-6 h-6 text-[#FE6C3A]" />
@@ -324,7 +324,7 @@ export default function StudentDashboard() {
         </div>
 
         {/* Mentor Info Card */}
-        <div className="bg-white border border-gray-200 rounded shadow-sm mb-6 p-6">
+        <div className="bg-white border border-gray-200 rounded shadow-sm mb-6 lg:mb-8 p-6 lg:p-8">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <Avatar className="w-16 h-16">
@@ -414,7 +414,7 @@ export default function StudentDashboard() {
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 lg:space-y-8">
           <TabsList className="bg-white border border-gray-200 rounded p-1 shadow-sm">
             <TabsTrigger value="overview" className="rounded data-[state=active]:bg-[#FE6C3A] data-[state=active]:text-white text-sm">
               Overview
