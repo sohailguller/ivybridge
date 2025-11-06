@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -35,6 +36,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -44,6 +47,11 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedMentor, setSelectedMentor] = useState(null);
   const [selectedReport, setSelectedReport] = useState(null);
+  const [payoutDialogOpen, setPayoutDialogOpen] = useState(false);
+  const [selectedMentorForPayout, setSelectedMentorForPayout] = useState(null);
+  const [payoutAmount, setPayoutAmount] = useState("");
+  const [payoutDescription, setPayoutDescription] = useState("");
+  const [isProcessingPayout, setIsProcessingPayout] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -106,6 +114,24 @@ export default function AdminDashboard() {
     },
   });
 
+  const createPayoutMutation = useMutation({
+    mutationFn: async ({ mentorProfileId, amount, description }) => {
+      const response = await base44.functions.invoke('createMentorPayout', {
+        mentorProfileId,
+        amount,
+        description
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['approved-mentors-admin']);
+      setPayoutDialogOpen(false);
+      setSelectedMentorForPayout(null);
+      setPayoutAmount("");
+      setPayoutDescription("");
+    },
+  });
+
   const handleApproveMentor = async (mentorId, approve) => {
     await approveMentorMutation.mutateAsync({
       id: mentorId,
@@ -121,6 +147,40 @@ export default function AdminDashboard() {
         action_taken: action
       }
     });
+  };
+
+  const handleCreatePayout = async () => {
+    if (!payoutAmount || parseFloat(payoutAmount) <= 0) {
+      alert("Please enter a valid amount");
+      return;
+    }
+
+    if (!selectedMentorForPayout.stripe_connect_id) {
+      alert("This mentor hasn't connected their Stripe account yet");
+      return;
+    }
+
+    setIsProcessingPayout(true);
+    try {
+      await createPayoutMutation.mutateAsync({
+        mentorProfileId: selectedMentorForPayout.id,
+        amount: parseFloat(payoutAmount),
+        description: payoutDescription || "Monthly mentorship payout"
+      });
+      alert("Payout created successfully!");
+    } catch (error) {
+      alert(`Failed to create payout: ${error.message}`);
+    } finally {
+      setIsProcessingPayout(false);
+    }
+  };
+
+  const calculateMentorEarnings = (mentorProfileId) => {
+    const mentorSubs = subscriptions.filter(s => 
+      s.mentor_profile_id === mentorProfileId && s.status === "active"
+    );
+    const totalRevenue = mentorSubs.reduce((sum, sub) => sum + sub.amount, 0);
+    return totalRevenue * 0.7; // 70% goes to mentor
   };
 
   const getMentorUser = (userId) => allUsers.find(u => u.id === userId);
@@ -212,6 +272,9 @@ export default function AdminDashboard() {
               {pendingMentors.length > 0 && (
                 <Badge className="ml-2 bg-red-500 text-white">{pendingMentors.length}</Badge>
               )}
+            </TabsTrigger>
+            <TabsTrigger value="payouts" className="rounded-xl data-[state=active]:bg-[#FF6B5C] data-[state=active]:text-white">
+              Payouts
             </TabsTrigger>
             <TabsTrigger value="reports" className="rounded-xl data-[state=active]:bg-[#FF6B5C] data-[state=active]:text-white">
               Reports
@@ -404,6 +467,97 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
 
+          <TabsContent value="payouts">
+            <Card className="rounded-3xl border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle>Mentor Payouts</CardTitle>
+                <p className="text-sm text-gray-600">Manage monthly payouts to mentors (70% of revenue)</p>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Mentor</TableHead>
+                      <TableHead>University</TableHead>
+                      <TableHead>Active Students</TableHead>
+                      <TableHead>Earnings (70%)</TableHead>
+                      <TableHead>Stripe Status</TableHead>
+                      <TableHead>Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {approvedMentors.map(mentor => {
+                      const mentorUser = getMentorUser(mentor.user_id);
+                      const earnings = calculateMentorEarnings(mentor.id);
+                      
+                      return (
+                        <TableRow key={mentor.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <Avatar className="w-10 h-10">
+                                <AvatarImage src={mentor.profile_photo_url} />
+                                <AvatarFallback className="bg-[#B3E5FC]">
+                                  {mentorUser?.full_name?.charAt(0) || 'M'}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-medium">{mentorUser?.full_name}</p>
+                                <p className="text-xs text-gray-500">{mentorUser?.email}</p>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{mentor.university}</Badge>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {mentor.total_students || 0}
+                          </TableCell>
+                          <TableCell>
+                            <span className="font-bold text-green-600">
+                              ${earnings.toFixed(2)}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            {mentor.stripe_connect_id ? (
+                              <Badge className="bg-green-100 text-green-800">
+                                Connected
+                              </Badge>
+                            ) : (
+                              <Badge className="bg-red-100 text-red-800">
+                                Not Connected
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              size="sm"
+                              onClick={() => {
+                                setSelectedMentorForPayout(mentor);
+                                setPayoutAmount(earnings.toFixed(2));
+                                setPayoutDialogOpen(true);
+                              }}
+                              disabled={!mentor.stripe_connect_id || earnings === 0 || createPayoutMutation.isPending}
+                            >
+                              Create Payout
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+
+                {approvedMentors.length === 0 && (
+                  <div className="text-center py-12 text-gray-500">
+                    <DollarSign className="w-16 h-16 mx-auto mb-4 opacity-30" />
+                    <p className="text-lg font-medium mb-2">No Active Mentors</p>
+                    <p className="text-sm">Approve mentor applications to see them here</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="reports">
             <Card className="rounded-3xl border-0 shadow-lg">
               <CardHeader>
@@ -564,6 +718,7 @@ export default function AdminDashboard() {
                     variant="outline"
                     className="flex-1"
                     onClick={() => handleResolveReport(selectedReport.id, "Dismissed as minor issue")}
+                    disabled={updateReportMutation.isPending}
                   >
                     Dismiss
                   </Button>
@@ -571,11 +726,110 @@ export default function AdminDashboard() {
                     variant="destructive"
                     className="flex-1"
                     onClick={() => handleResolveReport(selectedReport.id, "User warned")}
+                    disabled={updateReportMutation.isPending}
                   >
                     Warn User
                   </Button>
                 </div>
               )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Payout Dialog */}
+      {selectedMentorForPayout && (
+        <Dialog open={payoutDialogOpen} onOpenChange={setPayoutDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Create Payout</DialogTitle>
+              <DialogDescription>
+                Send payout to {getMentorUser(selectedMentorForPayout.user_id)?.full_name}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="p-4 bg-gray-50 rounded-lg space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Mentor:</span>
+                  <span className="font-medium">{getMentorUser(selectedMentorForPayout.user_id)?.full_name}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Active Students:</span>
+                  <span className="font-medium">{selectedMentorForPayout?.total_students || 0}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Stripe Account:</span>
+                  {selectedMentorForPayout.stripe_connect_id ? (
+                    <Badge className="bg-green-100 text-green-800">Connected</Badge>
+                  ) : (
+                    <Badge className="bg-red-100 text-red-800">Not Connected</Badge>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="payout-amount">Payout Amount ($)</Label>
+                <Input
+                  id="payout-amount"
+                  type="number"
+                  step="0.01"
+                  value={payoutAmount}
+                  onChange={(e) => setPayoutAmount(e.target.value)}
+                  placeholder="0.00"
+                  className="h-12 rounded-xl"
+                  disabled={isProcessingPayout}
+                />
+                <p className="text-xs text-gray-500">
+                  Calculated earnings based on 70% revenue share
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="payout-description">Description (Optional)</Label>
+                <Input
+                  id="payout-description"
+                  value={payoutDescription}
+                  onChange={(e) => setPayoutDescription(e.target.value)}
+                  placeholder="Monthly mentorship payout"
+                  className="h-12 rounded-xl"
+                  disabled={isProcessingPayout}
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setPayoutDialogOpen(false)}
+                  disabled={isProcessingPayout}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                  onClick={handleCreatePayout}
+                  disabled={isProcessingPayout || !payoutAmount || parseFloat(payoutAmount) <= 0 || !selectedMentorForPayout.stripe_connect_id}
+                >
+                  {isProcessingPayout ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <DollarSign className="w-4 h-4 mr-2" />
+                      Send ${payoutAmount}
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-xs text-blue-800">
+                  <strong>Note:</strong> Funds will be transferred to the mentor's connected Stripe account. 
+                  It typically takes 2-3 business days to arrive in their bank account.
+                </p>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
