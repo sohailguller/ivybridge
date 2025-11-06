@@ -302,7 +302,7 @@ export default function Layout({ children, currentPageName }) {
                 <img 
                   src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/65bfd119d_Untitleddesign3.png"
                   alt="IvyBridge"
-                  className="h-16"
+                  className="h-18"
                 />
               </div>
               <p className="text-[#0D3B33]/70 leading-relaxed max-w-md text-sm">
