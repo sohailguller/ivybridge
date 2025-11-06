@@ -1,13 +1,14 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
-import { 
-  Menu, 
-  X, 
-  GraduationCap, 
-  LogOut, 
-  User, 
+import {
+  Menu,
+  X,
+  GraduationCap,
+  LogOut,
+  User,
   MessageSquare,
   LayoutDashboard,
   Users,
@@ -22,6 +23,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import NotificationCenter from "./components/NotificationCenter";
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
@@ -69,39 +71,39 @@ export default function Layout({ children, currentPageName }) {
     <div className="min-h-screen bg-[#FAFAFA]">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
+
         :root {
           --primary: #FF6B5C;
           --secondary: #B3E5FC;
           --background: #FAFAFA;
           --text: #222222;
         }
-        
+
         body {
           font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
           color: var(--text);
         }
-        
+
         h1, h2, h3, h4, h5, h6 {
           font-family: Georgia, 'Times New Roman', serif;
           font-weight: 600;
         }
-        
+
         .btn-primary {
           background-color: var(--primary);
           transition: all 0.3s ease;
         }
-        
+
         .btn-primary:hover {
           background-color: #E55A4C;
           transform: translateY(-2px);
           box-shadow: 0 8px 16px rgba(255, 107, 92, 0.25);
         }
-        
+
         .card-hover {
           transition: all 0.3s ease;
         }
-        
+
         .card-hover:hover {
           transform: translateY(-4px);
           box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
@@ -142,44 +144,47 @@ export default function Layout({ children, currentPageName }) {
               {!isLoading && (
                 <>
                   {user ? (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="flex items-center gap-3">
-                          <Avatar className="w-9 h-9">
-                            <AvatarImage src={user.profile_photo_url} />
-                            <AvatarFallback className="bg-[#B3E5FC] text-[#222222]">
-                              {user.full_name?.charAt(0) || user.email?.charAt(0)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span className="text-sm font-medium">{user.full_name || user.email}</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-56">
-                        <DropdownMenuItem onClick={() => navigate(getDashboardUrl())}>
-                          <LayoutDashboard className="w-4 h-4 mr-2" />
-                          Dashboard
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate(createPageUrl("Settings"))}>
-                          <Settings className="w-4 h-4 mr-2" />
-                          Settings
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                          <LogOut className="w-4 h-4 mr-2" />
-                          Logout
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <>
+                      <NotificationCenter userId={user.id} />
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="flex items-center gap-3">
+                            <Avatar className="w-9 h-9">
+                              <AvatarImage src={user.profile_photo_url} />
+                              <AvatarFallback className="bg-[#B3E5FC] text-[#222222]">
+                                {user.full_name?.charAt(0) || user.email?.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="text-sm font-medium">{user.full_name || user.email}</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-56">
+                          <DropdownMenuItem onClick={() => navigate(getDashboardUrl())}>
+                            <LayoutDashboard className="w-4 h-4 mr-2" />
+                            Dashboard
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => navigate(createPageUrl("Settings"))}>
+                            <Settings className="w-4 h-4 mr-2" />
+                            Settings
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                            <LogOut className="w-4 h-4 mr-2" />
+                            Logout
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </>
                   ) : (
                     <>
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        variant="ghost"
                         onClick={() => base44.auth.redirectToLogin(location.pathname)}
                         className="text-sm font-medium"
                       >
                         Sign In
                       </Button>
-                      <Button 
+                      <Button
                         onClick={() => base44.auth.redirectToLogin(location.pathname)}
                         className="btn-primary text-white rounded-full px-6"
                       >
@@ -279,7 +284,7 @@ export default function Layout({ children, currentPageName }) {
                 </span>
               </div>
               <p className="text-gray-600 text-sm leading-relaxed max-w-md">
-                Connecting ambitious international students with verified Ivy League mentors 
+                Connecting ambitious international students with verified Ivy League mentors
                 for personalized admissions guidance and ongoing support.
               </p>
             </div>
