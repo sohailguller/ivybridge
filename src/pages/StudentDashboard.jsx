@@ -202,57 +202,57 @@ export default function StudentDashboard() {
   // Show loading state while waiting for webhook to activate subscription
   if (checkingPayment && activeSub?.status === "pending") {
     return (
-      <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
-        <Card className="max-w-md mx-4 rounded-3xl border-0 shadow-xl">
-          <CardContent className="p-12 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF6B5C] mx-auto mb-6"></div>
-            <h2 className="text-2xl font-bold mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md bg-white border border-gray-200 rounded shadow-sm p-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#FE6C3A] mx-auto mb-4"></div>
+            <h2 className="text-xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
               Activating Your Subscription
             </h2>
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 mb-3 text-sm">
               Please wait while we confirm your payment and activate your mentorship...
             </p>
-            <p className="text-sm text-gray-500">This usually takes just a few seconds.</p>
-          </CardContent>
-        </Card>
+            <p className="text-xs text-gray-500">This usually takes just a few seconds.</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!activeSub || !mentor) {
     return (
-      <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center p-4">
-        <Card className="max-w-md rounded-3xl border-0 shadow-xl">
-          <CardContent className="p-12 text-center">
-            <div className="w-20 h-20 bg-[#FF6B5C]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-              <AlertCircle className="w-10 h-10 text-[#FF6B5C]" />
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md bg-white border border-gray-200 rounded shadow-sm p-8">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertCircle className="w-8 h-8 text-gray-400" />
             </div>
-            <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+            <h2 className="text-2xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
               No Active Mentorship
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 mb-4 text-sm">
               You don't have an active mentorship yet. Browse our mentors to get started!
             </p>
             <Button
-              className="btn-primary text-white rounded-xl"
+              className="btn-primary text-white rounded"
               onClick={() => navigate(createPageUrl("BrowseMentors"))}
             >
               Find a Mentor
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Success Alert */}
         {showSuccessAlert && (
           <Alert className="mb-6 border-green-200 bg-green-50">
-            <AlertDescription className="text-green-800 flex items-center gap-2">
-              <CheckCircle className="w-5 h-5" />
+            <AlertDescription className="text-green-800 flex items-center gap-2 text-sm">
+              <CheckCircle className="w-4 h-4" />
               <span>
                 <strong>Payment successful!</strong> Your mentorship has been activated. Welcome to IvyBridge!
               </span>
@@ -263,280 +263,267 @@ export default function StudentDashboard() {
         {/* Pending Subscription Alert */}
         {activeSub?.status === "pending" && (
           <Alert className="mb-6 border-yellow-200 bg-yellow-50">
-            <AlertDescription className="text-yellow-800 flex items-center gap-2">
-              <Clock className="w-5 h-5" />
-              <span>
-                Your subscription is being processed. Full access will be available shortly.
-              </span>
+            <AlertDescription className="text-yellow-800 flex items-center gap-2 text-sm">
+              <Clock className="w-4 h-4" />
+              <span>Your subscription is being processed. Full access will be available shortly.</span>
             </AlertDescription>
           </Alert>
         )}
         {activeSub?.status === "cancelled" && (
           <Alert className="mb-6 border-red-200 bg-red-50">
-            <AlertDescription className="text-red-800 flex items-center gap-2">
-              <AlertCircle className="w-5 h-5" />
-              <span>
-                Your subscription is cancelled. You will retain access until {activeSub.end_date}.
-              </span>
+            <AlertDescription className="text-red-800 flex items-center gap-2 text-sm">
+              <AlertCircle className="w-4 h-4" />
+              <span>Your subscription is cancelled. You will retain access until {activeSub.end_date}.</span>
             </AlertDescription>
           </Alert>
         )}
 
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+        <div className="mb-6 border-b border-gray-200 pb-4">
+          <h1 className="text-2xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
             Welcome back, {user?.full_name?.split(' ')[0] || 'Student'}!
           </h1>
-          <p className="text-gray-600">Track your progress and stay connected with your mentor</p>
+          <p className="text-gray-600 text-sm">Track your progress and stay connected with your mentor</p>
         </div>
 
         {/* Quick Stats */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <Card className="rounded-2xl border-0 shadow-lg bg-gradient-to-br from-[#FF6B5C] to-[#E55A4C] text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-3">
-                <Clock className="w-8 h-8 opacity-80" />
-              </div>
-              <div className="text-3xl font-bold mb-1">{activeSub.months_remaining}</div>
-              <div className="text-sm opacity-90">Months Remaining</div>
-            </CardContent>
-          </Card>
+        <div className="grid md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white border-l-4 border-l-[#FE6C3A] border border-gray-200 rounded shadow-sm p-4">
+            <div className="flex items-center justify-between mb-2">
+              <Clock className="w-6 h-6 text-[#FE6C3A]" />
+            </div>
+            <div className="text-2xl font-bold mb-1 text-[#0D3B33]">{activeSub.months_remaining}</div>
+            <div className="text-xs text-gray-600">Months Remaining</div>
+          </div>
 
-          <Card className="rounded-2xl border-0 shadow-lg">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-3">
-                <CheckCircle className="w-8 h-8 text-[#FF6B5C]" />
-              </div>
-              <div className="text-3xl font-bold mb-1">{completedTasks.length}</div>
-              <div className="text-sm text-gray-600">Tasks Completed</div>
-            </CardContent>
-          </Card>
+          <div className="bg-white border border-gray-200 rounded shadow-sm p-4">
+            <div className="flex items-center justify-between mb-2">
+              <CheckCircle className="w-6 h-6 text-[#0D3B33]" />
+            </div>
+            <div className="text-2xl font-bold mb-1 text-[#0D3B33]">{completedTasks.length}</div>
+            <div className="text-xs text-gray-600">Tasks Completed</div>
+          </div>
 
-          <Card className="rounded-2xl border-0 shadow-lg">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-3">
-                <MessageSquare className="w-8 h-8 text-[#B3E5FC]" />
-              </div>
-              <div className="text-3xl font-bold mb-1">
-                {activeSub.status === "active" ? "Active" : "Pending"}
-              </div>
-              <div className="text-sm text-gray-600">Mentorship Status</div>
-            </CardContent>
-          </Card>
+          <div className="bg-white border border-gray-200 rounded shadow-sm p-4">
+            <div className="flex items-center justify-between mb-2">
+              <MessageSquare className="w-6 h-6 text-gray-400" />
+            </div>
+            <div className="text-2xl font-bold mb-1 text-[#0D3B33]">
+              {activeSub.status === "active" ? "Active" : "Pending"}
+            </div>
+            <div className="text-xs text-gray-600">Mentorship Status</div>
+          </div>
 
-          <Card className="rounded-2xl border-0 shadow-lg">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-3">
-                <TrendingUp className="w-8 h-8 text-green-500" />
-              </div>
-              <div className="text-3xl font-bold mb-1">{pendingTasks.length}</div>
-              <div className="text-sm text-gray-600">Pending Tasks</div>
-            </CardContent>
-          </Card>
+          <div className="bg-white border border-gray-200 rounded shadow-sm p-4">
+            <div className="flex items-center justify-between mb-2">
+              <TrendingUp className="w-6 h-6 text-green-500" />
+            </div>
+            <div className="text-2xl font-bold mb-1 text-[#0D3B33]">{pendingTasks.length}</div>
+            <div className="text-xs text-gray-600">Pending Tasks</div>
+          </div>
         </div>
 
         {/* Mentor Info Card */}
-        <Card className="rounded-3xl border-0 shadow-xl mb-8">
-          <CardContent className="p-8">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-              <div className="flex items-center gap-4">
-                <Avatar className="w-20 h-20">
-                  <AvatarImage src={mentor.profile_photo_url || mentorUser?.profile_photo_url} />
-                  <AvatarFallback className="bg-[#B3E5FC] text-2xl">
-                    {mentorUser?.full_name?.charAt(0) || 'M'}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="text-2xl font-bold mb-1">Your Mentor</h3>
-                  <p className="text-xl text-gray-700 mb-2">{mentorUser?.full_name}</p>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Badge className="bg-[#B3E5FC]/30 text-[#222222] border-0">
-                      {mentor.university}
-                    </Badge>
-                    <span>•</span>
-                    <span>{mentor.major}</span>
-                  </div>
+        <div className="bg-white border border-gray-200 rounded shadow-sm mb-6 p-6">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <Avatar className="w-16 h-16">
+                <AvatarImage src={mentor.profile_photo_url || mentorUser?.profile_photo_url} />
+                <AvatarFallback className="bg-[#E6EFEA] text-xl text-[#0D3B33]">
+                  {mentorUser?.full_name?.charAt(0) || 'M'}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h3 className="text-lg font-bold text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>Your Mentor</h3>
+                <p className="text-base text-gray-700 mb-1">{mentorUser?.full_name}</p>
+                <div className="flex items-center gap-2 text-xs text-gray-600">
+                  <Badge className="bg-[#E6EFEA] text-[#0D3B33] border-0 text-xs">
+                    {mentor.university}
+                  </Badge>
+                  <span>•</span>
+                  <span>{mentor.major}</span>
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                {mentor.calendly_link && (
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+              {mentor.calendly_link && (
+                <Button
+                  variant="outline"
+                  className="rounded text-sm"
+                  onClick={() => window.open(mentor.calendly_link, '_blank')}
+                >
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Schedule Meeting
+                  <ExternalLink className="w-3 h-3 ml-2" />
+                </Button>
+              )}
+              <Button
+                className="btn-primary text-white rounded text-sm"
+                onClick={() => setActiveTab("chat")}
+              >
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Message Mentor
+              </Button>
+            </div>
+          </div>
+
+          {/* Subscription Management */}
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-medium text-gray-700">Subscription Plan</p>
+                <p className="text-base font-bold capitalize text-[#0D3B33]">{activeSub.plan_type} Plan</p>
+                <p className="text-xs text-gray-500">
+                  {activeSub.status === "active" ? `${activeSub.months_remaining} months remaining` : (activeSub.status === "pending" ? "Subscription pending activation" : "Subscription cancelled")}
+                </p>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                {activeSub.status === "active" && !myReview && (
                   <Button
                     variant="outline"
-                    className="rounded-xl"
-                    onClick={() => window.open(mentor.calendly_link, '_blank')}
+                    size="sm"
+                    className="rounded text-xs"
+                    onClick={() => setShowReviewDialog(true)}
                   >
-                    <Calendar className="w-4 h-4 mr-2" />
-                    Schedule Meeting
-                    <ExternalLink className="w-4 h-4 ml-2" />
+                    <Star className="w-3 h-3 mr-1" />
+                    Write Review
                   </Button>
                 )}
                 <Button
-                  className="btn-primary text-white rounded-xl"
-                  onClick={() => setActiveTab("chat")}
+                  variant="outline"
+                  size="sm"
+                  className="rounded text-xs text-gray-600"
+                  onClick={() => setShowReportDialog(true)}
                 >
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  Message Mentor
+                  <AlertCircle className="w-3 h-3 mr-1" />
+                  Report Issue
                 </Button>
-              </div>
-            </div>
-
-            {/* Subscription Management */}
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-700">Subscription Plan</p>
-                  <p className="text-lg font-bold capitalize">{activeSub.plan_type} Plan</p>
-                  <p className="text-xs text-gray-500">
-                    {activeSub.status === "active" ? `${activeSub.months_remaining} months remaining` : (activeSub.status === "pending" ? "Subscription pending activation" : "Subscription cancelled")}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  {activeSub.status === "active" && !myReview && (
-                    <Button
-                      variant="outline"
-                      className="rounded-xl"
-                      onClick={() => setShowReviewDialog(true)}
-                    >
-                      <Star className="w-4 h-4 mr-2" />
-                      Write Review
-                    </Button>
-                  )}
+                {activeSub.status === "active" && (
                   <Button
                     variant="outline"
-                    className="rounded-xl text-gray-600"
-                    onClick={() => setShowReportDialog(true)}
+                    size="sm"
+                    className="rounded text-xs text-red-600 border-red-200 hover:bg-red-50"
+                    onClick={() => setCancelDialogOpen(true)}
                   >
-                    <AlertCircle className="w-4 h-4 mr-2" />
-                    Report Issue
+                    Cancel Subscription
                   </Button>
-                  {activeSub.status === "active" && (
-                    <Button
-                      variant="outline"
-                      className="rounded-xl text-red-600 border-red-200 hover:bg-red-50"
-                      onClick={() => setCancelDialogOpen(true)}
-                    >
-                      Cancel Subscription
-                    </Button>
-                  )}
-                </div>
+                )}
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-white border rounded-2xl p-1 shadow-sm">
-            <TabsTrigger value="overview" className="rounded-xl data-[state=active]:bg-[#FF6B5C] data-[state=active]:text-white">
+          <TabsList className="bg-white border border-gray-200 rounded p-1 shadow-sm">
+            <TabsTrigger value="overview" className="rounded data-[state=active]:bg-[#FE6C3A] data-[state=active]:text-white text-sm">
               Overview
             </TabsTrigger>
-            <TabsTrigger value="chat" className="rounded-xl data-[state=active]:bg-[#FF6B5C] data-[state=active]:text-white">
+            <TabsTrigger value="chat" className="rounded data-[state=active]:bg-[#FE6C3A] data-[state=active]:text-white text-sm">
               Chat
             </TabsTrigger>
-            <TabsTrigger value="tasks" className="rounded-xl data-[state=active]:bg-[#FF6B5C] data-[state=active]:text-white">
+            <TabsTrigger value="tasks" className="rounded data-[state=active]:bg-[#FE6C3A] data-[state=active]:text-white text-sm">
               Tasks
             </TabsTrigger>
-            <TabsTrigger value="progress" className="rounded-xl data-[state=active]:bg-[#FF6B5C] data-[state=active]:text-white">
+            <TabsTrigger value="progress" className="rounded data-[state=active]:bg-[#FE6C3A] data-[state=active]:text-white text-sm">
               Progress
             </TabsTrigger>
-            <TabsTrigger value="billing" className="rounded-xl data-[state=active]:bg-[#FF6B5C] data-[state=active]:text-white">
+            <TabsTrigger value="billing" className="rounded data-[state=active]:bg-[#FE6C3A] data-[state=active]:text-white text-sm">
               Billing
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
-              <Card className="rounded-3xl border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5 text-[#FF6B5C]" />
+              <div className="bg-white border border-gray-200 rounded shadow-sm">
+                <div className="p-4 border-b border-gray-200">
+                  <h3 className="font-bold flex items-center gap-2 text-[#0D3B33]">
+                    <CheckCircle className="w-4 h-4 text-[#FE6C3A]" />
                     Your Tasks
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
+                  </h3>
+                </div>
+                <div className="p-4">
                   <TaskList tasks={tasks.slice(0, 5)} studentView={true} />
                   {tasks.length > 5 && (
                     <Button
                       variant="ghost"
-                      className="w-full mt-4"
+                      className="w-full mt-3 text-sm"
                       onClick={() => setActiveTab("tasks")}
                     >
                       View All Tasks
                     </Button>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
-              <Card className="rounded-3xl border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-[#FF6B5C]" />
+              <div className="bg-white border border-gray-200 rounded shadow-sm">
+                <div className="p-4 border-b border-gray-200">
+                  <h3 className="font-bold flex items-center gap-2 text-[#0D3B33]">
+                    <TrendingUp className="w-4 h-4 text-[#FE6C3A]" />
                     Recent Progress
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
+                  </h3>
+                </div>
+                <div className="p-4">
                   <ProgressTimeline notes={progressNotes.slice(0, 3)} />
                   {progressNotes.length > 3 && (
                     <Button
                       variant="ghost"
-                      className="w-full mt-4"
+                      className="w-full mt-3 text-sm"
                       onClick={() => setActiveTab("progress")}
                     >
                       View All Updates
                     </Button>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
           </TabsContent>
 
           <TabsContent value="chat">
-            <Card className="rounded-3xl border-0 shadow-lg">
-              <CardContent className="p-0">
-                <ChatBox
-                  currentUserId={user.id}
-                  otherUserId={mentor.user_id}
-                  otherUserName={mentorUser?.full_name}
-                  otherUserPhoto={mentor.profile_photo_url || mentorUser?.profile_photo_url}
-                  subscriptionId={activeSub.id}
-                />
-              </CardContent>
-            </Card>
+            <div className="bg-white border border-gray-200 rounded shadow-sm">
+              <ChatBox
+                currentUserId={user.id}
+                otherUserId={mentor.user_id}
+                otherUserName={mentorUser?.full_name}
+                otherUserPhoto={mentor.profile_photo_url || mentorUser?.profile_photo_url}
+                subscriptionId={activeSub.id}
+              />
+            </div>
           </TabsContent>
 
           <TabsContent value="tasks">
-            <Card className="rounded-3xl border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle>All Tasks</CardTitle>
-              </CardHeader>
-              <CardContent>
+            <div className="bg-white border border-gray-200 rounded shadow-sm">
+              <div className="p-4 border-b border-gray-200">
+                <h3 className="font-bold text-[#0D3B33]">All Tasks</h3>
+              </div>
+              <div className="p-4">
                 <TaskList tasks={tasks} studentView={true} />
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="progress">
-            <Card className="rounded-3xl border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle>Progress History</CardTitle>
-              </CardHeader>
-              <CardContent>
+            <div className="bg-white border border-gray-200 rounded shadow-sm">
+              <div className="p-4 border-b border-gray-200">
+                <h3 className="font-bold text-[#0D3B33]">Progress History</h3>
+              </div>
+              <div className="p-4">
                 <ProgressTimeline notes={progressNotes} />
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="billing">
-            <Card className="rounded-3xl border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle>Billing & Subscription</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="bg-gradient-to-br from-[#FF6B5C]/10 to-[#B3E5FC]/10 rounded-2xl p-6">
+            <div className="bg-white border border-gray-200 rounded shadow-sm">
+              <div className="p-4 border-b border-gray-200">
+                <h3 className="font-bold text-[#0D3B33]">Billing & Subscription</h3>
+              </div>
+              <div className="p-6 space-y-6">
+                <div className="bg-gray-50 border border-gray-200 rounded p-4">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <p className="text-sm text-gray-600">Current Plan</p>
-                      <p className="text-2xl font-bold capitalize">{activeSub.plan_type}</p>
+                      <p className="text-xl font-bold capitalize text-[#0D3B33]">{activeSub.plan_type}</p>
                     </div>
                     <Badge className={`${
                       activeSub.status === "active" ? "bg-green-100 text-green-800" :
@@ -567,31 +554,31 @@ export default function StudentDashboard() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold mb-4">Payment History</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                  <h3 className="font-semibold mb-3 text-sm">Payment History</h3>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                          <CheckCircle className="w-5 h-5 text-green-600" />
+                        <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                          <CheckCircle className="w-4 h-4 text-green-600" />
                         </div>
                         <div>
-                          <p className="font-medium">Initial Payment</p>
-                          <p className="text-sm text-gray-600">{activeSub.start_date}</p>
+                          <p className="font-medium text-sm">Initial Payment</p>
+                          <p className="text-xs text-gray-600">{activeSub.start_date}</p>
                         </div>
                       </div>
-                      <p className="font-bold">${activeSub.amount}</p>
+                      <p className="font-bold text-sm">${activeSub.amount}</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                  <p className="text-sm text-blue-800">
+                <div className="bg-blue-50 border border-blue-200 rounded p-4">
+                  <p className="text-xs text-blue-800">
                     <strong>Note:</strong> For any billing questions or to update payment methods, 
                     please contact support or manage your subscription through Stripe.
                   </p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
