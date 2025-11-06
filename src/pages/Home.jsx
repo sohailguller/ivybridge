@@ -179,14 +179,14 @@ export default function Home() {
       </section>
 
       {/* Universities Ticker */}
-      <section className="py-8 bg-white border-y border-gray-200">
+      <section className="py-16 bg-white border-y border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-sm text-gray-500 mb-4">MENTORS FROM</p>
+          <p className="text-center text-sm text-gray-500 mb-8 tracking-wider">MENTORS FROM</p>
           <div className="overflow-hidden">
             <div className="flex animate-scroll whitespace-nowrap">
-              {[...universities, ...universities].map((uni, idx) => (
-                <div key={idx} className="inline-flex items-center mx-8">
-                  <span className="text-lg font-semibold text-[#0D3B33]">{uni}</span>
+              {[...universities, ...universities, ...universities, ...universities].map((uni, idx) => (
+                <div key={idx} className="inline-flex items-center mx-12">
+                  <span className="text-3xl font-semibold text-[#0D3B33]">{uni}</span>
                 </div>
               ))}
             </div>
@@ -200,7 +200,7 @@ export default function Home() {
           100% { transform: translateX(-50%); }
         }
         .animate-scroll {
-          animation: scroll 20s linear infinite;
+          animation: scroll 40s linear infinite;
         }
       `}</style>
 
