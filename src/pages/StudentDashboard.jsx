@@ -3,15 +3,15 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  MessageSquare, 
-  CheckCircle, 
+import {
+  MessageSquare,
+  CheckCircle,
   Calendar,
   TrendingUp,
   AlertCircle,
@@ -23,40 +23,50 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import ChatBox from "../components/dashboard/ChatBox";
 import TaskList from "../components/dashboard/TaskList";
 import ProgressTimeline from "../components/dashboard/ProgressTimeline";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const [checkingPayment, setCheckingPayment] = useState(false); // Added state
+  const [checkingPayment, setCheckingPayment] = useState(false);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   useEffect(() => {
     loadUser();
     checkPaymentSuccess();
   }, []);
 
-  const checkPaymentSuccess = async () => { // Made async
+  const checkPaymentSuccess = async () => {
     // Check if user just completed payment
     const urlParams = new URLSearchParams(window.location.search);
     const paymentSuccess = urlParams.get('payment_success');
-    
+
     if (paymentSuccess === 'true') {
       setShowSuccessAlert(true);
-      setCheckingPayment(true); // Set checkingPayment to true
-      
+      setCheckingPayment(true);
+
       // Clear the URL parameter
       window.history.replaceState({}, '', window.location.pathname);
-      
+
       // Wait a bit for webhook to process and activate subscription
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Added delay
-      
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
       // Clear localStorage
       localStorage.removeItem('pending_subscription_id');
       localStorage.removeItem('mentor_profile_id');
-      
-      setCheckingPayment(false); // Set checkingPayment to false
+
+      setCheckingPayment(false);
     }
   };
 
@@ -82,7 +92,7 @@ export default function StudentDashboard() {
   // Check for both active AND pending subscriptions
   const { data: subscriptions = [] } = useQuery({
     queryKey: ['my-subscriptions', user?.id],
-    queryFn: async () => { // Modified queryFn to be async and fetch both statuses
+    queryFn: async () => {
       const active = await base44.entities.Subscription.filter({ student_id: user.id, status: "active" });
       const pending = await base44.entities.Subscription.filter({ student_id: user.id, status: "pending" });
       return [...active, ...pending];
@@ -123,6 +133,36 @@ export default function StudentDashboard() {
     enabled: !!user
   });
 
+  const cancelSubscriptionMutation = useMutation({
+    mutationFn: async (subscriptionId) => {
+      await base44.entities.Subscription.update(subscriptionId, {
+        status: "cancelled"
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['my-subscriptions']);
+      setCancelDialogOpen(false);
+      // alert("Your subscription has been cancelled. You will retain access until the end of your current billing period.");
+      // For a better UX, we might want to display this message in a more integrated way,
+      // e.g., a toast notification or a temporary alert on the dashboard itself.
+    },
+    onError: (error) => {
+      console.error("Failed to cancel subscription:", error);
+      alert("Failed to cancel subscription. Please contact support.");
+    }
+  });
+
+  const handleCancelSubscription = async () => {
+    setIsCancelling(true);
+    try {
+      await cancelSubscriptionMutation.mutateAsync(activeSub.id);
+    } catch (error) {
+      // Error is handled by onError in useMutation, but we keep this for consistency if needed.
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
   const activeSub = subscriptions[0]; // activeSub refers to the first subscription found, whether active or pending
   const mentor = mentorProfiles.find(p => p.id === activeSub?.mentor_profile_id);
   const mentorUser = mentorUsers.find(u => u.id === mentor?.user_id);
@@ -142,7 +182,7 @@ export default function StudentDashboard() {
   }
 
   // Show loading state while waiting for webhook to activate subscription
-  if (checkingPayment && activeSub?.status === "pending") { // Added new loading state
+  if (checkingPayment && activeSub?.status === "pending") {
     return (
       <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
         <Card className="max-w-md mx-4 rounded-3xl border-0 shadow-xl">
@@ -175,7 +215,7 @@ export default function StudentDashboard() {
             <p className="text-gray-600 mb-6">
               You don't have an active mentorship yet. Browse our mentors to get started!
             </p>
-            <Button 
+            <Button
               className="btn-primary text-white rounded-xl"
               onClick={() => navigate(createPageUrl("BrowseMentors"))}
             >
@@ -203,12 +243,22 @@ export default function StudentDashboard() {
         )}
 
         {/* Pending Subscription Alert */}
-        {activeSub?.status === "pending" && ( // Added pending subscription alert
+        {activeSub?.status === "pending" && (
           <Alert className="mb-6 border-yellow-200 bg-yellow-50">
             <AlertDescription className="text-yellow-800 flex items-center gap-2">
               <Clock className="w-5 h-5" />
               <span>
                 Your subscription is being processed. Full access will be available shortly.
+              </span>
+            </AlertDescription>
+          </Alert>
+        )}
+        {activeSub?.status === "cancelled" && (
+          <Alert className="mb-6 border-red-200 bg-red-50">
+            <AlertDescription className="text-red-800 flex items-center gap-2">
+              <AlertCircle className="w-5 h-5" />
+              <span>
+                Your subscription is cancelled. You will retain access until {activeSub.end_date}.
               </span>
             </AlertDescription>
           </Alert>
@@ -250,7 +300,7 @@ export default function StudentDashboard() {
                 <MessageSquare className="w-8 h-8 text-[#B3E5FC]" />
               </div>
               <div className="text-3xl font-bold mb-1">
-                {activeSub.status === "active" ? "Active" : "Pending"} {/* Updated mentorship status display */}
+                {activeSub.status === "active" ? "Active" : "Pending"}
               </div>
               <div className="text-sm text-gray-600">Mentorship Status</div>
             </CardContent>
@@ -290,9 +340,9 @@ export default function StudentDashboard() {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                 {mentor.calendly_link && (
-                  <Button 
+                  <Button
                     variant="outline"
                     className="rounded-xl"
                     onClick={() => window.open(mentor.calendly_link, '_blank')}
@@ -302,13 +352,35 @@ export default function StudentDashboard() {
                     <ExternalLink className="w-4 h-4 ml-2" />
                   </Button>
                 )}
-                <Button 
+                <Button
                   className="btn-primary text-white rounded-xl"
                   onClick={() => setActiveTab("chat")}
                 >
                   <MessageSquare className="w-4 h-4 mr-2" />
                   Message Mentor
                 </Button>
+              </div>
+            </div>
+
+            {/* Subscription Management */}
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-700">Subscription Plan</p>
+                  <p className="text-lg font-bold capitalize">{activeSub.plan_type} Plan</p>
+                  <p className="text-xs text-gray-500">
+                    {activeSub.status === "active" ? `${activeSub.months_remaining} months remaining` : (activeSub.status === "pending" ? "Subscription pending activation" : "Subscription cancelled")}
+                  </p>
+                </div>
+                {activeSub.status === "active" && (
+                  <Button
+                    variant="outline"
+                    className="rounded-xl text-red-600 border-red-200 hover:bg-red-50"
+                    onClick={() => setCancelDialogOpen(true)}
+                  >
+                    Cancel Subscription
+                  </Button>
+                )}
               </div>
             </div>
           </CardContent>
@@ -343,8 +415,8 @@ export default function StudentDashboard() {
                 <CardContent>
                   <TaskList tasks={tasks.slice(0, 5)} studentView={true} />
                   {tasks.length > 5 && (
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       className="w-full mt-4"
                       onClick={() => setActiveTab("tasks")}
                     >
@@ -364,8 +436,8 @@ export default function StudentDashboard() {
                 <CardContent>
                   <ProgressTimeline notes={progressNotes.slice(0, 3)} />
                   {progressNotes.length > 3 && (
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       className="w-full mt-4"
                       onClick={() => setActiveTab("progress")}
                     >
@@ -380,7 +452,7 @@ export default function StudentDashboard() {
           <TabsContent value="chat">
             <Card className="rounded-3xl border-0 shadow-lg">
               <CardContent className="p-0">
-                <ChatBox 
+                <ChatBox
                   currentUserId={user.id}
                   otherUserId={mentor.user_id}
                   otherUserName={mentorUser?.full_name}
@@ -414,6 +486,72 @@ export default function StudentDashboard() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Cancel Subscription Dialog */}
+      <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Cancel Subscription</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to cancel your mentorship with {mentorUser?.full_name}?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <p className="text-sm text-yellow-800 mb-2">
+                <strong>Please note:</strong>
+              </p>
+              <ul className="text-xs text-yellow-700 space-y-1 list-disc list-inside">
+                <li>You will retain access until the end of your current billing period.</li>
+                <li>No refunds will be issued for the current billing cycle.</li>
+                <li>You can resubscribe at any time.</li>
+                <li>Your chat history and progress will be preserved.</li>
+              </ul>
+            </div>
+
+            <div className="p-4 bg-gray-50 rounded-lg space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Current Plan:</span>
+                <span className="font-medium capitalize">{activeSub.plan_type}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Months Remaining:</span>
+                <span className="font-medium">{activeSub.months_remaining}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Access Until:</span>
+                <span className="font-medium">{activeSub.end_date}</span>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => setCancelDialogOpen(false)}
+                disabled={isCancelling}
+              >
+                Keep Subscription
+              </Button>
+              <Button
+                variant="destructive"
+                className="flex-1"
+                onClick={handleCancelSubscription}
+                disabled={isCancelling}
+              >
+                {isCancelling ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                    Cancelling...
+                  </>
+                ) : (
+                  "Cancel Subscription"
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
