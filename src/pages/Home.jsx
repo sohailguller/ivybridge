@@ -117,17 +117,17 @@ export default function Home() {
         {/* Content */}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
           <div className="max-w-4xl mx-auto space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full text-sm font-medium text-[#0D3B33] border border-[#0D3B33]/20 shadow-lg">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium text-white border border-white/20">
               <Sparkles className="w-4 h-4" />
               Trusted by 500+ students worldwide
             </div>
 
-            <h1 className="text-5xl md:text-7xl font-bold leading-tight text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]" style={{ fontFamily: 'Georgia, serif' }}>
+            <h1 className="text-5xl md:text-7xl font-bold leading-tight text-white" style={{ fontFamily: 'Georgia, serif' }}>
               Get Into Your{" "}
-              <span className="text-[#FE6C3A] drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">Dream School</span>
+              <span className="text-[#FE6C3A]">Dream School</span>
             </h1>
 
-            <p className="text-xl md:text-2xl text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] leading-relaxed max-w-3xl mx-auto font-medium">
+            <p className="text-xl md:text-2xl text-white/90 leading-relaxed max-w-3xl mx-auto">
               Connect with verified Ivy League mentors for personalized admissions guidance.
               From essay reviews to interview prep — get the insider advantage.
             </p>
@@ -135,7 +135,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button
                 size="lg"
-                className="btn-primary text-white rounded-lg px-10 py-6 text-lg font-semibold shadow-2xl"
+                className="btn-primary text-white rounded-lg px-10 py-6 text-lg font-semibold shadow-xl"
                 onClick={() => user ? navigate(createPageUrl("BrowseMentors")) : base44.auth.redirectToLogin(createPageUrl("BrowseMentors"))}
               >
                 Find Your Mentor
@@ -144,7 +144,7 @@ export default function Home() {
               <Button
                 size="lg"
                 variant="outline"
-                className="rounded-lg px-10 py-6 text-lg font-semibold bg-white/95 backdrop-blur-sm border-2 border-white text-[#0D3B33] hover:bg-white shadow-xl"
+                className="rounded-lg px-10 py-6 text-lg font-semibold bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white hover:bg-white/20"
                 onClick={() => navigate(createPageUrl("ApplyAsMentor"))}
               >
                 Become a Mentor
@@ -153,17 +153,17 @@ export default function Home() {
 
             {/* Stats */}
             <div className="flex flex-wrap justify-center gap-12 pt-12">
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-xl">
+              <div>
                 <div className="text-4xl font-bold text-[#FE6C3A]">{stats.mentors}+</div>
-                <div className="text-sm text-[#0D3B33] font-medium">Ivy Mentors</div>
+                <div className="text-sm text-white/80">Ivy Mentors</div>
               </div>
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-xl">
+              <div>
                 <div className="text-4xl font-bold text-[#FE6C3A]">{stats.students}+</div>
-                <div className="text-sm text-[#0D3B33] font-medium">Students Helped</div>
+                <div className="text-sm text-white/80">Students Helped</div>
               </div>
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-xl">
+              <div>
                 <div className="text-4xl font-bold text-[#FE6C3A]">98%</div>
-                <div className="text-sm text-[#0D3B33] font-medium">Success Rate</div>
+                <div className="text-sm text-white/80">Success Rate</div>
               </div>
             </div>
           </div>
