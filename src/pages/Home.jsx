@@ -103,12 +103,15 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="relative min-h-[75vh] flex items-center overflow-hidden">
-        {/* Background Image - NO OVERLAY */}
-        <div
-          className="absolute inset-0 bg-cover bg-center"
+        {/* Background Video */}
+        <iframe
+          src="https://player.cloudinary.com/embed/?cloud_name=dihudketx&public_id=AdobeStock_503416191_Video_4K_Preview_ii79ks&profile=cld-default&autoplay=true&loop=true&muted=true&controls=false"
+          className="absolute inset-0 w-full h-full"
           style={{
-            backgroundImage: 'url(https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/66f4ff229_Harvard-University-Campus.jpg)'
+            border: 'none',
+            pointerEvents: 'none'
           }}
+          allow="autoplay; fullscreen"
         />
 
         {/* Subtle darkening for text readability */}
