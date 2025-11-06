@@ -96,33 +96,33 @@ export default function Layout({ children, currentPageName }) {
         .btn-primary {
           background-color: var(--accent);
           transition: all 0.3s ease;
-          box-shadow: 0 4px 6px rgba(254, 108, 58, 0.2);
+          box-shadow: 0 2px 4px rgba(254, 108, 58, 0.2);
         }
 
         .btn-primary:hover {
           background-color: #FF7B4A;
-          transform: translateY(-2px);
-          box-shadow: 0 8px 16px rgba(254, 108, 58, 0.3);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(254, 108, 58, 0.3);
         }
 
         .card-hover {
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .card-hover:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 20px 40px rgba(13, 59, 51, 0.15);
+          transform: translateY(-4px);
+          box-shadow: 0 12px 24px rgba(13, 59, 51, 0.1);
         }
 
         .section-padding {
-          padding-top: 100px;
-          padding-bottom: 100px;
+          padding-top: 80px;
+          padding-bottom: 80px;
         }
 
         @media (min-width: 768px) {
           .section-padding {
-            padding-top: 120px;
-            padding-bottom: 120px;
+            padding-top: 100px;
+            padding-bottom: 100px;
           }
         }
       `}</style>
@@ -130,19 +130,19 @@ export default function Layout({ children, currentPageName }) {
       {/* Navigation */}
       <nav className="bg-white border-b border-[#E6EFEA] sticky top-0 z-50 backdrop-blur-sm bg-white/95 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-24">
+          <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <Link to={createPageUrl("Home")} className="flex items-center gap-3 group">
-              <div className="w-14 h-14 bg-gradient-to-br from-[#0D3B33] to-[#1a5a4e] rounded-lg flex items-center justify-center transform group-hover:scale-105 transition-transform">
-                <GraduationCap className="w-7 h-7 text-white" />
+              <div className="w-12 h-12 bg-[#0D3B33] rounded-lg flex items-center justify-center transform group-hover:scale-105 transition-transform">
+                <GraduationCap className="w-6 h-6 text-white" />
               </div>
-              <span className="text-3xl font-bold" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>
+              <span className="text-2xl font-bold text-[#0D3B33]" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>
                 IVYBRIDGE
               </span>
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-10">
+            <div className="hidden md:flex items-center gap-8">
               {navItems.map((item) => (
                 <Link
                   key={item.path}
@@ -167,7 +167,7 @@ export default function Layout({ children, currentPageName }) {
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="flex items-center gap-3 hover:bg-[#E6EFEA]">
-                            <Avatar className="w-10 h-10 border-2 border-[#0D3B33]">
+                            <Avatar className="w-9 h-9 border-2 border-[#0D3B33]">
                               <AvatarImage src={user.profile_photo_url} />
                               <AvatarFallback className="bg-[#E6EFEA] text-[#0D3B33] font-bold">
                                 {user.full_name?.charAt(0) || user.email?.charAt(0)}
@@ -198,14 +198,14 @@ export default function Layout({ children, currentPageName }) {
                       <Button
                         variant="ghost"
                         onClick={() => base44.auth.redirectToLogin(location.pathname)}
-                        className="text-sm font-semibold hover:bg-[#E6EFEA] uppercase tracking-wider"
+                        className="text-sm font-semibold hover:bg-[#E6EFEA] uppercase tracking-wider text-[#0D3B33]"
                         style={{ fontFamily: 'Oswald, sans-serif' }}
                       >
                         Sign In
                       </Button>
                       <Button
                         onClick={() => base44.auth.redirectToLogin(location.pathname)}
-                        className="btn-primary text-white rounded-lg px-8 uppercase tracking-wider font-semibold"
+                        className="btn-primary text-white rounded-lg px-6 uppercase tracking-wider font-semibold"
                         style={{ fontFamily: 'Oswald, sans-serif' }}
                       >
                         Get Started
@@ -290,46 +290,46 @@ export default function Layout({ children, currentPageName }) {
       </nav>
 
       {/* Main Content */}
-      <main className="min-h-[calc(100vh-96px)]">
+      <main className="min-h-[calc(100vh-80px)]">
         {children}
       </main>
 
       {/* Footer */}
       <footer className="bg-[#E6EFEA] border-t border-[#0D3B33]/10 mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="grid md:grid-cols-4 gap-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#0D3B33] to-[#1a5a4e] rounded-lg flex items-center justify-center">
-                  <GraduationCap className="w-6 h-6 text-white" />
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-[#0D3B33] rounded-lg flex items-center justify-center">
+                  <GraduationCap className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-2xl font-bold" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>
+                <span className="text-xl font-bold text-[#0D3B33]" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>
                   IVYBRIDGE
                 </span>
               </div>
-              <p className="text-[#0D3B33]/80 leading-relaxed max-w-md">
+              <p className="text-[#0D3B33]/70 leading-relaxed max-w-md text-sm">
                 Connecting ambitious international students with verified Ivy League mentors
                 for personalized admissions guidance and ongoing support.
               </p>
             </div>
             <div>
-              <h3 className="font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>PLATFORM</h3>
-              <ul className="space-y-3 text-[#0D3B33]/80">
+              <h3 className="font-bold mb-3 text-[#0D3B33] text-sm" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>PLATFORM</h3>
+              <ul className="space-y-2 text-[#0D3B33]/70 text-sm">
                 <li><Link to={createPageUrl("BrowseMentors")} className="hover:text-[#FE6C3A] transition-colors hover:underline">Find a Mentor</Link></li>
                 <li><Link to={createPageUrl("ApplyAsMentor")} className="hover:text-[#FE6C3A] transition-colors hover:underline">Become a Mentor</Link></li>
                 <li><Link to={createPageUrl("Home")} className="hover:text-[#FE6C3A] transition-colors hover:underline">How It Works</Link></li>
               </ul>
             </div>
             <div>
-              <h3 className="font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>SUPPORT</h3>
-              <ul className="space-y-3 text-[#0D3B33]/80">
+              <h3 className="font-bold mb-3 text-[#0D3B33] text-sm" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>SUPPORT</h3>
+              <ul className="space-y-2 text-[#0D3B33]/70 text-sm">
                 <li><a href="#" className="hover:text-[#FE6C3A] transition-colors hover:underline">Help Center</a></li>
                 <li><a href="#" className="hover:text-[#FE6C3A] transition-colors hover:underline">Terms of Service</a></li>
                 <li><a href="#" className="hover:text-[#FE6C3A] transition-colors hover:underline">Privacy Policy</a></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-[#0D3B33]/10 mt-12 pt-8 text-center text-sm text-[#0D3B33]/60">
+          <div className="border-t border-[#0D3B33]/10 mt-8 pt-6 text-center text-xs text-[#0D3B33]/50">
             © 2025 IvyBridge. All rights reserved.
           </div>
         </div>
