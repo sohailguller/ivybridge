@@ -152,7 +152,7 @@ export default function Layout({ children, currentPageName }) {
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/65bfd119d_Untitleddesign3.png"
                 alt="IvyBridge"
-                className="h-16"
+                className="h-20"
               />
             </Link>
 
@@ -298,11 +298,11 @@ export default function Layout({ children, currentPageName }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
-              <div className="flex items-center gap-3 mb-4">
+              <div className="mb-4">
                 <img 
                   src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/65bfd119d_Untitleddesign3.png"
                   alt="IvyBridge"
-                  className="h-8"
+                  className="h-12"
                 />
               </div>
               <p className="text-[#0D3B33]/70 leading-relaxed max-w-md text-sm">
