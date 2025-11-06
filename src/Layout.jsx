@@ -132,13 +132,13 @@ export default function Layout({ children, currentPageName }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
-            <Link to={createPageUrl("Home")} className="flex items-center gap-3 group">
-              <div className="w-12 h-12 bg-[#0D3B33] rounded-lg flex items-center justify-center transform group-hover:scale-105 transition-transform">
-                <GraduationCap className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold text-[#0D3B33]" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>
-                IVYBRIDGE
-              </span>
+            <Link to={createPageUrl("Home")} className="flex items-center group">
+              <img 
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/0c921ab85_Screenshot2025-11-05at63238PM.png"
+                alt="IvyBridge"
+                className="h-10 w-auto object-contain transition-transform group-hover:scale-105"
+                style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' }}
+              />
             </Link>
 
             {/* Desktop Navigation */}
@@ -299,14 +299,12 @@ export default function Layout({ children, currentPageName }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-[#0D3B33] rounded-lg flex items-center justify-center">
-                  <GraduationCap className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-bold text-[#0D3B33]" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>
-                  IVYBRIDGE
-                </span>
-              </div>
+              <img 
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/0c921ab85_Screenshot2025-11-05at63238PM.png"
+                alt="IvyBridge"
+                className="h-8 w-auto object-contain mb-4"
+                style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' }}
+              />
               <p className="text-[#0D3B33]/70 leading-relaxed max-w-md text-sm">
                 Connecting ambitious international students with verified Ivy League mentors
                 for personalized admissions guidance and ongoing support.
