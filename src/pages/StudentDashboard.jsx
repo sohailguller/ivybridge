@@ -16,7 +16,8 @@ import {
   TrendingUp,
   AlertCircle,
   Clock,
-  ExternalLink
+  ExternalLink,
+  Star
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -30,6 +31,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import ReviewDialog from "../components/dashboard/ReviewDialog";
+import ReportDialog from "../components/dashboard/ReportDialog";
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
@@ -41,6 +44,8 @@ export default function StudentDashboard() {
   const [checkingPayment, setCheckingPayment] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [showReviewDialog, setShowReviewDialog] = useState(false);
+  const [showReportDialog, setShowReportDialog] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -131,6 +136,19 @@ export default function StudentDashboard() {
     queryKey: ['my-progress', user?.id],
     queryFn: () => base44.entities.ProgressNote.filter({ student_id: user.id }),
     enabled: !!user
+  });
+
+  const { data: myReview } = useQuery({
+    queryKey: ['my-review', activeSub?.id],
+    queryFn: async () => {
+      if (!activeSub || !user) return null;
+      const reviews = await base44.entities.Review.filter({ 
+        subscription_id: activeSub.id,
+        student_id: user.id 
+      });
+      return reviews[0];
+    },
+    enabled: !!activeSub && !!user
   });
 
   const cancelSubscriptionMutation = useMutation({
@@ -364,7 +382,7 @@ export default function StudentDashboard() {
 
             {/* Subscription Management */}
             <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-medium text-gray-700">Subscription Plan</p>
                   <p className="text-lg font-bold capitalize">{activeSub.plan_type} Plan</p>
@@ -372,15 +390,35 @@ export default function StudentDashboard() {
                     {activeSub.status === "active" ? `${activeSub.months_remaining} months remaining` : (activeSub.status === "pending" ? "Subscription pending activation" : "Subscription cancelled")}
                   </p>
                 </div>
-                {activeSub.status === "active" && (
+                <div className="flex gap-2">
+                  {activeSub.status === "active" && !myReview && (
+                    <Button
+                      variant="outline"
+                      className="rounded-xl"
+                      onClick={() => setShowReviewDialog(true)}
+                    >
+                      <Star className="w-4 h-4 mr-2" />
+                      Write Review
+                    </Button>
+                  )}
                   <Button
                     variant="outline"
-                    className="rounded-xl text-red-600 border-red-200 hover:bg-red-50"
-                    onClick={() => setCancelDialogOpen(true)}
+                    className="rounded-xl text-gray-600"
+                    onClick={() => setShowReportDialog(true)}
                   >
-                    Cancel Subscription
+                    <AlertCircle className="w-4 h-4 mr-2" />
+                    Report Issue
                   </Button>
-                )}
+                  {activeSub.status === "active" && (
+                    <Button
+                      variant="outline"
+                      className="rounded-xl text-red-600 border-red-200 hover:bg-red-50"
+                      onClick={() => setCancelDialogOpen(true)}
+                    >
+                      Cancel Subscription
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           </CardContent>
@@ -400,6 +438,9 @@ export default function StudentDashboard() {
             </TabsTrigger>
             <TabsTrigger value="progress" className="rounded-xl data-[state=active]:bg-[#FF6B5C] data-[state=active]:text-white">
               Progress
+            </TabsTrigger>
+            <TabsTrigger value="billing" className="rounded-xl data-[state=active]:bg-[#FF6B5C] data-[state=active]:text-white">
+              Billing
             </TabsTrigger>
           </TabsList>
 
@@ -484,6 +525,74 @@ export default function StudentDashboard() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          <TabsContent value="billing">
+            <Card className="rounded-3xl border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle>Billing & Subscription</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="bg-gradient-to-br from-[#FF6B5C]/10 to-[#B3E5FC]/10 rounded-2xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <p className="text-sm text-gray-600">Current Plan</p>
+                      <p className="text-2xl font-bold capitalize">{activeSub.plan_type}</p>
+                    </div>
+                    <Badge className={`${
+                      activeSub.status === "active" ? "bg-green-100 text-green-800" :
+                      activeSub.status === "pending" ? "bg-yellow-100 text-yellow-800" :
+                      "bg-red-100 text-red-800"
+                    }`}>
+                      {activeSub.status}
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-gray-600">Start Date</p>
+                      <p className="font-medium">{activeSub.start_date}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600">End Date</p>
+                      <p className="font-medium">{activeSub.end_date}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600">Amount Paid</p>
+                      <p className="font-medium">${activeSub.amount}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600">Months Remaining</p>
+                      <p className="font-medium">{activeSub.months_remaining}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold mb-4">Payment History</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                          <CheckCircle className="w-5 h-5 text-green-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium">Initial Payment</p>
+                          <p className="text-sm text-gray-600">{activeSub.start_date}</p>
+                        </div>
+                      </div>
+                      <p className="font-bold">${activeSub.amount}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                  <p className="text-sm text-blue-800">
+                    <strong>Note:</strong> For any billing questions or to update payment methods, 
+                    please contact support or manage your subscription through Stripe.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
 
@@ -552,6 +661,26 @@ export default function StudentDashboard() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Review Dialog */}
+      <ReviewDialog
+        open={showReviewDialog}
+        onOpenChange={setShowReviewDialog}
+        subscription={activeSub}
+        mentorProfile={mentor}
+        mentorUser={mentorUser}
+        currentUserId={user?.id}
+        onReviewSubmitted={() => queryClient.invalidateQueries(['my-review', activeSub?.id])}
+      />
+
+      {/* Report Dialog */}
+      <ReportDialog
+        open={showReportDialog}
+        onOpenChange={setShowReportDialog}
+        reportedUserId={mentor?.user_id}
+        reportedUserName={mentorUser?.full_name}
+        reporterUserId={user?.id}
+      />
     </div>
   );
 }
