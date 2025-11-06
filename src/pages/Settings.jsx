@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -96,19 +97,19 @@ export default function Settings() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] py-12">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+        <div className="mb-6 border-b border-gray-200 pb-4">
+          <h1 className="text-2xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
             Account Settings
           </h1>
-          <p className="text-gray-600">Manage your profile and preferences</p>
+          <p className="text-gray-600 text-sm">Manage your profile and preferences</p>
         </div>
 
         {success && (
           <Alert className="mb-6 border-green-200 bg-green-50">
-            <AlertDescription className="text-green-800">
+            <AlertDescription className="text-green-800 text-sm">
               Profile updated successfully!
             </AlertDescription>
           </Alert>
@@ -116,24 +117,24 @@ export default function Settings() {
 
         {error && (
           <Alert variant="destructive" className="mb-6">
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription className="text-sm">{error}</AlertDescription>
           </Alert>
         )}
 
-        <Card className="rounded-3xl border-0 shadow-xl mb-6">
-          <CardHeader className="p-8 border-b">
-            <CardTitle className="flex items-center gap-2">
-              <User className="w-5 h-5" />
+        <div className="bg-white border border-gray-200 rounded shadow-sm mb-6">
+          <div className="p-6 border-b border-gray-200">
+            <h3 className="font-bold flex items-center gap-2 text-[#0D3B33]">
+              <User className="w-4 h-4" />
               Profile Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-8">
+            </h3>
+          </div>
+          <div className="p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Profile Photo */}
-              <div className="flex flex-col items-center gap-4 pb-6 border-b">
-                <Avatar className="w-32 h-32">
+              <div className="flex flex-col items-center gap-3 pb-6 border-b border-gray-200">
+                <Avatar className="w-24 h-24">
                   <AvatarImage src={formData.profile_photo_url} />
-                  <AvatarFallback className="bg-[#B3E5FC] text-4xl">
+                  <AvatarFallback className="bg-[#E6EFEA] text-3xl text-[#0D3B33]">
                     {formData.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
                   </AvatarFallback>
                 </Avatar>
@@ -149,18 +150,19 @@ export default function Settings() {
                   <Button 
                     type="button" 
                     variant="outline" 
-                    className="rounded-xl"
+                    size="sm"
+                    className="rounded text-xs"
                     disabled={uploadingPhoto}
                     onClick={(e) => e.preventDefault()}
                   >
                     {uploadingPhoto ? (
                       <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 mr-2" />
+                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-gray-600 mr-2" />
                         Uploading...
                       </>
                     ) : (
                       <>
-                        <Camera className="w-4 h-4 mr-2" />
+                        <Camera className="w-3 h-3 mr-2" />
                         Change Photo
                       </>
                     )}
@@ -170,46 +172,46 @@ export default function Settings() {
 
               {/* Full Name */}
               <div className="space-y-2">
-                <Label>Full Name</Label>
+                <Label className="text-sm">Full Name</Label>
                 <Input
                   value={formData.full_name}
                   onChange={(e) => setFormData({...formData, full_name: e.target.value})}
                   placeholder="Your full name"
-                  className="h-12 rounded-xl"
+                  className="h-10 rounded"
                 />
               </div>
 
               {/* Email (Read-only) */}
               <div className="space-y-2">
-                <Label>Email</Label>
+                <Label className="text-sm">Email</Label>
                 <Input
                   value={user?.email}
                   disabled
-                  className="h-12 rounded-xl bg-gray-50"
+                  className="h-10 rounded bg-gray-50"
                 />
                 <p className="text-xs text-gray-500">Email cannot be changed</p>
               </div>
 
               {/* Phone Number */}
               <div className="space-y-2">
-                <Label>Phone Number</Label>
+                <Label className="text-sm">Phone Number</Label>
                 <Input
                   value={formData.phone_number}
                   onChange={(e) => setFormData({...formData, phone_number: e.target.value})}
                   placeholder="+1 (555) 123-4567"
-                  className="h-12 rounded-xl"
+                  className="h-10 rounded"
                 />
               </div>
 
               {/* Account Type Badge */}
               <div className="space-y-2">
-                <Label>Account Type</Label>
-                <div className="flex items-center gap-3">
-                  <div className="px-4 py-2 bg-[#B3E5FC]/20 rounded-xl text-sm font-medium capitalize">
+                <Label className="text-sm">Account Type</Label>
+                <div className="flex items-center gap-2">
+                  <div className="px-3 py-1 bg-gray-100 border border-gray-200 rounded text-xs font-medium capitalize">
                     {user?.account_type || 'Student'}
                   </div>
                   {user?.role === "admin" && (
-                    <div className="px-4 py-2 bg-[#FF6B5C]/20 text-[#FF6B5C] rounded-xl text-sm font-medium">
+                    <div className="px-3 py-1 bg-orange-100 text-orange-700 border border-orange-200 rounded text-xs font-medium">
                       Admin
                     </div>
                   )}
@@ -217,55 +219,56 @@ export default function Settings() {
               </div>
 
               {/* Save Button */}
-              <div className="pt-6">
+              <div className="pt-4">
                 <Button 
                   type="submit" 
                   disabled={isSaving}
-                  className="w-full btn-primary text-white rounded-xl h-12"
+                  className="w-full btn-primary text-white rounded h-10"
                 >
                   {isSaving ? (
                     <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
                       Saving...
                     </>
                   ) : (
                     <>
-                      <Save className="w-5 h-5 mr-2" />
+                      <Save className="w-4 h-4 mr-2" />
                       Save Changes
                     </>
                   )}
                 </Button>
               </div>
             </form>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Additional Settings Card */}
-        <Card className="rounded-3xl border-0 shadow-xl">
-          <CardHeader className="p-8 border-b">
-            <CardTitle>Account Actions</CardTitle>
-          </CardHeader>
-          <CardContent className="p-8">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+        <div className="bg-white border border-gray-200 rounded shadow-sm">
+          <div className="p-6 border-b border-gray-200">
+            <h3 className="font-bold text-[#0D3B33]">Account Actions</h3>
+          </div>
+          <div className="p-6">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded">
                 <div>
-                  <p className="font-medium">Change Password</p>
-                  <p className="text-sm text-gray-600">Update your account password</p>
+                  <p className="font-medium text-sm">Change Password</p>
+                  <p className="text-xs text-gray-600">Update your account password</p>
                 </div>
-                <Button variant="outline" className="rounded-xl">
+                <Button variant="outline" size="sm" className="rounded text-xs">
                   Update
                 </Button>
               </div>
 
               {user?.account_type === "mentor" && (
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                <div className="flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded">
                   <div>
-                    <p className="font-medium">Mentor Profile</p>
-                    <p className="text-sm text-gray-600">View and edit your mentor profile</p>
+                    <p className="font-medium text-sm">Mentor Profile</p>
+                    <p className="text-xs text-gray-600">View and edit your mentor profile</p>
                   </div>
                   <Button 
-                    variant="outline" 
-                    className="rounded-xl"
+                    variant="outline"
+                    size="sm"
+                    className="rounded text-xs"
                     onClick={() => navigate(createPageUrl("MentorDashboard"))}
                   >
                     View
@@ -273,22 +276,23 @@ export default function Settings() {
                 </div>
               )}
 
-              <div className="flex items-center justify-between p-4 bg-red-50 rounded-xl border border-red-100">
+              <div className="flex items-center justify-between p-4 bg-red-50 border border-red-200 rounded">
                 <div>
-                  <p className="font-medium text-red-700">Sign Out</p>
-                  <p className="text-sm text-red-600">Sign out of your account</p>
+                  <p className="font-medium text-sm text-red-700">Sign Out</p>
+                  <p className="text-xs text-red-600">Sign out of your account</p>
                 </div>
                 <Button 
-                  variant="destructive" 
-                  className="rounded-xl"
+                  variant="destructive"
+                  size="sm"
+                  className="rounded text-xs"
                   onClick={() => base44.auth.logout()}
                 >
                   Sign Out
                 </Button>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
