@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent } from "@/components/ui/card"; // Card and CardContent are still imported but their usage is changed
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +11,6 @@ import {
   Search,
   Filter,
   GraduationCap,
-  MapPin, // MapPin is not used in the new structure, but kept in imports
   Star,
   Users,
   ArrowRight
@@ -64,7 +62,6 @@ export default function BrowseMentors() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="mb-8 border-b border-gray-200 pb-6">
           <h1 className="text-3xl md:text-4xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
             Find Your Perfect Mentor
@@ -74,7 +71,6 @@ export default function BrowseMentors() {
           </p>
         </div>
 
-        {/* Search and Filters */}
         <div className="bg-white border border-gray-200 rounded shadow-sm mb-6 p-4">
           <div className="grid md:grid-cols-4 gap-4">
             <div className="md:col-span-2 relative">
@@ -118,7 +114,6 @@ export default function BrowseMentors() {
           </div>
         </div>
 
-        {/* Mentor Grid */}
         {isLoading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
@@ -152,11 +147,9 @@ export default function BrowseMentors() {
                   className="bg-white border border-gray-200 rounded shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden"
                   onClick={() => navigate(createPageUrl(`MentorProfile?id=${mentor.id}`))}
                 >
-                  {/* Header */}
                   <div className="h-24 bg-gradient-to-r from-[#0D3B33] to-[#1a5a4e]" />
 
                   <div className="p-6 -mt-8">
-                    {/* Avatar */}
                     <Avatar className="w-16 h-16 border-4 border-white shadow-sm mb-4">
                       <AvatarImage src={mentor.profile_photo_url || user?.profile_photo_url} />
                       <AvatarFallback className="bg-[#E6EFEA] text-xl text-[#0D3B33]">
@@ -164,7 +157,6 @@ export default function BrowseMentors() {
                       </AvatarFallback>
                     </Avatar>
 
-                    {/* Info */}
                     <h3 className="text-lg font-bold mb-1 text-[#0D3B33]">{user?.full_name || 'Mentor'}</h3>
                     <div className="flex items-center gap-2 text-xs text-gray-600 mb-3">
                       <GraduationCap className="w-4 h-4" />
@@ -179,7 +171,6 @@ export default function BrowseMentors() {
                       {mentor.bio}
                     </p>
 
-                    {/* Expertise Tags */}
                     {mentor.expertise_areas && mentor.expertise_areas.length > 0 && (
                       <div className="flex flex-wrap gap-1 mb-4">
                         {mentor.expertise_areas.slice(0, 2).map((area, idx) => (
@@ -195,7 +186,6 @@ export default function BrowseMentors() {
                       </div>
                     )}
 
-                    {/* Stats */}
                     <div className="flex items-center gap-4 mb-4 py-3 border-t border-gray-100 text-sm">
                       <div className="flex items-center gap-2">
                         <Users className="w-4 h-4 text-gray-400" />
@@ -208,7 +198,6 @@ export default function BrowseMentors() {
                       </div>
                     </div>
 
-                    {/* CTA */}
                     <Button className="w-full btn-primary text-white rounded text-sm py-2">
                       View Profile
                       <ArrowRight className="w-4 h-4 ml-2" />
