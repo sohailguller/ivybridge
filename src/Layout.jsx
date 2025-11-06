@@ -131,18 +131,8 @@ export default function Layout({ children, currentPageName }) {
       <nav className="bg-white border-b border-[#E6EFEA] sticky top-0 z-50 backdrop-blur-sm bg-white/95 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
-            {/* Logo */}
-            <Link to={createPageUrl("Home")} className="flex items-center gap-3 group">
-              <div className="w-12 h-12 bg-[#0D3B33] rounded-lg flex items-center justify-center transform group-hover:scale-105 transition-transform">
-                <GraduationCap className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold text-[#0D3B33]" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>
-                IVYBRIDGE
-              </span>
-            </Link>
-
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-8">
+            {/* Left: Desktop Navigation Links */}
+            <div className="hidden md:flex items-center gap-8 flex-1">
               {navItems.map((item) => (
                 <Link
                   key={item.path}
@@ -157,8 +147,17 @@ export default function Layout({ children, currentPageName }) {
               ))}
             </div>
 
-            {/* User Menu / Auth Buttons */}
-            <div className="hidden md:flex items-center gap-4">
+            {/* Center: Logo */}
+            <Link to={createPageUrl("Home")} className="flex items-center justify-center absolute left-1/2 transform -translate-x-1/2">
+              <img 
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/65bfd119d_Untitleddesign3.png"
+                alt="IvyBridge"
+                className="h-12"
+              />
+            </Link>
+
+            {/* Right: User Menu / Auth Buttons */}
+            <div className="hidden md:flex items-center gap-4 flex-1 justify-end">
               {!isLoading && (
                 <>
                   {user ? (
