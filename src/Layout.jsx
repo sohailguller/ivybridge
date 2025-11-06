@@ -152,7 +152,7 @@ export default function Layout({ children, currentPageName }) {
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/65bfd119d_Untitleddesign3.png"
                 alt="IvyBridge"
-                className="h-12"
+                className="h-16"
               />
             </Link>
 
@@ -299,12 +299,11 @@ export default function Layout({ children, currentPageName }) {
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-[#0D3B33] rounded-lg flex items-center justify-center">
-                  <GraduationCap className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-bold text-[#0D3B33]" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>
-                  IVYBRIDGE
-                </span>
+                <img 
+                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/65bfd119d_Untitleddesign3.png"
+                  alt="IvyBridge"
+                  className="h-8"
+                />
               </div>
               <p className="text-[#0D3B33]/70 leading-relaxed max-w-md text-sm">
                 Connecting ambitious international students with verified Ivy League mentors
