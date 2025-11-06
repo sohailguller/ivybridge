@@ -70,69 +70,87 @@ export default function Layout({ children, currentPageName }) {
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Crimson+Pro:wght@300;400;500;600&display=swap');
 
         :root {
-          --primary: #FF6B5C;
-          --secondary: #B3E5FC;
+          --primary: #0D3B33;
+          --secondary: #E6EFEA;
+          --accent: #FE6C3A;
           --background: #FAFAFA;
           --text: #222222;
         }
 
         body {
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+          font-family: 'Crimson Pro', Georgia, serif;
           color: var(--text);
+          line-height: 1.7;
         }
 
         h1, h2, h3, h4, h5, h6 {
-          font-family: Georgia, 'Times New Roman', serif;
-          font-weight: 600;
+          font-family: 'Oswald', sans-serif;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
         }
 
         .btn-primary {
-          background-color: var(--primary);
+          background-color: var(--accent);
           transition: all 0.3s ease;
+          box-shadow: 0 4px 6px rgba(254, 108, 58, 0.2);
         }
 
         .btn-primary:hover {
-          background-color: #E55A4C;
+          background-color: #FF7B4A;
           transform: translateY(-2px);
-          box-shadow: 0 8px 16px rgba(255, 107, 92, 0.25);
+          box-shadow: 0 8px 16px rgba(254, 108, 58, 0.3);
         }
 
         .card-hover {
-          transition: all 0.3s ease;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .card-hover:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+          transform: translateY(-8px);
+          box-shadow: 0 20px 40px rgba(13, 59, 51, 0.15);
+        }
+
+        .section-padding {
+          padding-top: 100px;
+          padding-bottom: 100px;
+        }
+
+        @media (min-width: 768px) {
+          .section-padding {
+            padding-top: 120px;
+            padding-bottom: 120px;
+          }
         }
       `}</style>
 
       {/* Navigation */}
-      <nav className="bg-white border-b border-gray-100 sticky top-0 z-50 backdrop-blur-sm bg-white/95">
+      <nav className="bg-white border-b border-[#E6EFEA] sticky top-0 z-50 backdrop-blur-sm bg-white/95 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
+          <div className="flex justify-between items-center h-24">
             {/* Logo */}
             <Link to={createPageUrl("Home")} className="flex items-center gap-3 group">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#FF6B5C] to-[#E55A4C] rounded-2xl flex items-center justify-center transform group-hover:scale-105 transition-transform">
-                <GraduationCap className="w-6 h-6 text-white" />
+              <div className="w-14 h-14 bg-gradient-to-br from-[#0D3B33] to-[#1a5a4e] rounded-lg flex items-center justify-center transform group-hover:scale-105 transition-transform">
+                <GraduationCap className="w-7 h-7 text-white" />
               </div>
-              <span className="text-2xl font-bold" style={{ fontFamily: 'Georgia, serif' }}>
-                IvyBridge
+              <span className="text-3xl font-bold" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>
+                IVYBRIDGE
               </span>
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-8">
+            <div className="hidden md:flex items-center gap-10">
               {navItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`text-sm font-medium transition-colors hover:text-[#FF6B5C] ${
-                    location.pathname === item.path ? 'text-[#FF6B5C]' : 'text-gray-600'
+                  className={`text-sm font-semibold transition-colors hover:text-[#FE6C3A] uppercase tracking-wider ${
+                    location.pathname === item.path ? 'text-[#FE6C3A]' : 'text-[#0D3B33]'
                   }`}
+                  style={{ fontFamily: 'Oswald, sans-serif' }}
                 >
                   {item.name}
                 </Link>
@@ -148,14 +166,14 @@ export default function Layout({ children, currentPageName }) {
                       <NotificationCenter userId={user.id} />
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="flex items-center gap-3">
-                            <Avatar className="w-9 h-9">
+                          <Button variant="ghost" className="flex items-center gap-3 hover:bg-[#E6EFEA]">
+                            <Avatar className="w-10 h-10 border-2 border-[#0D3B33]">
                               <AvatarImage src={user.profile_photo_url} />
-                              <AvatarFallback className="bg-[#B3E5FC] text-[#222222]">
+                              <AvatarFallback className="bg-[#E6EFEA] text-[#0D3B33] font-bold">
                                 {user.full_name?.charAt(0) || user.email?.charAt(0)}
                               </AvatarFallback>
                             </Avatar>
-                            <span className="text-sm font-medium">{user.full_name || user.email}</span>
+                            <span className="text-sm font-semibold" style={{ fontFamily: 'Oswald, sans-serif' }}>{user.full_name || user.email}</span>
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
@@ -180,13 +198,15 @@ export default function Layout({ children, currentPageName }) {
                       <Button
                         variant="ghost"
                         onClick={() => base44.auth.redirectToLogin(location.pathname)}
-                        className="text-sm font-medium"
+                        className="text-sm font-semibold hover:bg-[#E6EFEA] uppercase tracking-wider"
+                        style={{ fontFamily: 'Oswald, sans-serif' }}
                       >
                         Sign In
                       </Button>
                       <Button
                         onClick={() => base44.auth.redirectToLogin(location.pathname)}
-                        className="btn-primary text-white rounded-full px-6"
+                        className="btn-primary text-white rounded-lg px-8 uppercase tracking-wider font-semibold"
+                        style={{ fontFamily: 'Oswald, sans-serif' }}
                       >
                         Get Started
                       </Button>
@@ -199,7 +219,7 @@ export default function Layout({ children, currentPageName }) {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-gray-100"
+              className="md:hidden p-2 rounded-lg hover:bg-[#E6EFEA]"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -208,18 +228,19 @@ export default function Layout({ children, currentPageName }) {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-100 bg-white">
+          <div className="md:hidden border-t border-[#E6EFEA] bg-white">
             <div className="px-4 py-4 space-y-3">
               {navItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-4 py-2 rounded-lg text-sm font-medium ${
+                  className={`block px-4 py-3 rounded-lg text-sm font-semibold uppercase tracking-wider ${
                     location.pathname === item.path
-                      ? 'bg-[#FF6B5C]/10 text-[#FF6B5C]'
-                      : 'text-gray-600 hover:bg-gray-50'
+                      ? 'bg-[#FE6C3A]/10 text-[#FE6C3A]'
+                      : 'text-[#0D3B33] hover:bg-[#E6EFEA]'
                   }`}
+                  style={{ fontFamily: 'Oswald, sans-serif' }}
                 >
                   {item.name}
                 </Link>
@@ -231,7 +252,8 @@ export default function Layout({ children, currentPageName }) {
                       <Link
                         to={getDashboardUrl()}
                         onClick={() => setMobileMenuOpen(false)}
-                        className="block px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+                        className="block px-4 py-3 rounded-lg text-sm font-semibold text-[#0D3B33] hover:bg-[#E6EFEA] uppercase tracking-wider"
+                        style={{ fontFamily: 'Oswald, sans-serif' }}
                       >
                         <LayoutDashboard className="w-4 h-4 inline mr-2" />
                         Dashboard
@@ -241,7 +263,8 @@ export default function Layout({ children, currentPageName }) {
                           handleLogout();
                           setMobileMenuOpen(false);
                         }}
-                        className="w-full text-left px-4 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50"
+                        className="w-full text-left px-4 py-3 rounded-lg text-sm font-semibold text-red-600 hover:bg-red-50 uppercase tracking-wider"
+                        style={{ fontFamily: 'Oswald, sans-serif' }}
                       >
                         <LogOut className="w-4 h-4 inline mr-2" />
                         Logout
@@ -253,7 +276,8 @@ export default function Layout({ children, currentPageName }) {
                         base44.auth.redirectToLogin(location.pathname);
                         setMobileMenuOpen(false);
                       }}
-                      className="w-full btn-primary text-white rounded-full"
+                      className="w-full btn-primary text-white rounded-lg uppercase tracking-wider font-semibold"
+                      style={{ fontFamily: 'Oswald, sans-serif' }}
                     >
                       Get Started
                     </Button>
@@ -266,46 +290,46 @@ export default function Layout({ children, currentPageName }) {
       </nav>
 
       {/* Main Content */}
-      <main className="min-h-[calc(100vh-80px)]">
+      <main className="min-h-[calc(100vh-96px)]">
         {children}
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-100 mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid md:grid-cols-4 gap-8">
+      <footer className="bg-[#E6EFEA] border-t border-[#0D3B33]/10 mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="grid md:grid-cols-4 gap-12">
             <div className="md:col-span-2">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-[#FF6B5C] to-[#E55A4C] rounded-xl flex items-center justify-center">
-                  <GraduationCap className="w-5 h-5 text-white" />
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#0D3B33] to-[#1a5a4e] rounded-lg flex items-center justify-center">
+                  <GraduationCap className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-xl font-bold" style={{ fontFamily: 'Georgia, serif' }}>
-                  IvyBridge
+                <span className="text-2xl font-bold" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>
+                  IVYBRIDGE
                 </span>
               </div>
-              <p className="text-gray-600 text-sm leading-relaxed max-w-md">
+              <p className="text-[#0D3B33]/80 leading-relaxed max-w-md">
                 Connecting ambitious international students with verified Ivy League mentors
                 for personalized admissions guidance and ongoing support.
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-4">Platform</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li><Link to={createPageUrl("BrowseMentors")} className="hover:text-[#FF6B5C]">Find a Mentor</Link></li>
-                <li><Link to={createPageUrl("ApplyAsMentor")} className="hover:text-[#FF6B5C]">Become a Mentor</Link></li>
-                <li><Link to={createPageUrl("Home")} className="hover:text-[#FF6B5C]">How It Works</Link></li>
+              <h3 className="font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>PLATFORM</h3>
+              <ul className="space-y-3 text-[#0D3B33]/80">
+                <li><Link to={createPageUrl("BrowseMentors")} className="hover:text-[#FE6C3A] transition-colors hover:underline">Find a Mentor</Link></li>
+                <li><Link to={createPageUrl("ApplyAsMentor")} className="hover:text-[#FE6C3A] transition-colors hover:underline">Become a Mentor</Link></li>
+                <li><Link to={createPageUrl("Home")} className="hover:text-[#FE6C3A] transition-colors hover:underline">How It Works</Link></li>
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold mb-4">Support</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li><a href="#" className="hover:text-[#FF6B5C]">Help Center</a></li>
-                <li><a href="#" className="hover:text-[#FF6B5C]">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-[#FF6B5C]">Privacy Policy</a></li>
+              <h3 className="font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>SUPPORT</h3>
+              <ul className="space-y-3 text-[#0D3B33]/80">
+                <li><a href="#" className="hover:text-[#FE6C3A] transition-colors hover:underline">Help Center</a></li>
+                <li><a href="#" className="hover:text-[#FE6C3A] transition-colors hover:underline">Terms of Service</a></li>
+                <li><a href="#" className="hover:text-[#FE6C3A] transition-colors hover:underline">Privacy Policy</a></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-100 mt-8 pt-8 text-center text-sm text-gray-500">
+          <div className="border-t border-[#0D3B33]/10 mt-12 pt-8 text-center text-sm text-[#0D3B33]/60">
             © 2025 IvyBridge. All rights reserved.
           </div>
         </div>
