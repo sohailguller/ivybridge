@@ -65,6 +65,29 @@ export default function MentorProfile() {
     enabled: !!mentor?.user_id
   });
 
+  const { data: reviews = [] } = useQuery({
+    queryKey: ['mentor-reviews', mentorId],
+    queryFn: async () => {
+      const allReviews = await base44.entities.Review.filter({
+        mentor_profile_id: mentorId,
+        is_published: true
+      }, '-created_date');
+      return allReviews;
+    },
+    enabled: !!mentorId
+  });
+
+  const { data: reviewStudents = [] } = useQuery({
+    queryKey: ['review-students', reviews],
+    queryFn: async () => {
+      if (reviews.length === 0) return [];
+      const studentIds = [...new Set(reviews.map(r => r.student_id))];
+      const users = await base44.entities.User.list();
+      return users.filter(u => studentIds.includes(u.id));
+    },
+    enabled: reviews.length > 0
+  });
+
   const handleSubscribe = async (planType, amount) => {
     if (!user) {
       base44.auth.redirectToLogin(window.location.pathname);
@@ -112,6 +135,10 @@ export default function MentorProfile() {
       setIsSubscribing(false);
     }
   };
+
+  const averageRating = reviews.length > 0
+    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+    : 5.0; // Default to 5.0 if no reviews
 
   if (isLoading) {
     return (
@@ -200,10 +227,19 @@ export default function MentorProfile() {
                     </Badge>
                   </div>
 
-                  <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-[#FF6B5C] text-[#FF6B5C]" />
-                    ))}
+                  <div className="text-right">
+                    <div className="flex items-center gap-1 mb-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className={`w-5 h-5 ${
+                          i < Math.round(averageRating)
+                            ? 'fill-[#FF6B5C] text-[#FF6B5C]'
+                            : 'text-gray-300'
+                        }`} />
+                      ))}
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      {averageRating} ({reviews.length} {reviews.length === 1 ? 'review' : 'reviews'})
+                    </p>
                   </div>
                 </div>
 
@@ -353,6 +389,56 @@ export default function MentorProfile() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Reviews Section */}
+            {reviews.length > 0 && (
+              <Card className="rounded-3xl border-0 shadow-lg">
+                <CardContent className="p-8">
+                  <h2 className="text-2xl font-bold mb-6" style={{ fontFamily: 'Georgia, serif' }}>
+                    Student Reviews
+                  </h2>
+                  <div className="space-y-6">
+                    {reviews.map((review) => {
+                      const student = reviewStudents.find(s => s.id === review.student_id);
+                      return (
+                        <div key={review.id} className="border-b border-gray-100 last:border-0 pb-6 last:pb-0">
+                          <div className="flex items-start gap-4">
+                            <Avatar className="w-12 h-12">
+                              <AvatarImage src={student?.profile_photo_url} />
+                              <AvatarFallback className="bg-[#B3E5FC]">
+                                {student?.full_name?.charAt(0) || 'S'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-2">
+                                <div>
+                                  <p className="font-semibold">{student?.full_name?.split(' ')[0] || 'Student'}</p>
+                                  <div className="flex items-center gap-1">
+                                    {[...Array(5)].map((_, i) => (
+                                      <Star key={i} className={`w-4 h-4 ${
+                                        i < review.rating
+                                          ? 'fill-[#FF6B5C] text-[#FF6B5C]'
+                                          : 'text-gray-300'
+                                      }`} />
+                                    ))}
+                                  </div>
+                                </div>
+                                <span className="text-sm text-gray-500">
+                                  {new Date(review.created_date).toLocaleDateString()}
+                                </span>
+                              </div>
+                              {review.comment && (
+                                <p className="text-gray-700 leading-relaxed">{review.comment}</p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -403,13 +489,19 @@ export default function MentorProfile() {
                   <div className="text-sm text-gray-600">Current Students</div>
                 </div>
                 <div className="border-t border-gray-200 pt-4 text-center">
-                  <div className="text-2xl font-bold mb-1">5.0</div>
+                  <div className="text-2xl font-bold mb-1">{averageRating}</div>
                   <div className="flex justify-center gap-1 mb-2">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-[#FF6B5C] text-[#FF6B5C]" />
+                      <Star key={i} className={`w-4 h-4 ${
+                        i < Math.round(averageRating)
+                          ? 'fill-[#FF6B5C] text-[#FF6B5C]'
+                          : 'text-gray-300'
+                      }`} />
                     ))}
                   </div>
-                  <div className="text-xs text-gray-600">Average Rating</div>
+                  <div className="text-xs text-gray-600">
+                    {reviews.length} {reviews.length === 1 ? 'Review' : 'Reviews'}
+                  </div>
                 </div>
               </CardContent>
             </Card>
