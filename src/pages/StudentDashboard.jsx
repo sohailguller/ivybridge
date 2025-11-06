@@ -247,7 +247,7 @@ export default function StudentDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-24">
         {/* Success Alert */}
         {showSuccessAlert && (
           <Alert className="mb-6 border-green-200 bg-green-50">

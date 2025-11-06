@@ -275,7 +275,7 @@ export default function ApplyAsMentor() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-24">
         <div className="text-center mb-8 border-b border-gray-200 pb-6">
           <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
             Become a Mentor
