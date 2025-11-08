@@ -141,6 +141,10 @@ export default function ApplyAsMentor() {
   ];
 
   const validateEmail = () => {
+    // TESTING MODE: Email validation disabled for testing purposes
+    return { valid: true, message: "" };
+    
+    /* ORIGINAL VALIDATION - Uncomment when ready for production
     if (!user?.email || !formData.university) return { valid: false, message: "" };
     
     const university = universities.find(u => u.name === formData.university);
@@ -155,6 +159,7 @@ export default function ApplyAsMentor() {
     }
     
     return { valid: true, message: "" };
+    */
   };
 
   const handleFileUpload = async (file, type) => {
@@ -187,22 +192,22 @@ export default function ApplyAsMentor() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validate email domain
-    const emailValidation = validateEmail();
-    if (!emailValidation.valid) {
-      setError(emailValidation.message);
-      return;
-    }
+    // TESTING MODE: Email validation disabled
+    // const emailValidation = validateEmail();
+    // if (!emailValidation.valid) {
+    //   setError(emailValidation.message);
+    //   return;
+    // }
 
     setIsSubmitting(true);
     setError(null);
 
     try {
-      // Create mentor profile
+      // Create mentor profile - AUTO-APPROVED for testing
       const profile = await base44.entities.MentorProfile.create({
         user_id: user.id,
         ...formData,
-        verification_status: "pending",
+        verification_status: "approved", // TESTING MODE: Auto-approve instead of "pending"
         total_students: 0
       });
 
@@ -226,14 +231,16 @@ export default function ApplyAsMentor() {
   const canProceedToNextSection = () => {
     switch(currentSection) {
       case 1:
-        return formData.university && formData.year && formData.major && validateEmail().valid;
+        // TESTING MODE: Removed email validation requirement
+        return formData.university && formData.year && formData.major;
       case 2:
         return formData.bio.length >= 100 && formData.expertise_areas.length > 0;
       case 3:
         return formData.greatest_achievement && formData.advice_to_younger_self && 
                formData.dream_job && formData.why_major && formData.lifetime_goal;
       case 4:
-        return formData.profile_photo_url && formData.transcript_url && formData.calendly_link;
+        // TESTING MODE: Made transcript optional, only calendly_link required
+        return formData.calendly_link;
       default:
         return false;
     }
@@ -283,6 +290,9 @@ export default function ApplyAsMentor() {
           <p className="text-gray-600">
             Share your Ivy League experience and help aspiring students achieve their dreams
           </p>
+          <div className="mt-4 bg-blue-50 border border-blue-200 rounded p-3 text-sm text-blue-800 max-w-2xl mx-auto">
+            <strong>🧪 Testing Mode:</strong> Email verification disabled. Applications are auto-approved. Transcript upload is optional.
+          </div>
         </div>
 
         {/* Progress Indicator */}
@@ -330,14 +340,14 @@ export default function ApplyAsMentor() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Your University Email</Label>
+                    <Label>Your Email</Label>
                     <Input
                       value={user?.email || ""}
                       disabled
                       className="h-10 rounded bg-gray-50"
                     />
                     <p className="text-xs text-gray-500">
-                      You must use your official university email (@harvard.edu, @yale.edu, etc.)
+                      Email verification is disabled for testing
                     </p>
                   </div>
 
@@ -357,25 +367,11 @@ export default function ApplyAsMentor() {
                       <SelectContent>
                         {universities.map(uni => (
                           <SelectItem key={uni.name} value={uni.name}>
-                            {uni.name} (@{uni.domain})
+                            {uni.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                    {formData.university && !emailValidation.valid && (
-                      <Alert className="mt-2 border-red-200 bg-red-50">
-                        <AlertCircle className="h-4 w-4 text-red-600" />
-                        <AlertDescription className="text-red-800 text-sm">
-                          {emailValidation.message}
-                        </AlertDescription>
-                      </Alert>
-                    )}
-                    {formData.university && emailValidation.valid && (
-                      <div className="flex items-center gap-2 text-sm text-green-600 mt-2">
-                        <CheckCircle className="w-4 h-4" />
-                        Email verified for {formData.university}
-                      </div>
-                    )}
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-4">
@@ -598,7 +594,7 @@ export default function ApplyAsMentor() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>University Transcript *</Label>
+                    <Label>University Transcript (Optional for testing)</Label>
                     <div className="border border-gray-200 rounded p-4 text-center hover:border-[#FE6C3A] transition-colors">
                       {formData.transcript_url ? (
                         <div className="flex items-center justify-between">
@@ -631,9 +627,9 @@ export default function ApplyAsMentor() {
                           />
                           <Upload className="w-10 h-10 mx-auto mb-2 text-gray-400" />
                           <p className="font-medium text-sm mb-1">
-                            {uploadingTranscript ? "Uploading..." : "Click to upload transcript"}
+                            {uploadingTranscript ? "Uploading..." : "Click to upload transcript (optional)"}
                           </p>
-                          <p className="text-xs text-gray-500">PDF or image file required for verification</p>
+                          <p className="text-xs text-gray-500">PDF or image file - optional for testing</p>
                         </label>
                       )}
                     </div>
