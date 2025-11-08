@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
@@ -12,9 +12,20 @@ import {
   User, 
   Save,
   Camera,
-  CheckCircle
+  CheckCircle,
+  X,
+  ZoomIn,
+  ZoomOut,
+  RotateCw
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -22,6 +33,13 @@ export default function Settings() {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState(null);
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [imageSrc, setImageSrc] = useState(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0, scale: 1, rotation: 0 });
+  
+  const canvasRef = useRef(null);
+  const imageRef = useRef(null);
   
   const [formData, setFormData] = useState({
     full_name: "",
@@ -33,16 +51,20 @@ export default function Settings() {
   const { data: user, isLoading } = useQuery({
     queryKey: ['current-user'],
     queryFn: async () => {
-      const currentUser = await base44.auth.me();
-      // Initialize form with user data
-      setFormData({
-        full_name: currentUser.full_name || "",
-        phone_number: currentUser.phone_number || "",
-        profile_photo_url: currentUser.profile_photo_url || ""
-      });
-      return currentUser;
+      return await base44.auth.me();
     },
   });
+
+  // Initialize form data only when user data first loads - FIX FOR PERSISTENCE
+  useEffect(() => {
+    if (user && !formData.full_name && !formData.phone_number) {
+      setFormData({
+        full_name: user.full_name || "",
+        phone_number: user.phone_number || "",
+        profile_photo_url: user.profile_photo_url || ""
+      });
+    }
+  }, [user]);
 
   // Update profile mutation
   const updateProfileMutation = useMutation({
@@ -61,24 +83,82 @@ export default function Settings() {
     }
   });
 
-  const handlePhotoUpload = async (e) => {
+  const handleFileSelect = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     
+    setSelectedFile(file);
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setImageSrc(event.target.result);
+      setShowCropModal(true);
+      setCrop({ x: 0, y: 0, scale: 1, rotation: 0 });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const getCroppedImage = () => {
+    return new Promise((resolve) => {
+      const canvas = canvasRef.current;
+      const image = imageRef.current;
+      
+      if (!canvas || !image) {
+        resolve(null);
+        return;
+      }
+
+      const ctx = canvas.getContext('2d');
+      const size = 400;
+      canvas.width = size;
+      canvas.height = size;
+
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, size, size);
+
+      ctx.save();
+      ctx.translate(size / 2, size / 2);
+      ctx.rotate((crop.rotation * Math.PI) / 180);
+      ctx.scale(crop.scale, crop.scale);
+      
+      const drawWidth = image.naturalWidth;
+      const drawHeight = image.naturalHeight;
+      
+      ctx.drawImage(
+        image,
+        -drawWidth / 2 + crop.x,
+        -drawHeight / 2 + crop.y,
+        drawWidth,
+        drawHeight
+      );
+      
+      ctx.restore();
+
+      canvas.toBlob((blob) => {
+        resolve(blob);
+      }, 'image/jpeg', 0.95);
+    });
+  };
+
+  const handleCropConfirm = async () => {
     setUploadingPhoto(true);
+    setShowCropModal(false);
     setError(null);
 
     try {
-      // Upload file
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const croppedBlob = await getCroppedImage();
+      if (!croppedBlob) throw new Error("Failed to crop image");
+
+      const croppedFile = new File([croppedBlob], selectedFile.name, {
+        type: 'image/jpeg',
+      });
+
+      const { file_url } = await base44.integrations.Core.UploadFile({ file: croppedFile });
       
-      // Update form state
       setFormData(prev => ({ ...prev, profile_photo_url: file_url }));
       
-      // Save to database immediately
       await base44.auth.updateMe({ profile_photo_url: file_url });
       
-      // Refresh user data
       queryClient.invalidateQueries(['current-user']);
       
       setShowSuccess(true);
@@ -88,6 +168,8 @@ export default function Settings() {
       setError("Failed to upload photo. Please try again.");
     } finally {
       setUploadingPhoto(false);
+      setImageSrc(null);
+      setSelectedFile(null);
     }
   };
 
@@ -95,10 +177,10 @@ export default function Settings() {
     e.preventDefault();
     setError(null);
 
+    // Only send name and phone - not profile_photo_url
     updateProfileMutation.mutate({
       full_name: formData.full_name.trim(),
-      phone_number: formData.phone_number.trim(),
-      profile_photo_url: formData.profile_photo_url
+      phone_number: formData.phone_number.trim()
     });
   };
 
@@ -171,7 +253,7 @@ export default function Settings() {
                     type="file"
                     id="photo-upload"
                     accept="image/*"
-                    onChange={handlePhotoUpload}
+                    onChange={handleFileSelect}
                     className="hidden"
                     disabled={uploadingPhoto}
                   />
@@ -330,6 +412,117 @@ export default function Settings() {
           </div>
         </div>
       </div>
+
+      {/* Image Crop Modal */}
+      <Dialog open={showCropModal} onOpenChange={setShowCropModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Adjust Your Photo</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="relative bg-gray-100 rounded-lg overflow-hidden" style={{ height: '400px' }}>
+              <div className="absolute inset-0 flex items-center justify-center">
+                {imageSrc && (
+                  <img
+                    ref={imageRef}
+                    src={imageSrc}
+                    alt="Preview"
+                    className="max-w-full max-h-full object-contain"
+                    style={{
+                      transform: `translate(${crop.x}px, ${crop.y}px) scale(${crop.scale}) rotate(${crop.rotation}deg)`,
+                      transition: 'transform 0.1s ease-out'
+                    }}
+                  />
+                )}
+              </div>
+              
+              {/* Circular overlay */}
+              <div className="absolute inset-0 pointer-events-none">
+                <svg className="w-full h-full" viewBox="0 0 400 400">
+                  <defs>
+                    <mask id="circle-mask">
+                      <rect width="400" height="400" fill="white" />
+                      <circle cx="200" cy="200" r="150" fill="black" />
+                    </mask>
+                  </defs>
+                  <rect width="400" height="400" fill="black" opacity="0.5" mask="url(#circle-mask)" />
+                  <circle cx="200" cy="200" r="150" fill="none" stroke="white" strokeWidth="2" />
+                </svg>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <ZoomOut className="w-4 h-4" />
+                <input
+                  type="range"
+                  min="0.5"
+                  max="3"
+                  step="0.1"
+                  value={crop.scale}
+                  onChange={(e) => setCrop(prev => ({ ...prev, scale: parseFloat(e.target.value) }))}
+                  className="flex-1"
+                />
+                <ZoomIn className="w-4 h-4" />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <RotateCw className="w-4 h-4" />
+                <input
+                  type="range"
+                  min="0"
+                  max="360"
+                  step="1"
+                  value={crop.rotation}
+                  onChange={(e) => setCrop(prev => ({ ...prev, rotation: parseInt(e.target.value) }))}
+                  className="flex-1"
+                />
+                <span className="text-sm w-12 text-right">{crop.rotation}°</span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <Label className="text-xs">Horizontal</Label>
+                  <input
+                    type="range"
+                    min="-200"
+                    max="200"
+                    step="1"
+                    value={crop.x}
+                    onChange={(e) => setCrop(prev => ({ ...prev, x: parseInt(e.target.value) }))}
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Vertical</Label>
+                  <input
+                    type="range"
+                    min="-200"
+                    max="200"
+                    step="1"
+                    value={crop.y}
+                    onChange={(e) => setCrop(prev => ({ ...prev, y: parseInt(e.target.value) }))}
+                    className="w-full"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCropModal(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCropConfirm} className="btn-primary">
+              Apply & Upload
+            </Button>
+          </DialogFooter>
+
+          {/* Hidden canvas for cropping */}
+          <canvas ref={canvasRef} style={{ display: 'none' }} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
