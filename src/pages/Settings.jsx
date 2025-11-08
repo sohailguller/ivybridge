@@ -52,12 +52,25 @@ export default function Settings() {
   };
 
   const handlePhotoUpload = async (file) => {
+    if (!file) return;
+    
     setUploadingPhoto(true);
     setError(null);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setFormData(prev => ({ ...prev, profile_photo_url: file_url }));
+      
+      // Auto-save the photo immediately
+      await base44.auth.updateMe({ profile_photo_url: file_url });
+      
+      // Reload user data
+      const updatedUser = await base44.auth.me();
+      setUser(updatedUser);
+      
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
     } catch (error) {
+      console.error("Photo upload error:", error);
       setError("Failed to upload photo. Please try again.");
     } finally {
       setUploadingPhoto(false);
@@ -71,14 +84,25 @@ export default function Settings() {
     setSuccess(false);
 
     try {
-      await base44.auth.updateMe(formData);
+      await base44.auth.updateMe({
+        full_name: formData.full_name,
+        phone_number: formData.phone_number,
+        profile_photo_url: formData.profile_photo_url
+      });
+      
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
       
-      // Reload user data
+      // Reload user data to reflect changes
       const updatedUser = await base44.auth.me();
       setUser(updatedUser);
+      setFormData({
+        full_name: updatedUser.full_name || "",
+        phone_number: updatedUser.phone_number || "",
+        profile_photo_url: updatedUser.profile_photo_url || ""
+      });
     } catch (error) {
+      console.error("Update profile error:", error);
       setError("Failed to update profile. Please try again.");
     } finally {
       setIsSaving(false);
@@ -143,30 +167,36 @@ export default function Settings() {
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={(e) => handlePhotoUpload(e.target.files[0])}
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        handlePhotoUpload(e.target.files[0]);
+                      }
+                    }}
                     className="hidden"
                     disabled={uploadingPhoto}
                   />
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    size="sm"
-                    className="rounded text-xs"
-                    disabled={uploadingPhoto}
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    {uploadingPhoto ? (
-                      <>
-                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-gray-600 mr-2" />
-                        Uploading...
-                      </>
-                    ) : (
-                      <>
-                        <Camera className="w-3 h-3 mr-2" />
-                        Change Photo
-                      </>
-                    )}
-                  </Button>
+                  <div>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm"
+                      className="rounded text-xs"
+                      disabled={uploadingPhoto}
+                      as="div"
+                    >
+                      {uploadingPhoto ? (
+                        <>
+                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-gray-600 mr-2" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Camera className="w-3 h-3 mr-2" />
+                          Change Photo
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </label>
               </div>
 
