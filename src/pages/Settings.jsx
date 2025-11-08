@@ -1,8 +1,8 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,19 +10,17 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   User, 
-  Upload,
   Save,
-  Camera
+  Camera,
+  CheckCircle
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function Settings() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
+  const queryClient = useQueryClient();
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState(null);
   
   const [formData, setFormData] = useState({
@@ -31,46 +29,62 @@ export default function Settings() {
     profile_photo_url: ""
   });
 
-  useEffect(() => {
-    loadUser();
-  }, []);
-
-  const loadUser = async () => {
-    try {
+  // Fetch user data
+  const { data: user, isLoading } = useQuery({
+    queryKey: ['current-user'],
+    queryFn: async () => {
       const currentUser = await base44.auth.me();
-      setUser(currentUser);
+      // Initialize form with user data
       setFormData({
         full_name: currentUser.full_name || "",
         phone_number: currentUser.phone_number || "",
         profile_photo_url: currentUser.profile_photo_url || ""
       });
-    } catch (error) {
-      base44.auth.redirectToLogin();
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      return currentUser;
+    },
+  });
 
-  const handlePhotoUpload = async (file) => {
+  // Update profile mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data) => {
+      return await base44.auth.updateMe(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['current-user']);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+      setError(null);
+    },
+    onError: (err) => {
+      console.error("Update error:", err);
+      setError("Failed to update profile. Please try again.");
+    }
+  });
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files?.[0];
     if (!file) return;
     
     setUploadingPhoto(true);
     setError(null);
+
     try {
+      // Upload file
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      
+      // Update form state
       setFormData(prev => ({ ...prev, profile_photo_url: file_url }));
       
-      // Auto-save the photo immediately
+      // Save to database immediately
       await base44.auth.updateMe({ profile_photo_url: file_url });
       
-      // Reload user data
-      const updatedUser = await base44.auth.me();
-      setUser(updatedUser);
+      // Refresh user data
+      queryClient.invalidateQueries(['current-user']);
       
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
-    } catch (error) {
-      console.error("Photo upload error:", error);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+    } catch (err) {
+      console.error("Photo upload error:", err);
       setError("Failed to upload photo. Please try again.");
     } finally {
       setUploadingPhoto(false);
@@ -79,45 +93,29 @@ export default function Settings() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSaving(true);
     setError(null);
-    setSuccess(false);
 
-    try {
-      await base44.auth.updateMe({
-        full_name: formData.full_name,
-        phone_number: formData.phone_number,
-        profile_photo_url: formData.profile_photo_url
-      });
-      
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
-      
-      // Reload user data to reflect changes
-      const updatedUser = await base44.auth.me();
-      setUser(updatedUser);
-      setFormData({
-        full_name: updatedUser.full_name || "",
-        phone_number: updatedUser.phone_number || "",
-        profile_photo_url: updatedUser.profile_photo_url || ""
-      });
-    } catch (error) {
-      console.error("Update profile error:", error);
-      setError("Failed to update profile. Please try again.");
-    } finally {
-      setIsSaving(false);
-    }
+    updateProfileMutation.mutate({
+      full_name: formData.full_name.trim(),
+      phone_number: formData.phone_number.trim(),
+      profile_photo_url: formData.profile_photo_url
+    });
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF6B5C] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FE6C3A] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading settings...</p>
         </div>
       </div>
     );
+  }
+
+  if (!user) {
+    base44.auth.redirectToLogin();
+    return null;
   }
 
   return (
@@ -131,20 +129,24 @@ export default function Settings() {
           <p className="text-gray-600 text-sm">Manage your profile and preferences</p>
         </div>
 
-        {success && (
+        {/* Success Alert */}
+        {showSuccess && (
           <Alert className="mb-6 border-green-200 bg-green-50">
-            <AlertDescription className="text-green-800 text-sm">
+            <CheckCircle className="w-4 h-4 text-green-600" />
+            <AlertDescription className="text-green-800 text-sm ml-2">
               Profile updated successfully!
             </AlertDescription>
           </Alert>
         )}
 
+        {/* Error Alert */}
         {error && (
           <Alert variant="destructive" className="mb-6">
             <AlertDescription className="text-sm">{error}</AlertDescription>
           </Alert>
         )}
 
+        {/* Profile Information Card */}
         <div className="bg-white border border-gray-200 rounded shadow-sm mb-6">
           <div className="p-6 border-b border-gray-200">
             <h3 className="font-bold flex items-center gap-2 text-[#0D3B33]">
@@ -152,37 +154,38 @@ export default function Settings() {
               Profile Information
             </h3>
           </div>
+          
           <div className="p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Profile Photo */}
-              <div className="flex flex-col items-center gap-3 pb-6 border-b border-gray-200">
-                <Avatar className="w-24 h-24">
+              <div className="flex flex-col items-center gap-4 pb-6 border-b border-gray-200">
+                <Avatar className="w-24 h-24 border-4 border-gray-100">
                   <AvatarImage src={formData.profile_photo_url} />
                   <AvatarFallback className="bg-[#E6EFEA] text-3xl text-[#0D3B33]">
-                    {formData.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                    {formData.full_name?.charAt(0) || user.email?.charAt(0) || 'U'}
                   </AvatarFallback>
                 </Avatar>
                 
-                <label className="cursor-pointer">
+                <div>
                   <input
                     type="file"
+                    id="photo-upload"
                     accept="image/*"
-                    onChange={(e) => {
-                      if (e.target.files && e.target.files[0]) {
-                        handlePhotoUpload(e.target.files[0]);
-                      }
-                    }}
+                    onChange={handlePhotoUpload}
                     className="hidden"
                     disabled={uploadingPhoto}
                   />
-                  <div>
+                  <label htmlFor="photo-upload">
                     <Button 
                       type="button" 
                       variant="outline" 
                       size="sm"
                       className="rounded text-xs"
                       disabled={uploadingPhoto}
-                      as="div"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        document.getElementById('photo-upload').click();
+                      }}
                     >
                       {uploadingPhoto ? (
                         <>
@@ -196,16 +199,17 @@ export default function Settings() {
                         </>
                       )}
                     </Button>
-                  </div>
-                </label>
+                  </label>
+                </div>
               </div>
 
               {/* Full Name */}
               <div className="space-y-2">
-                <Label className="text-sm">Full Name</Label>
+                <Label className="text-sm font-medium">Full Name</Label>
                 <Input
+                  type="text"
                   value={formData.full_name}
-                  onChange={(e) => setFormData({...formData, full_name: e.target.value})}
+                  onChange={(e) => setFormData(prev => ({...prev, full_name: e.target.value}))}
                   placeholder="Your full name"
                   className="h-10 rounded"
                 />
@@ -213,21 +217,23 @@ export default function Settings() {
 
               {/* Email (Read-only) */}
               <div className="space-y-2">
-                <Label className="text-sm">Email</Label>
+                <Label className="text-sm font-medium">Email</Label>
                 <Input
-                  value={user?.email}
+                  type="email"
+                  value={user.email}
                   disabled
-                  className="h-10 rounded bg-gray-50"
+                  className="h-10 rounded bg-gray-50 text-gray-500"
                 />
                 <p className="text-xs text-gray-500">Email cannot be changed</p>
               </div>
 
               {/* Phone Number */}
               <div className="space-y-2">
-                <Label className="text-sm">Phone Number</Label>
+                <Label className="text-sm font-medium">Phone Number</Label>
                 <Input
+                  type="tel"
                   value={formData.phone_number}
-                  onChange={(e) => setFormData({...formData, phone_number: e.target.value})}
+                  onChange={(e) => setFormData(prev => ({...prev, phone_number: e.target.value}))}
                   placeholder="+1 (555) 123-4567"
                   className="h-10 rounded"
                 />
@@ -235,12 +241,12 @@ export default function Settings() {
 
               {/* Account Type Badge */}
               <div className="space-y-2">
-                <Label className="text-sm">Account Type</Label>
+                <Label className="text-sm font-medium">Account Type</Label>
                 <div className="flex items-center gap-2">
                   <div className="px-3 py-1 bg-gray-100 border border-gray-200 rounded text-xs font-medium capitalize">
-                    {user?.account_type || 'Student'}
+                    {user.account_type || 'Student'}
                   </div>
-                  {user?.role === "admin" && (
+                  {user.role === "admin" && (
                     <div className="px-3 py-1 bg-orange-100 text-orange-700 border border-orange-200 rounded text-xs font-medium">
                       Admin
                     </div>
@@ -252,10 +258,10 @@ export default function Settings() {
               <div className="pt-4">
                 <Button 
                   type="submit" 
-                  disabled={isSaving}
+                  disabled={updateProfileMutation.isPending}
                   className="w-full btn-primary text-white rounded h-10"
                 >
-                  {isSaving ? (
+                  {updateProfileMutation.isPending ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
                       Saving...
@@ -272,7 +278,7 @@ export default function Settings() {
           </div>
         </div>
 
-        {/* Additional Settings Card */}
+        {/* Account Actions Card */}
         <div className="bg-white border border-gray-200 rounded shadow-sm">
           <div className="p-6 border-b border-gray-200">
             <h3 className="font-bold text-[#0D3B33]">Account Actions</h3>
@@ -284,12 +290,12 @@ export default function Settings() {
                   <p className="font-medium text-sm">Change Password</p>
                   <p className="text-xs text-gray-600">Update your account password</p>
                 </div>
-                <Button variant="outline" size="sm" className="rounded text-xs">
+                <Button variant="outline" size="sm" className="rounded text-xs" disabled>
                   Update
                 </Button>
               </div>
 
-              {user?.account_type === "mentor" && (
+              {user.account_type === "mentor" && (
                 <div className="flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded">
                   <div>
                     <p className="font-medium text-sm">Mentor Profile</p>
