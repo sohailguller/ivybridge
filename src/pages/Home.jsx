@@ -111,8 +111,11 @@ export default function Home() {
             style={{
               border: 'none',
               pointerEvents: 'none',
-              transform: 'translate(-50%, -50%)',
-              aspectRatio: '16/9'
+              transform: 'translate(-50%, -50%) scale(1.5)',
+              width: '177.77vh',
+              height: '56.25vw',
+              minWidth: '100%',
+              minHeight: '100%'
             }}
             allow="autoplay; fullscreen"
           />
