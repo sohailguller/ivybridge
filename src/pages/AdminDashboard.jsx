@@ -38,6 +38,14 @@ import {
 } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { 
+  FileText,
+  Calendar as CalendarIcon,
+  ExternalLink as ExternalLinkIcon,
+  GraduationCap
+} from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -52,6 +60,7 @@ export default function AdminDashboard() {
   const [payoutAmount, setPayoutAmount] = useState("");
   const [payoutDescription, setPayoutDescription] = useState("");
   const [isProcessingPayout, setIsProcessingPayout] = useState(false);
+  const [mentorReviewDialogOpen, setMentorReviewDialogOpen] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -98,11 +107,22 @@ export default function AdminDashboard() {
   });
 
   const approveMentorMutation = useMutation({
-    mutationFn: ({ id, status }) => base44.entities.MentorProfile.update(id, { verification_status: status }),
+    mutationFn: async ({ id, status }) => {
+      await base44.entities.MentorProfile.update(id, { verification_status: status });
+      
+      // If approving, also update the user's account_type to "mentor"
+      if (status === "approved") {
+        const profile = pendingMentors.find(m => m.id === id);
+        if (profile) {
+          await base44.entities.User.update(profile.user_id, { account_type: "mentor" });
+        }
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(['pending-mentors']);
       queryClient.invalidateQueries(['approved-mentors-admin']);
       setSelectedMentor(null);
+      setMentorReviewDialogOpen(false);
     },
   });
 
@@ -323,7 +343,10 @@ export default function AdminDashboard() {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => setSelectedMentor(mentor)}
+                              onClick={() => {
+                                setSelectedMentor(mentor);
+                                setMentorReviewDialogOpen(true);
+                              }}
                             >
                               <Eye className="w-4 h-4 mr-1" />
                               Review
@@ -401,61 +424,32 @@ export default function AdminDashboard() {
                       return (
                         <Card key={mentor.id} className="border-2">
                           <CardContent className="p-6">
-                            <div className="flex flex-col md:flex-row gap-6">
-                              <Avatar className="w-20 h-20">
-                                <AvatarImage src={mentor.profile_photo_url} />
-                                <AvatarFallback className="bg-[#B3E5FC] text-2xl">
-                                  {mentorUser?.full_name?.charAt(0) || 'M'}
-                                </AvatarFallback>
-                              </Avatar>
-
-                              <div className="flex-1">
-                                <h3 className="text-xl font-bold mb-2">{mentorUser?.full_name}</h3>
-                                <div className="flex flex-wrap gap-2 mb-3">
-                                  <Badge>{mentor.university}</Badge>
-                                  <Badge variant="outline">{mentor.year}</Badge>
-                                  <Badge variant="outline">{mentor.major}</Badge>
-                                </div>
-                                <p className="text-sm text-gray-700 mb-4">{mentor.bio}</p>
-                                
-                                <div className="flex flex-wrap gap-2 mb-4">
-                                  {mentor.expertise_areas?.map((area, idx) => (
-                                    <Badge key={idx} className="bg-[#B3E5FC]/30 text-[#222222] border-0 text-xs">
-                                      {area}
-                                    </Badge>
-                                  ))}
-                                </div>
-
-                                <div className="flex gap-3">
-                                  {mentor.transcript_url && (
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => window.open(mentor.transcript_url, '_blank')}
-                                    >
-                                      View Transcript
-                                    </Button>
-                                  )}
-                                  <Button
-                                    size="sm"
-                                    className="bg-green-600 hover:bg-green-700 text-white"
-                                    onClick={() => handleApproveMentor(mentor.id, true)}
-                                    disabled={approveMentorMutation.isPending}
-                                  >
-                                    <CheckCircle className="w-4 h-4 mr-1" />
-                                    Approve
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="destructive"
-                                    onClick={() => handleApproveMentor(mentor.id, false)}
-                                    disabled={approveMentorMutation.isPending}
-                                  >
-                                    <X className="w-4 h-4 mr-1" />
-                                    Reject
-                                  </Button>
+                            <div className="flex items-center justify-between mb-4">
+                              <div className="flex items-center gap-4">
+                                <Avatar className="w-16 h-16">
+                                  <AvatarImage src={mentor.profile_photo_url} />
+                                  <AvatarFallback className="bg-[#B3E5FC] text-xl">
+                                    {mentorUser?.full_name?.charAt(0) || 'M'}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <h3 className="text-lg font-bold">{mentorUser?.full_name}</h3>
+                                  <div className="flex flex-wrap gap-2 mt-1">
+                                    <Badge>{mentor.university}</Badge>
+                                    <Badge variant="outline">{mentor.year}</Badge>
+                                    <Badge variant="outline">{mentor.major}</Badge>
+                                  </div>
                                 </div>
                               </div>
+                              <Button
+                                onClick={() => {
+                                  setSelectedMentor(mentor);
+                                  setMentorReviewDialogOpen(true);
+                                }}
+                              >
+                                <Eye className="w-4 h-4 mr-2" />
+                                Review Application
+                              </Button>
                             </div>
                           </CardContent>
                         </Card>
@@ -685,6 +679,196 @@ export default function AdminDashboard() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Mentor Application Review Dialog */}
+      {selectedMentor && (
+        <Dialog open={mentorReviewDialogOpen} onOpenChange={setMentorReviewDialogOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh]">
+            <DialogHeader>
+              <DialogTitle>Mentor Application Review</DialogTitle>
+              <DialogDescription>
+                Review the complete application for {getMentorUser(selectedMentor.user_id)?.full_name}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <ScrollArea className="max-h-[calc(90vh-200px)] pr-4">
+              <div className="space-y-6">
+                {/* Basic Information Section */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                    <GraduationCap className="w-5 h-5" />
+                    Basic Information
+                  </h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-xs text-gray-600">Full Name</Label>
+                      <p className="font-medium">{getMentorUser(selectedMentor.user_id)?.full_name}</p>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-gray-600">Email</Label>
+                      <p className="font-medium">{getMentorUser(selectedMentor.user_id)?.email}</p>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-gray-600">University</Label>
+                      <p className="font-medium">{selectedMentor.university}</p>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-gray-600">Year</Label>
+                      <p className="font-medium">{selectedMentor.year}</p>
+                    </div>
+                    <div className="md:col-span-2">
+                      <Label className="text-xs text-gray-600">Major</Label>
+                      <p className="font-medium">{selectedMentor.major}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Profile Photo */}
+                {selectedMentor.profile_photo_url && (
+                  <div className="border border-gray-200 rounded-lg p-4">
+                    <h3 className="font-bold text-sm mb-3">Profile Photo</h3>
+                    <img 
+                      src={selectedMentor.profile_photo_url} 
+                      alt="Profile" 
+                      className="w-32 h-32 rounded-full object-cover border-2 border-gray-200"
+                    />
+                  </div>
+                )}
+
+                {/* Bio */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <h3 className="font-bold text-sm mb-3">About</h3>
+                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{selectedMentor.bio}</p>
+                </div>
+
+                {/* Expertise Areas */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <h3 className="font-bold text-sm mb-3">Areas of Expertise</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedMentor.expertise_areas?.map((area, idx) => (
+                      <Badge key={idx} variant="outline">{area}</Badge>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Personal Essays */}
+                <div className="border border-gray-200 rounded-lg p-4 space-y-4">
+                  <h3 className="font-bold text-lg mb-2">Personal Essays</h3>
+                  
+                  <div>
+                    <Label className="text-xs text-gray-600 font-semibold">Greatest Achievement</Label>
+                    <p className="text-sm text-gray-700 leading-relaxed mt-1 whitespace-pre-wrap">{selectedMentor.greatest_achievement}</p>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs text-gray-600 font-semibold">Advice to Younger Self</Label>
+                    <p className="text-sm text-gray-700 leading-relaxed mt-1 whitespace-pre-wrap">{selectedMentor.advice_to_younger_self}</p>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs text-gray-600 font-semibold">Dream Job</Label>
+                    <p className="text-sm text-gray-700 leading-relaxed mt-1">{selectedMentor.dream_job}</p>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs text-gray-600 font-semibold">Why This Major?</Label>
+                    <p className="text-sm text-gray-700 leading-relaxed mt-1 whitespace-pre-wrap">{selectedMentor.why_major}</p>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs text-gray-600 font-semibold">Lifetime Goal</Label>
+                    <p className="text-sm text-gray-700 leading-relaxed mt-1 whitespace-pre-wrap">{selectedMentor.lifetime_goal}</p>
+                  </div>
+                </div>
+
+                {/* Verification Documents */}
+                <div className="border border-gray-200 rounded-lg p-4 space-y-3">
+                  <h3 className="font-bold text-lg mb-2">Verification & Setup</h3>
+                  
+                  {selectedMentor.transcript_url && (
+                    <div>
+                      <Label className="text-xs text-gray-600 font-semibold">Transcript</Label>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-2"
+                        onClick={() => window.open(selectedMentor.transcript_url, '_blank')}
+                      >
+                        <FileText className="w-4 h-4 mr-2" />
+                        View Transcript
+                        <ExternalLinkIcon className="w-3 h-3 ml-2" />
+                      </Button>
+                    </div>
+                  )}
+
+                  <div>
+                    <Label className="text-xs text-gray-600 font-semibold">Calendly Link</Label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-sm font-mono bg-gray-50 px-2 py-1 rounded flex-1 truncate">{selectedMentor.calendly_link}</p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(selectedMentor.calendly_link, '_blank')}
+                      >
+                        <ExternalLinkIcon className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Application Date */}
+                <div className="text-xs text-gray-500 text-center">
+                  Application submitted on {new Date(selectedMentor.created_date).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </div>
+              </div>
+            </ScrollArea>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 pt-4 border-t">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => setMentorReviewDialogOpen(false)}
+                disabled={approveMentorMutation.isPending}
+              >
+                Close
+              </Button>
+              <Button
+                variant="destructive"
+                className="flex-1"
+                onClick={() => handleApproveMentor(selectedMentor.id, false)}
+                disabled={approveMentorMutation.isPending}
+              >
+                <X className="w-4 h-4 mr-2" />
+                Reject
+              </Button>
+              <Button
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                onClick={() => handleApproveMentor(selectedMentor.id, true)}
+                disabled={approveMentorMutation.isPending}
+              >
+                {approveMentorMutation.isPending ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Approve
+                  </>
+                )}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Report Details Dialog */}
       {selectedReport && (
