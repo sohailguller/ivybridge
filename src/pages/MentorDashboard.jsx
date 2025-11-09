@@ -47,7 +47,7 @@ export default function MentorDashboard() {
   const loadUser = async () => {
     try {
       const currentUser = await base44.auth.me();
-      if (currentUser.account_type !== "mentor") {
+      if (currentUser.account_type !== "mentor" && !currentUser.mentor_profile_id) {
         navigate(createPageUrl("StudentDashboard"));
         return;
       }
@@ -57,10 +57,6 @@ export default function MentorDashboard() {
         const profiles = await base44.entities.MentorProfile.filter({ id: currentUser.mentor_profile_id });
         if (profiles.length > 0) {
           setMentorProfile(profiles[0]);
-          
-          if (profiles[0].verification_status === "pending") {
-            // Show pending status - This comment is fine.
-          }
         }
       }
     } catch (error) {
@@ -112,9 +108,9 @@ export default function MentorDashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF6B5C] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FE6C3A] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading your dashboard...</p>
         </div>
       </div>
@@ -160,9 +156,16 @@ export default function MentorDashboard() {
               Your mentor application is currently being reviewed by our team. 
               We'll notify you via email once it's been approved.
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 mb-6">
               This usually takes 1-2 business days.
             </p>
+            <Button 
+              variant="outline"
+              className="rounded"
+              onClick={() => navigate(createPageUrl("Home"))}
+            >
+              Return to Home
+            </Button>
           </div>
         </div>
       </div>
@@ -178,9 +181,17 @@ export default function MentorDashboard() {
             <h2 className="text-2xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
               Application Not Approved
             </h2>
-            <p className="text-gray-600 text-sm">
+            <p className="text-gray-600 text-sm mb-6">
               Unfortunately, your mentor application was not approved at this time.
+              Please contact support for more information.
             </p>
+            <Button 
+              variant="outline"
+              className="rounded"
+              onClick={() => navigate(createPageUrl("Home"))}
+            >
+              Return to Home
+            </Button>
           </div>
         </div>
       </div>
