@@ -428,7 +428,7 @@ export default function AdminDashboard() {
                               <div className="flex items-center gap-4">
                                 <Avatar className="w-16 h-16">
                                   <AvatarImage src={mentor.profile_photo_url} />
-                                  <AvatarFallback className="bg-[#B3E5FC] text-xl">
+                                  <AvatarFallback className="bg-[#B3E5FC]">
                                     {mentorUser?.full_name?.charAt(0) || 'M'}
                                   </AvatarFallback>
                                 </Avatar>
@@ -683,115 +683,131 @@ export default function AdminDashboard() {
       {/* Mentor Application Review Dialog */}
       {selectedMentor && (
         <Dialog open={mentorReviewDialogOpen} onOpenChange={setMentorReviewDialogOpen}>
-          <DialogContent className="max-w-4xl max-h-[90vh]">
-            <DialogHeader>
-              <DialogTitle>Mentor Application Review</DialogTitle>
-              <DialogDescription>
+          <DialogContent className="max-w-4xl max-h-[90vh] bg-white">
+            <DialogHeader className="border-b border-gray-200 pb-4">
+              <DialogTitle className="text-xl font-bold text-[#0D3B33]">
+                Mentor Application Review
+              </DialogTitle>
+              <DialogDescription className="text-gray-600">
                 Review the complete application for {getMentorUser(selectedMentor.user_id)?.full_name}
               </DialogDescription>
             </DialogHeader>
             
             <ScrollArea className="max-h-[calc(90vh-200px)] pr-4">
-              <div className="space-y-6">
+              <div className="space-y-6 py-4">
                 {/* Basic Information Section */}
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                    <GraduationCap className="w-5 h-5" />
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                  <h3 className="font-bold text-base mb-4 flex items-center gap-2 text-[#0D3B33]">
+                    <GraduationCap className="w-5 h-5 text-[#FE6C3A]" />
                     Basic Information
                   </h3>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-xs text-gray-600">Full Name</Label>
-                      <p className="font-medium">{getMentorUser(selectedMentor.user_id)?.full_name}</p>
+                      <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Full Name</Label>
+                      <p className="font-medium text-gray-900 mt-1">{getMentorUser(selectedMentor.user_id)?.full_name}</p>
                     </div>
                     <div>
-                      <Label className="text-xs text-gray-600">Email</Label>
-                      <p className="font-medium">{getMentorUser(selectedMentor.user_id)?.email}</p>
+                      <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Email</Label>
+                      <p className="font-medium text-gray-900 mt-1">{getMentorUser(selectedMentor.user_id)?.email}</p>
                     </div>
                     <div>
-                      <Label className="text-xs text-gray-600">University</Label>
-                      <p className="font-medium">{selectedMentor.university}</p>
+                      <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">University</Label>
+                      <p className="font-medium text-gray-900 mt-1">{selectedMentor.university}</p>
                     </div>
                     <div>
-                      <Label className="text-xs text-gray-600">Year</Label>
-                      <p className="font-medium">{selectedMentor.year}</p>
+                      <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Year</Label>
+                      <p className="font-medium text-gray-900 mt-1">{selectedMentor.year}</p>
                     </div>
                     <div className="md:col-span-2">
-                      <Label className="text-xs text-gray-600">Major</Label>
-                      <p className="font-medium">{selectedMentor.major}</p>
+                      <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Major</Label>
+                      <p className="font-medium text-gray-900 mt-1">{selectedMentor.major}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Profile Photo */}
                 {selectedMentor.profile_photo_url && (
-                  <div className="border border-gray-200 rounded-lg p-4">
-                    <h3 className="font-bold text-sm mb-3">Profile Photo</h3>
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <h3 className="font-bold text-sm mb-4 text-[#0D3B33]">Profile Photo</h3>
                     <img 
                       src={selectedMentor.profile_photo_url} 
                       alt="Profile" 
-                      className="w-32 h-32 rounded-full object-cover border-2 border-gray-200"
+                      className="w-32 h-32 rounded-full object-cover border-4 border-gray-100 shadow-sm"
                     />
                   </div>
                 )}
 
                 {/* Bio */}
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <h3 className="font-bold text-sm mb-3">About</h3>
-                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{selectedMentor.bio}</p>
+                <div className="bg-white border border-gray-200 rounded-lg p-6">
+                  <h3 className="font-bold text-sm mb-3 text-[#0D3B33]">About</h3>
+                  <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{selectedMentor.bio}</p>
                 </div>
 
                 {/* Expertise Areas */}
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <h3 className="font-bold text-sm mb-3">Areas of Expertise</h3>
+                <div className="bg-white border border-gray-200 rounded-lg p-6">
+                  <h3 className="font-bold text-sm mb-3 text-[#0D3B33]">Areas of Expertise</h3>
                   <div className="flex flex-wrap gap-2">
                     {selectedMentor.expertise_areas?.map((area, idx) => (
-                      <Badge key={idx} variant="outline">{area}</Badge>
+                      <Badge key={idx} className="bg-[#E6EFEA] text-[#0D3B33] border-0 text-xs">
+                        {area}
+                      </Badge>
                     ))}
                   </div>
                 </div>
 
                 {/* Personal Essays */}
-                <div className="border border-gray-200 rounded-lg p-4 space-y-4">
-                  <h3 className="font-bold text-lg mb-2">Personal Essays</h3>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 space-y-5">
+                  <h3 className="font-bold text-base text-[#0D3B33]">Personal Essays</h3>
                   
-                  <div>
-                    <Label className="text-xs text-gray-600 font-semibold">Greatest Achievement</Label>
-                    <p className="text-sm text-gray-700 leading-relaxed mt-1 whitespace-pre-wrap">{selectedMentor.greatest_achievement}</p>
+                  <div className="bg-white rounded-lg p-4 border border-gray-200">
+                    <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide block mb-2">
+                      Greatest Achievement
+                    </Label>
+                    <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{selectedMentor.greatest_achievement}</p>
                   </div>
 
-                  <div>
-                    <Label className="text-xs text-gray-600 font-semibold">Advice to Younger Self</Label>
-                    <p className="text-sm text-gray-700 leading-relaxed mt-1 whitespace-pre-wrap">{selectedMentor.advice_to_younger_self}</p>
+                  <div className="bg-white rounded-lg p-4 border border-gray-200">
+                    <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide block mb-2">
+                      Advice to Younger Self
+                    </Label>
+                    <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{selectedMentor.advice_to_younger_self}</p>
                   </div>
 
-                  <div>
-                    <Label className="text-xs text-gray-600 font-semibold">Dream Job</Label>
-                    <p className="text-sm text-gray-700 leading-relaxed mt-1">{selectedMentor.dream_job}</p>
+                  <div className="bg-white rounded-lg p-4 border border-gray-200">
+                    <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide block mb-2">
+                      Dream Job
+                    </Label>
+                    <p className="text-sm text-gray-800 leading-relaxed">{selectedMentor.dream_job}</p>
                   </div>
 
-                  <div>
-                    <Label className="text-xs text-gray-600 font-semibold">Why This Major?</Label>
-                    <p className="text-sm text-gray-700 leading-relaxed mt-1 whitespace-pre-wrap">{selectedMentor.why_major}</p>
+                  <div className="bg-white rounded-lg p-4 border border-gray-200">
+                    <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide block mb-2">
+                      Why This Major?
+                    </Label>
+                    <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{selectedMentor.why_major}</p>
                   </div>
 
-                  <div>
-                    <Label className="text-xs text-gray-600 font-semibold">Lifetime Goal</Label>
-                    <p className="text-sm text-gray-700 leading-relaxed mt-1 whitespace-pre-wrap">{selectedMentor.lifetime_goal}</p>
+                  <div className="bg-white rounded-lg p-4 border border-gray-200">
+                    <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide block mb-2">
+                      Lifetime Goal
+                    </Label>
+                    <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{selectedMentor.lifetime_goal}</p>
                   </div>
                 </div>
 
                 {/* Verification Documents */}
-                <div className="border border-gray-200 rounded-lg p-4 space-y-3">
-                  <h3 className="font-bold text-lg mb-2">Verification & Setup</h3>
+                <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-4">
+                  <h3 className="font-bold text-base text-[#0D3B33]">Verification & Setup</h3>
                   
                   {selectedMentor.transcript_url && (
                     <div>
-                      <Label className="text-xs text-gray-600 font-semibold">Transcript</Label>
+                      <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide block mb-2">
+                        Transcript
+                      </Label>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="mt-2"
+                        className="rounded text-xs"
                         onClick={() => window.open(selectedMentor.transcript_url, '_blank')}
                       >
                         <FileText className="w-4 h-4 mr-2" />
@@ -802,22 +818,27 @@ export default function AdminDashboard() {
                   )}
 
                   <div>
-                    <Label className="text-xs text-gray-600 font-semibold">Calendly Link</Label>
-                    <div className="flex items-center gap-2 mt-1">
-                      <p className="text-sm font-mono bg-gray-50 px-2 py-1 rounded flex-1 truncate">{selectedMentor.calendly_link}</p>
+                    <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide block mb-2">
+                      Calendly Link
+                    </Label>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-mono bg-gray-100 px-3 py-2 rounded border border-gray-200 flex-1 truncate text-gray-800">
+                        {selectedMentor.calendly_link}
+                      </p>
                       <Button
                         variant="outline"
                         size="sm"
+                        className="rounded"
                         onClick={() => window.open(selectedMentor.calendly_link, '_blank')}
                       >
-                        <ExternalLinkIcon className="w-3 h-3" />
+                        <ExternalLinkIcon className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
                 </div>
 
                 {/* Application Date */}
-                <div className="text-xs text-gray-500 text-center">
+                <div className="text-xs text-gray-500 text-center bg-gray-50 py-3 rounded-lg border border-gray-200">
                   Application submitted on {new Date(selectedMentor.created_date).toLocaleDateString('en-US', { 
                     year: 'numeric', 
                     month: 'long', 
@@ -830,10 +851,10 @@ export default function AdminDashboard() {
             </ScrollArea>
 
             {/* Action Buttons */}
-            <div className="flex gap-3 pt-4 border-t">
+            <div className="flex gap-3 pt-4 border-t border-gray-200">
               <Button
                 variant="outline"
-                className="flex-1"
+                className="flex-1 rounded"
                 onClick={() => setMentorReviewDialogOpen(false)}
                 disabled={approveMentorMutation.isPending}
               >
@@ -841,7 +862,7 @@ export default function AdminDashboard() {
               </Button>
               <Button
                 variant="destructive"
-                className="flex-1"
+                className="flex-1 rounded"
                 onClick={() => handleApproveMentor(selectedMentor.id, false)}
                 disabled={approveMentorMutation.isPending}
               >
@@ -849,7 +870,7 @@ export default function AdminDashboard() {
                 Reject
               </Button>
               <Button
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white rounded"
                 onClick={() => handleApproveMentor(selectedMentor.id, true)}
                 disabled={approveMentorMutation.isPending}
               >
