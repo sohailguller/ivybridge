@@ -22,10 +22,17 @@ import {
   Lightbulb,   // Added Lightbulb icon
   Target,      // Added Target icon
   Heart,       // Added Heart icon
-  BookOpen     // Added BookOpen icon
+  BookOpen,     // Added BookOpen icon
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 export default function MentorProfile() {
   const navigate = useNavigate();
@@ -33,6 +40,7 @@ export default function MentorProfile() {
   const mentorId = urlParams.get('id');
   const [user, setUser] = useState(null);
   const [isSubscribing, setIsSubscribing] = useState(false);
+  const [openFAQ, setOpenFAQ] = useState(null);
 
   useEffect(() => {
     loadUser();
@@ -140,6 +148,51 @@ export default function MentorProfile() {
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
     : 5.0; // Default to 5.0 if no reviews
 
+  // University background images mapping
+  const universityImages = {
+    Harvard: "https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80",
+    Yale: "https://images.unsplash.com/photo-1603487742131-4160ec999306?w=1200&q=80",
+    Princeton: "https://images.unsplash.com/photo-1564981797816-1043664bf78d?w=1200&q=80",
+    Columbia: "https://images.unsplash.com/photo-1555786750-7c3c2b9a6b0e?w=1200&q=80",
+    Brown: "https://images.unsplash.com/photo-1576495199011-eb94736d05d6?w=1200&q=80",
+    Dartmouth: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&q=80",
+    Cornell: "https://images.unsplash.com/photo-1519452635265-7b1fbfd1e4e0?w=1200&q=80",
+    Penn: "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1200&q=80"
+  };
+
+  const personalQuestions = [
+    {
+      id: 'achievement',
+      icon: Award,
+      question: "What is your greatest achievement?",
+      answer: mentor?.greatest_achievement
+    },
+    {
+      id: 'advice',
+      icon: Lightbulb,
+      question: "What advice would you give to your younger self?",
+      answer: mentor?.advice_to_younger_self
+    },
+    {
+      id: 'dream',
+      icon: Target,
+      question: "What is your dream job?",
+      answer: mentor?.dream_job
+    },
+    {
+      id: 'major',
+      icon: BookOpen,
+      question: "Why did you choose your major?",
+      answer: mentor?.why_major
+    },
+    {
+      id: 'lifetime',
+      icon: Heart,
+      question: "What is one thing you hope to accomplish in your lifetime?",
+      answer: mentor?.lifetime_goal
+    }
+  ];
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#FAFAFA] py-12">
@@ -173,6 +226,8 @@ export default function MentorProfile() {
   }
 
   const isMentor = user?.account_type === "mentor";
+  const universityBg = universityImages[mentor.university] || universityImages.Harvard;
+
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -180,7 +235,7 @@ export default function MentorProfile() {
         <Button
           variant="ghost"
           onClick={() => navigate(createPageUrl("BrowseMentors"))}
-          className="mb-6 hover:bg-gray-100"
+          className="mb-6 hover:bg-gray-100 rounded"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to All Mentors
@@ -194,19 +249,28 @@ export default function MentorProfile() {
           </div>
         )}
 
+        {/* Banner with University Image */}
         <div className="bg-white border border-gray-200 rounded shadow-sm mb-6 overflow-hidden">
-          <div className="h-32 bg-gradient-to-r from-[#0D3B33] to-[#1a5a4e]" />
+          <div 
+            className="h-32 bg-cover bg-center relative"
+            style={{ 
+              backgroundImage: `url(${universityBg})`,
+              backgroundPosition: 'center 30%'
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/20" />
+          </div>
 
-          <div className="p-8 -mt-16">
+          <div className="p-8 -mt-16 relative">
             <div className="flex flex-col md:flex-row gap-6 mb-6">
-              <Avatar className="w-32 h-32 border-4 border-white shadow-sm">
+              <Avatar className="w-32 h-32 border-4 border-white shadow-lg ring-2 ring-gray-100">
                 <AvatarImage src={mentor.profile_photo_url || mentorUser?.profile_photo_url} />
                 <AvatarFallback className="bg-[#E6EFEA] text-4xl text-[#0D3B33]">
                   {mentorUser?.full_name?.charAt(0) || 'M'}
                 </AvatarFallback>
               </Avatar>
 
-              <div className="flex-1">
+              <div className="flex-1 bg-white rounded-lg">
                 <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
                   {mentorUser?.full_name || 'Mentor'}
                 </h1>
@@ -249,6 +313,7 @@ export default function MentorProfile() {
 
         <div className="grid md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-6">
+            {/* About Me */}
             <div className="bg-white border border-gray-200 rounded shadow-sm p-6 border-l-4 border-l-[#FE6C3A]">
               <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
                 About Me
@@ -258,28 +323,59 @@ export default function MentorProfile() {
               </p>
             </div>
 
-            {mentor.personal_statement && (
-              <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
-                <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
-                  Personal Insights
-                </h2>
-                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                  {mentor.personal_statement}
-                </p>
+            {/* Personal Questions - FAQ Style */}
+            <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
+              <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+                Get to Know Me
+              </h2>
+              <p className="text-sm text-gray-600 mb-6">
+                Click to read my responses to common questions
+              </p>
+              <div className="space-y-3">
+                {personalQuestions.map((item) => {
+                  if (!item.answer) return null;
+                  const Icon = item.icon;
+                  const isOpen = openFAQ === item.id;
+                  
+                  return (
+                    <Collapsible
+                      key={item.id}
+                      open={isOpen}
+                      onOpenChange={() => setOpenFAQ(isOpen ? null : item.id)}
+                    >
+                      <div className="border border-gray-200 rounded-lg overflow-hidden hover:border-[#FE6C3A] transition-colors">
+                        <CollapsibleTrigger className="w-full">
+                          <div className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer">
+                            <div className="flex items-center gap-3 flex-1 text-left">
+                              <div className="w-8 h-8 bg-[#E6EFEA] rounded-full flex items-center justify-center flex-shrink-0">
+                                <Icon className="w-4 h-4 text-[#0D3B33]" />
+                              </div>
+                              <span className="font-semibold text-[#0D3B33] text-sm">
+                                {item.question}
+                              </span>
+                            </div>
+                            {isOpen ? (
+                              <ChevronUp className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                            ) : (
+                              <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                            )}
+                          </div>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <div className="p-4 bg-white border-t border-gray-200">
+                            <p className="text-gray-700 leading-relaxed text-sm whitespace-pre-wrap">
+                              {item.answer}
+                            </p>
+                          </div>
+                        </CollapsibleContent>
+                      </div>
+                    </Collapsible>
+                  );
+                })}
               </div>
-            )}
+            </div>
 
-            {mentor.expertise_description && (
-              <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
-                <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
-                  Expertise Areas
-                </h2>
-                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                  {mentor.expertise_description}
-                </p>
-              </div>
-            )}
-
+            {/* What You'll Get */}
             <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
               <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
                 What You'll Get
