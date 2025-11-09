@@ -14,7 +14,8 @@ import {
   GraduationCap,
   Star,
   Users,
-  ArrowRight
+  ArrowRight,
+  AlertCircle // Added AlertCircle import
 } from "lucide-react";
 import {
   Select,
@@ -32,14 +33,28 @@ export default function BrowseMentors() {
   const [universityFilter, setUniversityFilter] = useState("all");
   const [majorFilter, setMajorFilter] = useState("all");
 
-  const { data: mentors = [], isLoading } = useQuery({
+  const { data: mentors = [], isLoading, error } = useQuery({ // Added error here
     queryKey: ['approved-mentors'],
-    queryFn: () => base44.entities.MentorProfile.filter({ verification_status: "approved" }),
+    queryFn: async () => {
+      try {
+        return await base44.entities.MentorProfile.filter({ verification_status: "approved" });
+      } catch (err) {
+        console.error("Error fetching mentors:", err);
+        throw err; // Re-throw to let react-query handle it
+      }
+    },
   });
 
   const { data: users = [] } = useQuery({
     queryKey: ['mentor-users'],
-    queryFn: () => base44.entities.User.list(),
+    queryFn: async () => {
+      try {
+        return await base44.entities.User.list();
+      } catch (err) {
+        console.error("Error fetching users:", err);
+        return []; // Return empty array on error for users, or re-throw if it should halt rendering
+      }
+    },
     enabled: mentors.length > 0
   });
 
@@ -59,6 +74,24 @@ export default function BrowseMentors() {
   const getMentorUser = (userId) => users.find(u => u.id === userId);
 
   const allMajors = [...new Set(mentors.map(m => m.major).filter(Boolean))];
+
+  // Add error state display here
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md bg-white border border-gray-200 rounded shadow-sm p-8 text-center">
+          <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
+          <h2 className="text-xl font-bold mb-2 text-[#0D3B33]">Error Loading Mentors</h2>
+          <p className="text-gray-600 text-sm mb-4">
+            We're having trouble loading the mentor list. Please try refreshing the page.
+          </p>
+          <Button onClick={() => window.location.reload()} className="btn-primary text-white rounded">
+            Refresh Page
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
