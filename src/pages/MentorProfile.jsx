@@ -228,7 +228,6 @@ export default function MentorProfile() {
   const isMentor = user?.account_type === "mentor";
   const universityBg = universityImages[mentor.university] || universityImages.Harvard;
 
-
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-24">
@@ -249,63 +248,72 @@ export default function MentorProfile() {
           </div>
         )}
 
-        {/* Banner with University Image */}
-        <div className="bg-white border border-gray-200 rounded shadow-sm mb-6 overflow-hidden">
+        {/* LinkedIn-style Banner Section */}
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6 overflow-hidden">
+          {/* University Banner Image */}
           <div 
-            className="h-32 bg-cover bg-center relative"
+            className="h-48 bg-cover bg-center relative"
             style={{ 
               backgroundImage: `url(${universityBg})`,
-              backgroundPosition: 'center 30%'
+              backgroundPosition: 'center 35%'
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/20" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent" />
           </div>
 
-          <div className="p-8 -mt-16 relative">
-            <div className="flex flex-col md:flex-row gap-6 mb-6">
-              <Avatar className="w-32 h-32 border-4 border-white shadow-lg ring-2 ring-gray-100">
+          {/* Profile Content */}
+          <div className="px-8 pb-6">
+            {/* Profile Photo - Overlapping Banner */}
+            <div className="-mt-20 mb-4">
+              <Avatar className="w-36 h-36 border-4 border-white shadow-lg">
                 <AvatarImage src={mentor.profile_photo_url || mentorUser?.profile_photo_url} />
-                <AvatarFallback className="bg-[#E6EFEA] text-4xl text-[#0D3B33]">
+                <AvatarFallback className="bg-[#E6EFEA] text-5xl text-[#0D3B33]">
                   {mentorUser?.full_name?.charAt(0) || 'M'}
                 </AvatarFallback>
               </Avatar>
-
-              <div className="flex-1 bg-white rounded-lg">
-                <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
-                  {mentorUser?.full_name || 'Mentor'}
-                </h1>
-                <div className="flex items-center gap-2 text-gray-600 mb-3">
-                  <GraduationCap className="w-5 h-5" />
-                  <span className="text-lg">{mentor.university} • {mentor.year}</span>
-                </div>
-                <Badge className="bg-[#E6EFEA] text-[#0D3B33] border-0 mb-4">
-                  {mentor.major}
-                </Badge>
-
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className={`w-5 h-5 ${
-                        i < Math.round(averageRating)
-                          ? 'fill-[#FE6C3A] text-[#FE6C3A]'
-                          : 'text-gray-300'
-                      }`} />
-                    ))}
-                  </div>
-                  <span className="text-sm text-gray-600">
-                    {averageRating} ({reviews.length} {reviews.length === 1 ? 'review' : 'reviews'})
-                  </span>
-                </div>
-              </div>
             </div>
 
-            {mentor.expertise_areas && mentor.expertise_areas.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-6">
-                {mentor.expertise_areas.map((area, idx) => (
-                  <Badge key={idx} variant="outline" className="text-xs">
-                    {area}
-                  </Badge>
+            {/* Name and Info */}
+            <div className="mb-4">
+              <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+                {mentorUser?.full_name || 'Mentor'}
+              </h1>
+              <div className="flex items-center gap-2 text-gray-600 mb-3">
+                <GraduationCap className="w-5 h-5" />
+                <span className="text-base">{mentor.university} • {mentor.year}</span>
+              </div>
+              <Badge className="bg-[#E6EFEA] text-[#0D3B33] border-0 text-sm px-3 py-1">
+                {mentor.major}
+              </Badge>
+            </div>
+
+            {/* Rating */}
+            <div className="flex items-center gap-4 pb-4 border-b border-gray-200">
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className={`w-5 h-5 ${
+                    i < Math.round(averageRating)
+                      ? 'fill-[#FE6C3A] text-[#FE6C3A]'
+                      : 'text-gray-300'
+                  }`} />
                 ))}
+              </div>
+              <span className="text-sm text-gray-600">
+                {averageRating} ({reviews.length} {reviews.length === 1 ? 'review' : 'reviews'})
+              </span>
+            </div>
+
+            {/* Expertise Areas */}
+            {mentor.expertise_areas && mentor.expertise_areas.length > 0 && (
+              <div className="pt-4">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3">Areas of Expertise</h3>
+                <div className="flex flex-wrap gap-2">
+                  {mentor.expertise_areas.map((area, idx) => (
+                    <Badge key={idx} variant="outline" className="text-xs">
+                      {area}
+                    </Badge>
+                  ))}
+                </div>
               </div>
             )}
           </div>

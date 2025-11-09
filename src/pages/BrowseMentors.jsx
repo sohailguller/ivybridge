@@ -60,6 +60,18 @@ export default function BrowseMentors() {
 
   const universities = ["Harvard", "Yale", "Princeton", "Columbia", "Brown", "Dartmouth", "Cornell", "Penn"];
 
+  // University background images mapping
+  const universityImages = {
+    Harvard: "https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80",
+    Yale: "https://images.unsplash.com/photo-1603487742131-4160ec999306?w=1200&q=80",
+    Princeton: "https://images.unsplash.com/photo-1564981797816-1043664bf78d?w=1200&q=80",
+    Columbia: "https://images.unsplash.com/photo-1555786750-7c3c2b9a6b0e?w=1200&q=80",
+    Brown: "https://images.unsplash.com/photo-1576495199011-eb94736d05d6?w=1200&q=80",
+    Dartmouth: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&q=80",
+    Cornell: "https://images.unsplash.com/photo-1519452635265-7b1fbfd1e4e0?w=1200&q=80",
+    Penn: "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1200&q=80"
+  };
+
   const filteredMentors = mentors.filter(mentor => {
     const matchesSearch = !searchQuery ||
       mentor.bio?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -174,6 +186,7 @@ export default function BrowseMentors() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredMentors.map((mentor) => {
               const user = getMentorUser(mentor.user_id);
+              const universityBg = universityImages[mentor.university] || universityImages.Harvard; // Default to Harvard if no image for university
 
               return (
                 <div
@@ -181,7 +194,15 @@ export default function BrowseMentors() {
                   className="bg-white border border-gray-200 rounded shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden"
                   onClick={() => navigate(createPageUrl(`MentorProfile?id=${mentor.id}`))}
                 >
-                  <div className="h-24 bg-gradient-to-r from-[#0D3B33] to-[#1a5a4e]" />
+                  <div
+                    className="h-24 bg-cover bg-center relative"
+                    style={{
+                      backgroundImage: `url(${universityBg})`,
+                      backgroundPosition: 'center 30%'
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/20" />
+                  </div>
 
                   <div className="p-6 -mt-8">
                     <Avatar className="w-16 h-16 border-4 border-white shadow-sm mb-4">
