@@ -53,24 +53,16 @@ export default function StudentDashboard() {
   }, []);
 
   const checkPaymentSuccess = async () => {
-    // Check if user just completed payment
     const urlParams = new URLSearchParams(window.location.search);
     const paymentSuccess = urlParams.get('payment_success');
 
     if (paymentSuccess === 'true') {
       setShowSuccessAlert(true);
       setCheckingPayment(true);
-
-      // Clear the URL parameter
       window.history.replaceState({}, '', window.location.pathname);
-
-      // Wait a bit for webhook to process and activate subscription
       await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Clear localStorage
       localStorage.removeItem('pending_subscription_id');
       localStorage.removeItem('mentor_profile_id');
-
       setCheckingPayment(false);
     }
   };
@@ -78,17 +70,23 @@ export default function StudentDashboard() {
   const loadUser = async () => {
     try {
       const currentUser = await base44.auth.me();
+      
+      // Check redirects BEFORE setting user state
       if (currentUser.account_type === "mentor") {
         navigate(createPageUrl("MentorDashboard"));
-        return;
+        return; // Stop execution
       }
       if (currentUser.role === "admin") {
         navigate(createPageUrl("AdminDashboard"));
-        return;
+        return; // Stop execution
       }
+      
+      // Only set user if not redirecting
       setUser(currentUser);
     } catch (error) {
+      console.error("Auth error:", error);
       base44.auth.redirectToLogin();
+      return; // Stop execution after redirect
     } finally {
       setIsLoading(false);
     }
@@ -190,10 +188,22 @@ export default function StudentDashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF6B5C] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FE6C3A] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Add safety check - if no user after loading, show error
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FE6C3A] mx-auto mb-4"></div>
+          <p className="text-gray-600">Redirecting...</p>
         </div>
       </div>
     );
