@@ -38,6 +38,7 @@ export default function ApplyAsMentor() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [currentSection, setCurrentSection] = useState(1);
+  const [calendlyError, setCalendlyError] = useState("");
   
   const [formData, setFormData] = useState({
     university: "",
@@ -72,8 +73,15 @@ export default function ApplyAsMentor() {
         const profiles = await base44.entities.MentorProfile.filter({ id: currentUser.mentor_profile_id });
         if (profiles.length > 0) {
           const profile = profiles[0];
+          // If pending or approved, redirect to waiting page or dashboard
           if (profile.verification_status === "pending") {
+            // Show pending status page instead of allowing resubmission
+            setSuccess(true);
+            return;
+          }
+          if (profile.verification_status === "approved") {
             navigate(createPageUrl("MentorDashboard"));
+            return;
           }
         }
       }
@@ -140,6 +148,12 @@ export default function ApplyAsMentor() {
     ]}
   ];
 
+  const validateCalendlyLink = (link) => {
+    if (!link) return false;
+    const calendlyRegex = /^https?:\/\/(www\.)?calendly\.com\/.+/i;
+    return calendlyRegex.test(link);
+  };
+
   const validateEmail = () => {
     // TESTING MODE: Email validation disabled for testing purposes
     return { valid: true, message: "" };
@@ -163,6 +177,8 @@ export default function ApplyAsMentor() {
   };
 
   const handleFileUpload = async (file, type) => {
+    if (!file) return;
+    
     if (type === "photo") setUploadingPhoto(true);
     else setUploadingTranscript(true);
 
@@ -189,39 +205,57 @@ export default function ApplyAsMentor() {
     }));
   };
 
+  const countWords = (text) => {
+    return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+  };
+
+  const handleTextareaChange = (field, value) => {
+    const wordCount = countWords(value);
+    if (wordCount <= 250) {
+      setFormData(prev => ({ ...prev, [field]: value }));
+    }
+  };
+
+  const handleCalendlyChange = (value) => {
+    setFormData(prev => ({ ...prev, calendly_link: value }));
+    if (value && !validateCalendlyLink(value)) {
+      setCalendlyError("Please enter a valid Calendly link (e.g., https://calendly.com/your-username)");
+    } else {
+      setCalendlyError("");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // TESTING MODE: Email validation disabled
-    // const emailValidation = validateEmail();
-    // if (!emailValidation.valid) {
-    //   setError(emailValidation.message);
-    //   return;
-    // }
+    // Validate Calendly link
+    if (!validateCalendlyLink(formData.calendly_link)) {
+      setError("Please enter a valid Calendly link");
+      setCalendlyError("Please enter a valid Calendly link (e.g., https://calendly.com/your-username)");
+      return;
+    }
 
     setIsSubmitting(true);
     setError(null);
 
     try {
-      // Create mentor profile - AUTO-APPROVED for testing
+      // Create mentor profile - PENDING for approval
       const profile = await base44.entities.MentorProfile.create({
         user_id: user.id,
         ...formData,
-        verification_status: "approved", // TESTING MODE: Auto-approve instead of "pending"
+        verification_status: "pending", // Changed from "approved" to "pending"
         total_students: 0
       });
 
-      // Update user with mentor profile ID
+      // Update user with mentor profile ID but DON'T set account_type yet
       await base44.auth.updateMe({
-        mentor_profile_id: profile.id,
-        account_type: "mentor"
+        mentor_profile_id: profile.id
       });
 
       setSuccess(true);
-      setTimeout(() => {
-        navigate(createPageUrl("MentorDashboard"));
-      }, 2000);
+      // Don't redirect - show success message
     } catch (error) {
+      console.error("Application submission error:", error);
       setError("Failed to submit application. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -239,8 +273,8 @@ export default function ApplyAsMentor() {
         return formData.greatest_achievement && formData.advice_to_younger_self && 
                formData.dream_job && formData.why_major && formData.lifetime_goal;
       case 4:
-        // TESTING MODE: Made transcript optional, only calendly_link required
-        return formData.calendly_link;
+        // Calendly link required and validated
+        return formData.calendly_link && validateCalendlyLink(formData.calendly_link);
       default:
         return false;
     }
@@ -248,9 +282,9 @@ export default function ApplyAsMentor() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF6B5C] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FE6C3A] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
@@ -262,16 +296,24 @@ export default function ApplyAsMentor() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-md bg-white border border-gray-200 rounded shadow-sm p-8">
           <div className="text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-8 h-8 text-green-600" />
+            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertCircle className="w-8 h-8 text-yellow-600" />
             </div>
             <h2 className="text-2xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
-              Application Submitted!
+              Application Under Review
             </h2>
             <p className="text-gray-600 mb-4">
-              Your application is now under review. We'll notify you via email once it's been approved.
+              Thank you for applying to become a mentor! Your application has been submitted and is currently under review by our team.
             </p>
-            <p className="text-sm text-gray-500">Redirecting to dashboard...</p>
+            <p className="text-sm text-gray-600 mb-6">
+              We'll notify you via email once your application has been reviewed. This typically takes 1-2 business days.
+            </p>
+            <Button
+              onClick={() => navigate(createPageUrl("Home"))}
+              className="btn-primary text-white rounded"
+            >
+              Return to Home
+            </Button>
           </div>
         </div>
       </div>
@@ -290,9 +332,6 @@ export default function ApplyAsMentor() {
           <p className="text-gray-600">
             Share your Ivy League experience and help aspiring students achieve their dreams
           </p>
-          <div className="mt-4 bg-blue-50 border border-blue-200 rounded p-3 text-sm text-blue-800 max-w-2xl mx-auto">
-            <strong>🧪 Testing Mode:</strong> Email verification disabled. Applications are auto-approved. Transcript upload is optional.
-          </div>
         </div>
 
         {/* Progress Indicator */}
@@ -416,16 +455,16 @@ export default function ApplyAsMentor() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>About You *</Label>
+                    <Label>About You * (Maximum 250 words)</Label>
                     <Textarea
                       value={formData.bio}
-                      onChange={(e) => setFormData({...formData, bio: e.target.value})}
+                      onChange={(e) => handleTextareaChange('bio', e.target.value)}
                       placeholder="Tell students about your background, achievements, and how you can help them. What makes you a great mentor?"
-                      className="h-28 rounded"
+                      className="h-32 rounded resize-none"
                       required
                     />
                     <p className="text-xs text-gray-500">
-                      {formData.bio.length}/100 characters minimum
+                      {countWords(formData.bio)}/250 words • {formData.bio.length >= 100 ? '✓' : ''} {formData.bio.length}/100 characters minimum
                     </p>
                   </div>
 
@@ -434,17 +473,18 @@ export default function ApplyAsMentor() {
                     {expertiseOptions.map((category, idx) => (
                       <div key={idx} className="border border-gray-200 rounded p-4">
                         <h3 className="font-semibold mb-3 text-sm text-[#0D3B33]">{category.category}</h3>
-                        <div className="grid md:grid-cols-2 gap-2">
+                        <div className="space-y-2">
                           {category.options.map((option, optIdx) => (
-                            <div key={optIdx} className="flex items-center space-x-2">
+                            <div key={optIdx} className="flex items-start space-x-2">
                               <Checkbox
                                 id={`${idx}-${optIdx}`}
                                 checked={formData.expertise_areas.includes(option)}
                                 onCheckedChange={() => toggleExpertise(option)}
+                                className="mt-0.5"
                               />
                               <label
                                 htmlFor={`${idx}-${optIdx}`}
-                                className="text-sm cursor-pointer"
+                                className="text-sm cursor-pointer leading-tight"
                               >
                                 {option}
                               </label>
@@ -480,30 +520,32 @@ export default function ApplyAsMentor() {
                   <div className="border-b border-gray-200 pb-4">
                     <h2 className="text-xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>Get Personal</h2>
                     <p className="text-sm text-gray-600">
-                      Help students get to know you better with these thoughtful responses
+                      Help students get to know you better with these thoughtful responses (250 words max each)
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label>What is your greatest achievement? *</Label>
+                    <Label>What is your greatest achievement? * (Max 250 words)</Label>
                     <Textarea
                       value={formData.greatest_achievement}
-                      onChange={(e) => setFormData({...formData, greatest_achievement: e.target.value})}
+                      onChange={(e) => handleTextareaChange('greatest_achievement', e.target.value)}
                       placeholder="Share an accomplishment you're proud of..."
-                      className="h-20 rounded"
+                      className="h-24 rounded resize-none"
                       required
                     />
+                    <p className="text-xs text-gray-500">{countWords(formData.greatest_achievement)}/250 words</p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label>What advice would you give to your middle or high school self? *</Label>
+                    <Label>What advice would you give to your middle or high school self? * (Max 250 words)</Label>
                     <Textarea
                       value={formData.advice_to_younger_self}
-                      onChange={(e) => setFormData({...formData, advice_to_younger_self: e.target.value})}
+                      onChange={(e) => handleTextareaChange('advice_to_younger_self', e.target.value)}
                       placeholder="If you could go back in time..."
-                      className="h-20 rounded"
+                      className="h-24 rounded resize-none"
                       required
                     />
+                    <p className="text-xs text-gray-500">{countWords(formData.advice_to_younger_self)}/250 words</p>
                   </div>
 
                   <div className="space-y-2">
@@ -518,25 +560,27 @@ export default function ApplyAsMentor() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Why did you choose your major? *</Label>
+                    <Label>Why did you choose your major? * (Max 250 words)</Label>
                     <Textarea
                       value={formData.why_major}
-                      onChange={(e) => setFormData({...formData, why_major: e.target.value})}
+                      onChange={(e) => handleTextareaChange('why_major', e.target.value)}
                       placeholder="What drew you to your field of study?"
-                      className="h-20 rounded"
+                      className="h-24 rounded resize-none"
                       required
                     />
+                    <p className="text-xs text-gray-500">{countWords(formData.why_major)}/250 words</p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label>What is one thing you hope to accomplish in your lifetime? *</Label>
+                    <Label>What is one thing you hope to accomplish in your lifetime? * (Max 250 words)</Label>
                     <Textarea
                       value={formData.lifetime_goal}
-                      onChange={(e) => setFormData({...formData, lifetime_goal: e.target.value})}
+                      onChange={(e) => handleTextareaChange('lifetime_goal', e.target.value)}
                       placeholder="Your biggest life goal or aspiration..."
-                      className="h-20 rounded"
+                      className="h-24 rounded resize-none"
                       required
                     />
+                    <p className="text-xs text-gray-500">{countWords(formData.lifetime_goal)}/250 words</p>
                   </div>
                 </div>
               )}
@@ -639,11 +683,14 @@ export default function ApplyAsMentor() {
                     <Label>Calendly Link *</Label>
                     <Input
                       value={formData.calendly_link}
-                      onChange={(e) => setFormData({...formData, calendly_link: e.target.value})}
-                      placeholder="https://calendly.com/your-link"
-                      className="h-10 rounded"
+                      onChange={(e) => handleCalendlyChange(e.target.value)}
+                      placeholder="https://calendly.com/your-username"
+                      className={`h-10 rounded ${calendlyError ? 'border-red-500' : ''}`}
                       required
                     />
+                    {calendlyError && (
+                      <p className="text-xs text-red-600">{calendlyError}</p>
+                    )}
                     <p className="text-xs text-gray-500">
                       Students will use this to book meetings with you. Create a free account at calendly.com
                     </p>
