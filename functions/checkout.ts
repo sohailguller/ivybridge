@@ -3,6 +3,12 @@ import Stripe from 'npm:stripe@16.14.0';
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"));
 
+// Your Stripe Price IDs from the product catalog
+const PRICE_IDS = {
+  monthly: 'price_1SPAhYPVHYXDQ24FbMDRdZJc',  // $425/month
+  annual: 'price_1SPAiCPVHYXDQ24FPps95Yw5'    // $5000 one-time
+};
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -13,6 +19,10 @@ Deno.serve(async (req) => {
 
     const { mentorProfileId, planType } = await req.json();
     
+    if (!mentorProfileId || !planType) {
+      return Response.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
     const mentorProfiles = await base44.asServiceRole.entities.MentorProfile.filter({ id: mentorProfileId });
     if (mentorProfiles.length === 0) {
       return Response.json({ error: 'Mentor not found' }, { status: 404 });
@@ -46,24 +56,15 @@ Deno.serve(async (req) => {
       await base44.asServiceRole.entities.User.update(user.id, { stripe_customer_id: customerId });
     }
 
-    const amount = planType === 'monthly' ? 42500 : 500000;
+    const priceId = PRICE_IDS[planType];
     const mode = planType === 'monthly' ? 'subscription' : 'payment';
-    
     const origin = req.headers.get('origin') || 'https://ivy-bridge-f5bb348d.base44.app';
     
     const sessionConfig = {
       customer: customerId,
       payment_method_types: ['card'],
       line_items: [{
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: `IvyBridge ${planType === 'monthly' ? 'Monthly' : 'Annual'} Mentorship`,
-            description: `Mentorship with ${mentorProfile.university} mentor`,
-          },
-          unit_amount: amount,
-          ...(planType === 'monthly' ? { recurring: { interval: 'month' } } : {})
-        },
+        price: priceId,
         quantity: 1,
       }],
       mode: mode,
@@ -96,9 +97,11 @@ Deno.serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Checkout error:', error);
+    console.error('Checkout error:', error.message);
+    console.error('Stack:', error.stack);
     return Response.json({ 
-      error: error.message 
+      error: error.message,
+      details: error.stack
     }, { status: 500 });
   }
 });
