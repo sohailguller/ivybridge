@@ -226,7 +226,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-6 md:px-12 lg:px-24">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Georgia, serif' }}>

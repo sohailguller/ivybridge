@@ -17,10 +17,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { 
-  GraduationCap, 
-  Upload, 
-  CheckCircle, 
+import {
+  GraduationCap,
+  Upload,
+  CheckCircle,
   ArrowRight,
   X,
   FileText,
@@ -36,10 +36,10 @@ export default function ApplyAsMentor() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false); // Renamed from 'success'
   const [currentSection, setCurrentSection] = useState(1);
   const [calendlyError, setCalendlyError] = useState("");
-  
+
   const [formData, setFormData] = useState({
     university: "",
     major: "",
@@ -67,7 +67,7 @@ export default function ApplyAsMentor() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
-      
+
       // Check if user already has a mentor profile
       if (currentUser.mentor_profile_id) {
         const profiles = await base44.entities.MentorProfile.filter({ id: currentUser.mentor_profile_id });
@@ -76,7 +76,7 @@ export default function ApplyAsMentor() {
           // If pending or approved, redirect to waiting page or dashboard
           if (profile.verification_status === "pending") {
             // Show pending status page instead of allowing resubmission
-            setSuccess(true);
+            setIsSubmitted(true); // Updated to isSubmitted
             return;
           }
           if (profile.verification_status === "approved") {
@@ -157,28 +157,28 @@ export default function ApplyAsMentor() {
   const validateEmail = () => {
     // TESTING MODE: Email validation disabled for testing purposes
     return { valid: true, message: "" };
-    
+
     /* ORIGINAL VALIDATION - Uncomment when ready for production
     if (!user?.email || !formData.university) return { valid: false, message: "" };
-    
+
     const university = universities.find(u => u.name === formData.university);
     if (!university) return { valid: false, message: "" };
-    
+
     const emailDomain = user.email.split('@')[1];
     if (emailDomain !== university.domain) {
-      return { 
-        valid: false, 
+      return {
+        valid: false,
         message: `Your email (${user.email}) must be a ${university.name} email (@${university.domain}) to apply as a mentor from ${university.name}.`
       };
     }
-    
+
     return { valid: true, message: "" };
     */
   };
 
   const handleFileUpload = async (file, type) => {
     if (!file) return;
-    
+
     if (type === "photo") setUploadingPhoto(true);
     else setUploadingTranscript(true);
 
@@ -227,7 +227,7 @@ export default function ApplyAsMentor() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate Calendly link
     if (!validateCalendlyLink(formData.calendly_link)) {
       setError("Please enter a valid Calendly link");
@@ -252,7 +252,7 @@ export default function ApplyAsMentor() {
         mentor_profile_id: profile.id
       });
 
-      setSuccess(true);
+      setIsSubmitted(true); // Updated to isSubmitted
       // Don't redirect - show success message
     } catch (error) {
       console.error("Application submission error:", error);
@@ -270,7 +270,7 @@ export default function ApplyAsMentor() {
       case 2:
         return formData.bio.length >= 100 && formData.expertise_areas.length > 0;
       case 3:
-        return formData.greatest_achievement && formData.advice_to_younger_self && 
+        return formData.greatest_achievement && formData.advice_to_younger_self &&
                formData.dream_job && formData.why_major && formData.lifetime_goal;
       case 4:
         // Calendly link required and validated
@@ -291,26 +291,24 @@ export default function ApplyAsMentor() {
     );
   }
 
-  if (success) {
+  if (isSubmitted) { // Updated from 'success'
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-md bg-white border border-gray-200 rounded shadow-sm p-8">
           <div className="text-center">
-            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <AlertCircle className="w-8 h-8 text-yellow-600" />
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
             <h2 className="text-2xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
-              Application Under Review
+              Application Submitted!
             </h2>
-            <p className="text-gray-600 mb-4">
-              Thank you for applying to become a mentor! Your application has been submitted and is currently under review by our team.
-            </p>
-            <p className="text-sm text-gray-600 mb-6">
-              We'll notify you via email once your application has been reviewed. This typically takes 1-2 business days.
+            <p className="text-gray-600 mb-6 text-sm">
+              Thank you for applying to become a mentor. We'll review your application and
+              get back to you within 1-2 business days.
             </p>
             <Button
+              className="w-full btn-primary text-white rounded"
               onClick={() => navigate(createPageUrl("Home"))}
-              className="btn-primary text-white rounded"
             >
               Return to Home
             </Button>
@@ -324,7 +322,7 @@ export default function ApplyAsMentor() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-24">
+      <div className="w-full px-6 md:px-12 lg:px-24"> {/* Updated width and padding */}
         <div className="text-center mb-8 border-b border-gray-200 pb-6">
           <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
             Become a Mentor
@@ -392,8 +390,8 @@ export default function ApplyAsMentor() {
 
                   <div className="space-y-2">
                     <Label>University *</Label>
-                    <Select 
-                      value={formData.university} 
+                    <Select
+                      value={formData.university}
                       onValueChange={(value) => {
                         setFormData({...formData, university: value});
                         setError(null);
@@ -416,8 +414,8 @@ export default function ApplyAsMentor() {
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Year *</Label>
-                      <Select 
-                        value={formData.year} 
+                      <Select
+                        value={formData.year}
                         onValueChange={(value) => setFormData({...formData, year: value})}
                         required
                       >
@@ -599,9 +597,9 @@ export default function ApplyAsMentor() {
                       {formData.profile_photo_url ? (
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <img 
-                              src={formData.profile_photo_url} 
-                              alt="Profile" 
+                            <img
+                              src={formData.profile_photo_url}
+                              alt="Profile"
                               className="w-12 h-12 rounded-full object-cover"
                             />
                             <div className="text-left">
@@ -725,8 +723,8 @@ export default function ApplyAsMentor() {
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                 ) : (
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     disabled={isSubmitting || !canProceedToNextSection()}
                     className="btn-primary text-white rounded"
                   >

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -15,7 +14,7 @@ import {
   Star,
   Users,
   ArrowRight,
-  AlertCircle // Added AlertCircle import
+  AlertCircle
 } from "lucide-react";
 import {
   Select,
@@ -33,14 +32,14 @@ export default function BrowseMentors() {
   const [universityFilter, setUniversityFilter] = useState("all");
   const [majorFilter, setMajorFilter] = useState("all");
 
-  const { data: mentors = [], isLoading, error } = useQuery({ // Added error here
+  const { data: mentors = [], isLoading, error } = useQuery({
     queryKey: ['approved-mentors'],
     queryFn: async () => {
       try {
         return await base44.entities.MentorProfile.filter({ verification_status: "approved" });
       } catch (err) {
         console.error("Error fetching mentors:", err);
-        throw err; // Re-throw to let react-query handle it
+        throw err;
       }
     },
   });
@@ -52,7 +51,7 @@ export default function BrowseMentors() {
         return await base44.entities.User.list();
       } catch (err) {
         console.error("Error fetching users:", err);
-        return []; // Return empty array on error for users, or re-throw if it should halt rendering
+        return [];
       }
     },
     enabled: mentors.length > 0
@@ -60,7 +59,6 @@ export default function BrowseMentors() {
 
   const universities = ["Harvard", "Yale", "Princeton", "Columbia", "Brown", "Dartmouth", "Cornell", "Penn"];
 
-  // University background images mapping
   const universityImages = {
     Harvard: "https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80",
     Yale: "https://images.unsplash.com/photo-1603487742131-4160ec999306?w=1200&q=80",
@@ -87,7 +85,6 @@ export default function BrowseMentors() {
 
   const allMajors = [...new Set(mentors.map(m => m.major).filter(Boolean))];
 
-  // Add error state
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -107,7 +104,7 @@ export default function BrowseMentors() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-24">
+      <div className="w-full px-6 md:px-12 lg:px-24">
         <div className="mb-8 border-b border-gray-200 pb-6">
           <h1 className="text-3xl md:text-4xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
             Find Your Perfect Mentor
@@ -194,7 +191,6 @@ export default function BrowseMentors() {
                   className="bg-white border border-gray-200 rounded shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden"
                   onClick={() => navigate(createPageUrl(`MentorProfile?id=${mentor.id}`))}
                 >
-                  {/* University Banner */}
                   <div
                     className="h-20 bg-cover bg-center relative"
                     style={{
@@ -206,7 +202,6 @@ export default function BrowseMentors() {
                   </div>
 
                   <div className="px-6 pt-0 pb-6">
-                    {/* Profile Photo - Overlapping LinkedIn Style */}
                     <div className="-mt-12 mb-4">
                       <Avatar className="w-24 h-24 border-4 border-white shadow-lg ring-2 ring-gray-100">
                         <AvatarImage src={mentor.profile_photo_url || user?.profile_photo_url} />
@@ -216,7 +211,6 @@ export default function BrowseMentors() {
                       </Avatar>
                     </div>
 
-                    {/* Name and Info */}
                     <h3 className="text-lg font-bold mb-1 text-[#0D3B33]">{user?.full_name || 'Mentor'}</h3>
                     <div className="flex items-center gap-2 text-xs text-gray-600 mb-2">
                       <GraduationCap className="w-4 h-4" />

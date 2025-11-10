@@ -201,7 +201,7 @@ export default function MentorProfile() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#FAFAFA] py-12">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-6 md:px-12 lg:px-24">
           <Skeleton className="h-64 w-full rounded-3xl mb-8" />
           <div className="grid md:grid-cols-3 gap-8">
             <div className="md:col-span-2">
@@ -235,7 +235,7 @@ export default function MentorProfile() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-24">
+      <div className="w-full px-6 md:px-12 lg:px-24">
         <Button
           variant="ghost"
           onClick={() => navigate(createPageUrl("BrowseMentors"))}
@@ -256,9 +256,9 @@ export default function MentorProfile() {
         {/* LinkedIn-style Banner Section */}
         <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6 overflow-hidden">
           {/* University Banner Image */}
-          <div 
+          <div
             className="h-48 bg-cover bg-center relative"
-            style={{ 
+            style={{
               backgroundImage: `url(${universityBg})`,
               backgroundPosition: 'center 35%'
             }}
@@ -349,7 +349,7 @@ export default function MentorProfile() {
                   if (!item.answer) return null;
                   const Icon = item.icon;
                   const isOpen = openFAQ === item.id;
-                  
+
                   return (
                     <Collapsible
                       key={item.id}
