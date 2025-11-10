@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -125,13 +124,13 @@ export default function Home() {
         <div className="absolute inset-0 bg-black/30" />
 
         {/* Content */}
-        <div className="relative w-full mx-auto px-4 sm:px-6 lg:px-12 xl:px-24 2xl:px-32 py-16 text-center">
-          <div className="max-w-5xl mx-auto space-y-6">
+        <div className="relative w-full px-6 md:px-12 lg:px-24 py-16 text-center">
+          <div className="space-y-6">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight text-white" style={{ fontFamily: 'Georgia, serif' }}>
               Get Into Your Dream School
             </h1>
 
-            <p className="text-lg md:text-xl lg:text-2xl text-white/95 leading-relaxed max-w-4xl mx-auto">
+            <p className="text-lg md:text-xl lg:text-2xl text-white/95 leading-relaxed max-w-5xl mx-auto">
               Connect with verified Ivy League mentors for personalized admissions guidance.
               From essay reviews to interview prep — get the insider advantage.
             </p>
@@ -163,7 +162,7 @@ export default function Home() {
 
       {/* Track Record Section */}
       <section className="py-12 bg-gray-50">
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-24">
+        <div className="w-full px-6 md:px-12 lg:px-24">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
               Our Track Record
@@ -171,7 +170,7 @@ export default function Home() {
             <p className="text-gray-600">Trusted by students worldwide</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white border border-gray-200 rounded p-6 text-center">
               <div className="text-4xl font-bold text-[#0D3B33] mb-2">{stats.mentors}+</div>
               <div className="text-sm text-gray-600 font-medium">Verified Ivy League Mentors</div>
@@ -190,7 +189,7 @@ export default function Home() {
 
       {/* Universities Ticker */}
       <section className="py-16 bg-white border-y border-gray-200">
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12">
+        <div className="w-full px-6 md:px-12">
           <p className="text-center text-sm text-gray-500 mb-8 tracking-wider">MENTORS FROM</p>
           <div className="overflow-hidden">
             <div className="flex animate-scroll whitespace-nowrap">
@@ -216,7 +215,7 @@ export default function Home() {
 
       {/* How It Works */}
       <section className="py-16 bg-gray-50">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-24">
+        <div className="w-full px-6 md:px-12 lg:px-24">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
               How IvyBridge Works
@@ -224,7 +223,7 @@ export default function Home() {
             <p className="text-gray-600">A proven process to get you into your dream school</p>
           </div>
 
-          <div className="space-y-6 max-w-4xl mx-auto">
+          <div className="space-y-6">
             <div className="bg-white border border-gray-200 rounded p-6 border-l-4 border-l-[#FE6C3A]">
               <div className="flex gap-6">
                 <div className="flex-shrink-0">
@@ -281,7 +280,7 @@ export default function Home() {
 
       {/* Features */}
       <section className="py-16 bg-white">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-24">
+        <div className="w-full px-6 md:px-12 lg:px-24">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
               Everything You Need to Succeed
@@ -309,7 +308,7 @@ export default function Home() {
 
       {/* Testimonials */}
       <section className="py-16 bg-gray-50">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-24">
+        <div className="w-full px-6 md:px-12 lg:px-24">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
               Success Stories
@@ -340,7 +339,7 @@ export default function Home() {
 
       {/* Pricing */}
       <section className="py-16 bg-white border-t-4 border-t-[#FE6C3A]">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-24">
+        <div className="w-full px-6 md:px-12 lg:px-24">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
               Simple, Transparent Pricing
@@ -348,7 +347,7 @@ export default function Home() {
             <p className="text-gray-600">Choose the plan that works best for you</p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
             <div className="bg-white border border-gray-200 rounded p-8">
               <div className="text-center">
                 <div className="text-base font-medium text-gray-600 mb-2">Monthly Plan</div>
@@ -427,7 +426,7 @@ export default function Home() {
 
       {/* CTA Section */}
       <section className="py-16 bg-[#0D3B33] text-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-24 text-center">
+        <div className="w-full px-6 md:px-12 lg:px-24 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ fontFamily: 'Georgia, serif' }}>
             Ready to Start Your Journey?
           </h2>
