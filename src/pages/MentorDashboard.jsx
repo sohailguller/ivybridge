@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -119,7 +120,6 @@ export default function MentorDashboard() {
       
       console.log('🔎 Fetching subscriptions for mentor_profile_id:', mentorProfile.id);
       
-      // Try direct filter
       const subs = await base44.entities.Subscription.filter({ 
         mentor_profile_id: mentorProfile.id,
         status: "active"
@@ -133,32 +133,27 @@ export default function MentorDashboard() {
         status: s.status
       })));
       
-      // Also check if there are any subscriptions with different status
-      const allForMentor = await base44.entities.Subscription.filter({ 
-        mentor_profile_id: mentorProfile.id
-      });
-      console.log(`📊 ALL subscriptions for mentor (any status): ${allForMentor.length}`);
-      
       setDebugInfo({
         mentorProfileId: mentorProfile.id,
         totalInDb: allSubscriptions.length,
-        forThisMentor: allForMentor.length,
+        forThisMentor: subs.length, // Changed this line
         active: subs.length,
-        subscriptions: subs
+        subscriptions: subs,
+        studentIds: subs.map(s => s.student_id) // Added this line
       });
       
       return subs;
     },
     enabled: !!mentorProfile?.id,
-    refetchInterval: 2000, // Poll every 2 seconds
+    refetchInterval: 2000,
     refetchOnWindowFocus: true,
     refetchOnMount: true,
     staleTime: 0,
   });
 
-  // Fetch student users based on subscriptions
-  const { data: students = [] } = useQuery({
-    queryKey: ['my-students', subscriptions.length, ...subscriptions.map(s => s.id)],
+  // Fetch student users - FIXED VERSION
+  const { data: students = [], isLoading: studentsLoading, error: studentsError } = useQuery({
+    queryKey: ['my-students', subscriptions.length, JSON.stringify(subscriptions.map(s => s.student_id).sort())],
     queryFn: async () => {
       if (subscriptions.length === 0) {
         console.log('⚠️ No subscriptions, skipping student fetch');
@@ -166,18 +161,44 @@ export default function MentorDashboard() {
       }
       
       const studentIds = subscriptions.map(s => s.student_id);
-      console.log('👥 Fetching students with IDs:', studentIds);
+      console.log('👥 Attempting to fetch students with IDs:', studentIds);
       
-      const allUsers = await base44.entities.User.list();
-      console.log('📋 Total users in database:', allUsers.length);
-      
-      const filteredStudents = allUsers.filter(u => studentIds.includes(u.id));
-      console.log(`✅ Found ${filteredStudents.length} matching students`);
-      
-      return filteredStudents;
+      try {
+        // Try filtering by ID directly for each student
+        const studentPromises = studentIds.map(id => 
+          base44.entities.User.filter({ id: id })
+        );
+        
+        const studentArrays = await Promise.all(studentPromises);
+        const fetchedStudents = studentArrays.flat();
+        
+        console.log(`✅ Successfully fetched ${fetchedStudents.length} students`);
+        console.log('📋 Student details:', fetchedStudents.map(s => ({ id: s.id, name: s.full_name, email: s.email })));
+        
+        if (fetchedStudents.length === 0 && studentIds.length > 0) {
+          console.error('❌ ISSUE: Subscriptions exist but no students found!');
+          console.log('🔍 Trying alternative: list all users...');
+          
+          // Fallback: list all users
+          const allUsers = await base44.entities.User.list();
+          console.log(`📊 Total users in system: ${allUsers.length}`);
+          
+          const matched = allUsers.filter(u => studentIds.includes(u.id));
+          console.log(`🎯 Matched ${matched.length} students from all users`);
+          
+          return matched;
+        }
+        
+        return fetchedStudents;
+      } catch (error) {
+        console.error('❌ Error fetching students:', error);
+        throw error;
+      }
     },
     enabled: subscriptions.length > 0,
     refetchOnMount: true,
+    staleTime: 0,
+    retry: 3,
   });
 
   const { data: allTasks = [] } = useQuery({
@@ -208,6 +229,14 @@ export default function MentorDashboard() {
     queryClient.invalidateQueries(['mentor-tasks']);
     queryClient.invalidateQueries(['debug-all-subscriptions']);
   };
+
+  useEffect(() => {
+    if (subscriptions.length > 0 && students.length === 0 && !studentsLoading) {
+      console.warn('⚠️⚠️⚠️ ALERT: Subscriptions exist but no students loaded!');
+      console.log('Subscription student IDs:', subscriptions.map(s => s.student_id));
+      console.log('Students loaded:', students);
+    }
+  }, [subscriptions, students, studentsLoading]);
 
   const totalRevenue = subscriptions.reduce((sum, sub) => sum + sub.amount, 0);
   const monthlyRevenue = totalRevenue * 0.7;
@@ -321,14 +350,21 @@ export default function MentorDashboard() {
                   <Bug className="w-3 h-3" />
                   Debug Information
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-gray-700">
+                <div className="grid grid-cols-3 gap-2 text-gray-700">
                   <div>Mentor Profile ID: <span className="font-mono font-bold">{mentorProfile.id}</span></div>
                   <div>Active Subscriptions: <span className="font-bold">{subscriptions.length}</span></div>
-                  <div>Students Loaded: <span className="font-bold">{students.length}</span></div>
+                  <div>Students Loaded: <span className={students.length === 0 && subscriptions.length > 0 ? "font-bold text-red-600" : "font-bold text-green-600"}>{students.length}</span></div>
+                  <div>Students Loading: <span className="font-bold">{studentsLoading ? "YES" : "NO"}</span></div>
+                  <div>Students Error: <span className="font-bold">{studentsError ? "YES" : "NO"}</span></div>
                   <div>Total Subs in DB: <span className="font-bold">{allSubscriptions.length}</span></div>
                 </div>
+                {studentsError && (
+                  <div className="p-2 bg-red-100 border border-red-300 rounded text-red-800">
+                    <strong>Error:</strong> {studentsError.message}
+                  </div>
+                )}
                 {debugInfo && (
-                  <div className="mt-2 p-2 bg-white border border-yellow-300 rounded">
+                  <div className="mt-2 p-2 bg-white border border-yellow-300 rounded max-h-64 overflow-y-auto">
                     <div className="font-semibold mb-1">Query Results:</div>
                     <pre className="text-xs overflow-x-auto">{JSON.stringify(debugInfo, null, 2)}</pre>
                   </div>
