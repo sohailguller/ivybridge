@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -41,9 +40,6 @@ export default function StudentDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  // Removed [checkingPayment, setCheckingPayment] state as per outline
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [isCancelling, setIsCancelling] = useState(false);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
 
@@ -57,7 +53,7 @@ export default function StudentDashboard() {
     }
   }, [user]);
 
-  const checkPaymentSuccess = async () => { // Added async keyword
+  const checkPaymentSuccess = async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentSuccess = urlParams.get('payment_success');
 
@@ -66,31 +62,23 @@ export default function StudentDashboard() {
       window.history.replaceState({}, '', window.location.pathname);
       
       // Auto-activate any pending subscriptions
-      // This logic will only run if payment_success is in the URL and a user is loaded
-      if (user) {
-        const pendingSubs = await base44.entities.Subscription.filter({ 
-          student_id: user.id, 
-          status: "pending" 
-        });
-        
-        for (const sub of pendingSubs) {
-          await base44.entities.Subscription.update(sub.id, { status: 'active' });
-        }
-        
-        queryClient.invalidateQueries(['my-subscriptions']);
+      const pendingSubs = await base44.entities.Subscription.filter({ 
+        student_id: user.id, 
+        status: "pending" 
+      });
+      
+      for (const sub of pendingSubs) {
+        await base44.entities.Subscription.update(sub.id, { status: 'active' });
       }
-
-      // Removed setCheckingPayment and setTimeout logic as per outline
-      localStorage.removeItem('pending_subscription_id'); // Keeping this as outline didn't remove it
-      localStorage.removeItem('mentor_profile_id'); // Keeping this as outline didn't remove it
+      
+      queryClient.invalidateQueries(['my-subscriptions']);
     }
   };
 
   const loadUser = async () => {
     try {
       const currentUser = await base44.auth.me();
-
-      // Check redirects for wrong account types
+      
       if (currentUser.account_type === "mentor") {
         navigate(createPageUrl("MentorDashboard"), { replace: true });
         return;
@@ -99,27 +87,23 @@ export default function StudentDashboard() {
         navigate(createPageUrl("AdminDashboard"), { replace: true });
         return;
       }
-
-      // Set user and stop loading
+      
       setUser(currentUser);
       setIsLoading(false);
     } catch (error) {
       console.error("Auth error:", error);
-      setIsLoading(false); // Ensure loading state is false on error too
+      setIsLoading(false);
       base44.auth.redirectToLogin();
     }
   };
 
-  // Check for both active AND pending subscriptions (now just filters all)
   const { data: subscriptions = [], isLoading: subsLoading } = useQuery({
     queryKey: ['my-subscriptions', user?.id],
     queryFn: async () => {
-      // Modified queryFn to fetch all subscriptions for the student
       const subs = await base44.entities.Subscription.filter({ student_id: user.id });
       return subs;
     },
     enabled: !!user,
-    // Removed refetchInterval as checkingPayment state is removed
   });
 
   const { data: mentorProfiles = [] } = useQuery({
@@ -127,7 +111,6 @@ export default function StudentDashboard() {
     queryFn: async () => {
       if (subscriptions.length === 0) return [];
       const profiles = await base44.entities.MentorProfile.list();
-      // This will now match against all fetched subscriptions, not just active/pending implicitly from subscriptions[0]
       return profiles.filter(p => subscriptions.some(s => s.mentor_profile_id === p.id));
     },
     enabled: subscriptions.length > 0
@@ -155,9 +138,8 @@ export default function StudentDashboard() {
     enabled: !!user
   });
 
-  // activeSub now explicitly refers to an active subscription as per outline
   const activeSub = subscriptions.find(s => s.status === "active");
-  const pendingSub = subscriptions.find(s => s.status === "pending"); // Keep separate check for pending alert if needed
+  const pendingSub = subscriptions.find(s => s.status === "pending");
   const mentor = mentorProfiles.find(p => p.id === activeSub?.mentor_profile_id);
   const mentorUser = mentorUsers.find(u => u.id === mentor?.user_id);
 
@@ -174,40 +156,9 @@ export default function StudentDashboard() {
     enabled: !!activeSub && !!user
   });
 
-  const cancelSubscriptionMutation = useMutation({
-    mutationFn: async (subscriptionId) => {
-      await base44.entities.Subscription.update(subscriptionId, {
-        status: "cancelled"
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['my-subscriptions']);
-      setCancelDialogOpen(false);
-      // alert("Your subscription has been cancelled. You will retain access until the end of your current billing period.");
-      // For a better UX, we might want to display this message in a more integrated way,
-      // e.g., a toast notification or a temporary alert on the dashboard itself.
-    },
-    onError: (error) => {
-      console.error("Failed to cancel subscription:", error);
-      alert("Failed to cancel subscription. Please contact support.");
-    }
-  });
-
-  const handleCancelSubscription = async () => {
-    setIsCancelling(true);
-    try {
-      await cancelSubscriptionMutation.mutateAsync(activeSub.id);
-    } catch (error) {
-      // Error is handled by onError in useMutation, but we keep this for consistency if needed.
-    } finally {
-      setIsCancelling(false);
-    }
-  };
-
   const pendingTasks = tasks.filter(t => t.status === "pending" || t.status === "in_progress");
   const completedTasks = tasks.filter(t => t.status === "completed");
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -219,7 +170,6 @@ export default function StudentDashboard() {
     );
   }
 
-  // No user after loading - shouldn't happen, but safety check
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -240,7 +190,6 @@ export default function StudentDashboard() {
     );
   }
 
-  // Loading subscriptions
   if (subsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -252,11 +201,6 @@ export default function StudentDashboard() {
     );
   }
 
-  // Removed "Show processing state while waiting for webhook" block as per outline changes
-  // The auto-activation in checkPaymentSuccess should make this transient or handled differently.
-
-  // No active subscription found - now explicitly checks for activeSub as per outline
-  // If only pending subscriptions exist, this block will be triggered.
   if (!activeSub || !mentor) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -286,7 +230,6 @@ export default function StudentDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-24">
-        {/* Success Alert */}
         {showSuccessAlert && (
           <Alert className="mb-6 border-green-200 bg-green-50">
             <AlertDescription className="text-green-800 flex items-center gap-2 text-sm">
@@ -298,7 +241,6 @@ export default function StudentDashboard() {
           </Alert>
         )}
 
-        {/* Pending Subscription Alert - now based on pendingSub */}
         {pendingSub?.status === "pending" && (
           <Alert className="mb-6 border-yellow-200 bg-yellow-50">
             <AlertDescription className="text-yellow-800 flex items-center gap-2 text-sm">
@@ -307,16 +249,7 @@ export default function StudentDashboard() {
             </AlertDescription>
           </Alert>
         )}
-        {activeSub?.status === "cancelled" && ( // This refers to the activeSub potentially being cancelled
-          <Alert className="mb-6 border-red-200 bg-red-50">
-            <AlertDescription className="text-red-800 flex items-center gap-2 text-sm">
-              <AlertCircle className="w-4 h-4" />
-              <span>Your subscription is cancelled. You will retain access until {activeSub.end_date}.</span>
-            </AlertDescription>
-          </Alert>
-        )}
 
-        {/* Header */}
         <div className="mb-6 border-b border-gray-200 pb-4">
           <h1 className="text-2xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
             Welcome back, {user?.full_name?.split(' ')[0] || 'Student'}!
@@ -324,7 +257,6 @@ export default function StudentDashboard() {
           <p className="text-gray-600 text-sm">Track your progress and stay connected with your mentor</p>
         </div>
 
-        {/* Quick Stats */}
         <div className="grid md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white border-l-4 border-l-[#FE6C3A] border border-gray-200 rounded shadow-sm p-4">
             <div className="flex items-center justify-between mb-2">
@@ -361,7 +293,6 @@ export default function StudentDashboard() {
           </div>
         </div>
 
-        {/* Mentor Info Card */}
         <div className="bg-white border border-gray-200 rounded shadow-sm mb-6 p-6">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -405,14 +336,13 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Subscription Management */}
           <div className="mt-4 pt-4 border-t border-gray-200">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
                 <p className="text-sm font-medium text-gray-700">Subscription Plan</p>
                 <p className="text-base font-bold capitalize text-[#0D3B33]">{activeSub.plan_type} Plan</p>
                 <p className="text-xs text-gray-500">
-                  {activeSub.status === "active" ? `${activeSub.months_remaining} months remaining` : (activeSub.status === "pending" ? "Subscription pending activation" : "Subscription cancelled")}
+                  {activeSub.status === "active" ? `${activeSub.months_remaining} months remaining • Non-cancellable` : "Subscription pending activation"}
                 </p>
               </div>
               <div className="flex gap-2 flex-wrap">
@@ -436,22 +366,11 @@ export default function StudentDashboard() {
                   <AlertCircle className="w-3 h-3 mr-1" />
                   Report Issue
                 </Button>
-                {activeSub.status === "active" && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="rounded text-xs text-red-600 border-red-200 hover:bg-red-50"
-                    onClick={() => setCancelDialogOpen(true)}
-                  >
-                    Cancel Subscription
-                  </Button>
-                )}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-white border border-gray-200 rounded p-1 shadow-sm">
             <TabsTrigger value="overview" className="rounded data-[state=active]:bg-[#FE6C3A] data-[state=active]:text-white text-sm">
@@ -611,8 +530,8 @@ export default function StudentDashboard() {
 
                 <div className="bg-blue-50 border border-blue-200 rounded p-4">
                   <p className="text-xs text-blue-800">
-                    <strong>Note:</strong> For any billing questions or to update payment methods,
-                    please contact support or manage your subscription through Stripe.
+                    <strong>Note:</strong> This is a 12-month non-cancellable commitment. 
+                    For any billing questions, please contact support.
                   </p>
                 </div>
               </div>
@@ -621,73 +540,6 @@ export default function StudentDashboard() {
         </Tabs>
       </div>
 
-      {/* Cancel Subscription Dialog */}
-      <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Cancel Subscription</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to cancel your mentorship with {mentorUser?.full_name}?
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <p className="text-sm text-yellow-800 mb-2">
-                <strong>Please note:</strong>
-              </p>
-              <ul className="text-xs text-yellow-700 space-y-1 list-disc list-inside">
-                <li>You will retain access until the end of your current billing period.</li>
-                <li>No refunds will be issued for the current billing cycle.</li>
-                <li>You can resubscribe at any time.</li>
-                <li>Your chat history and progress will be preserved.</li>
-              </ul>
-            </div>
-
-            <div className="p-4 bg-gray-50 rounded-lg space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Current Plan:</span>
-                <span className="font-medium capitalize">{activeSub.plan_type}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Months Remaining:</span>
-                <span className="font-medium">{activeSub.months_remaining}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Access Until:</span>
-                <span className="font-medium">{activeSub.end_date}</span>
-              </div>
-            </div>
-
-            <div className="flex gap-3 pt-4">
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => setCancelDialogOpen(false)}
-                disabled={isCancelling}
-              >
-                Keep Subscription
-              </Button>
-              <Button
-                variant="destructive"
-                className="flex-1"
-                onClick={handleCancelSubscription}
-                disabled={isCancelling}
-              >
-                {isCancelling ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                    Cancelling...
-                  </>
-                ) : (
-                  "Cancel Subscription"
-                )}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Review Dialog */}
       <ReviewDialog
         open={showReviewDialog}
         onOpenChange={setShowReviewDialog}
@@ -698,7 +550,6 @@ export default function StudentDashboard() {
         onReviewSubmitted={() => queryClient.invalidateQueries(['my-review', activeSub?.id])}
       />
 
-      {/* Report Dialog */}
       <ReportDialog
         open={showReportDialog}
         onOpenChange={setShowReportDialog}
