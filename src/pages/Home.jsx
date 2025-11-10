@@ -195,7 +195,7 @@ export default function Home() {
           <div className="overflow-hidden">
             <div className="flex animate-scroll whitespace-nowrap">
               {[...universities, ...universities].map((uni, idx) => (
-                <div key={idx} className="inline-flex items-center mx-16">
+                <div key={idx} className="inline-flex items-center mx-14">
                   <span className="text-3xl font-semibold text-[#0D3B33]">{uni}</span>
                 </div>
               ))}
@@ -210,7 +210,7 @@ export default function Home() {
           100% { transform: translateX(-50%); }
         }
         .animate-scroll {
-          animation: scroll 40s linear infinite;
+          animation: scroll 20s linear infinite;
         }
       `}</style>
 
