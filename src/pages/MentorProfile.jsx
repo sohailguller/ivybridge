@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -10,24 +9,18 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   GraduationCap,
-  MapPin,
   Star,
-  Calendar,
-  MessageSquare,
   CheckCircle,
   ArrowLeft,
-  ExternalLink,
-  AlertCircle,
-  Award,       // Added Award icon
-  Lightbulb,   // Added Lightbulb icon
-  Target,      // Added Target icon
-  Heart,       // Added Heart icon
-  BookOpen,     // Added BookOpen icon
+  Award,
+  Lightbulb,
+  Target,
+  Heart,
+  BookOpen,
   ChevronDown,
   ChevronUp
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Collapsible,
   CollapsibleContent,
@@ -55,6 +48,7 @@ export default function MentorProfile() {
     }
   };
 
+  // Fetch mentor profile and all users IN PARALLEL
   const { data: mentor, isLoading: mentorLoading } = useQuery({
     queryKey: ['mentor-profile', mentorId],
     queryFn: async () => {
@@ -62,18 +56,19 @@ export default function MentorProfile() {
       return profiles[0] || null;
     },
     enabled: !!mentorId,
-    staleTime: 30000,
   });
 
-  const { data: mentorUser, isLoading: userLoading } = useQuery({
-    queryKey: ['mentor-user', mentor?.user_id],
+  const { data: allUsers = [], isLoading: usersLoading } = useQuery({
+    queryKey: ['all-users-for-profile'],
     queryFn: async () => {
-      const users = await base44.entities.User.filter({ id: mentor.user_id });
-      return users[0] || null;
+      const result = await base44.entities.User.list();
+      return result || [];
     },
-    enabled: !!mentor?.user_id,
-    staleTime: 30000,
   });
+
+  const mentorUser = React.useMemo(() => {
+    return allUsers.find(u => u.id === mentor?.user_id);
+  }, [allUsers, mentor?.user_id]);
 
   const { data: reviews = [] } = useQuery({
     queryKey: ['mentor-reviews', mentorId],
@@ -85,20 +80,13 @@ export default function MentorProfile() {
       return allReviews || [];
     },
     enabled: !!mentorId,
-    staleTime: 30000,
   });
 
-  const { data: reviewStudents = [] } = useQuery({
-    queryKey: ['review-students', reviews],
-    queryFn: async () => {
-      if (reviews.length === 0) return [];
-      const studentIds = [...new Set(reviews.map(r => r.student_id))];
-      const users = await base44.entities.User.list();
-      return users.filter(u => studentIds.includes(u.id)) || [];
-    },
-    enabled: reviews.length > 0,
-    staleTime: 30000,
-  });
+  const reviewStudents = React.useMemo(() => {
+    if (reviews.length === 0) return [];
+    const studentIds = [...new Set(reviews.map(r => r.student_id))];
+    return allUsers.filter(u => studentIds.includes(u.id));
+  }, [allUsers, reviews]);
 
   const handleSubscribe = async (planType, amount) => {
     if (!user) {
@@ -107,7 +95,7 @@ export default function MentorProfile() {
     }
 
     if (user.account_type === "mentor") {
-      alert("Mentors cannot subscribe to other mentors. This platform is for mentors to guide students.");
+      alert("Mentors cannot subscribe to other mentors.");
       return;
     }
 
@@ -131,7 +119,6 @@ export default function MentorProfile() {
         stripe_subscription_id: `test_${Date.now()}_${user.id}`
       });
 
-      // Use test Stripe links - subscription will be activated on return
       const stripeUrls = {
         monthly: `https://buy.stripe.com/test_eVqfZj1uJg5l50e0pH1Fe00`,
         annual: `https://buy.stripe.com/test_6oUcN78Xb8CT0JY4FX1Fe01`
@@ -141,16 +128,15 @@ export default function MentorProfile() {
 
     } catch (error) {
       console.error("Error creating subscription:", error);
-      alert("There was an error starting your subscription. Please try again.");
+      alert("There was an error. Please try again.");
       setIsSubscribing(false);
     }
   };
 
   const averageRating = reviews.length > 0
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
-    : 5.0; // Default to 5.0 if no reviews
+    : 5.0;
 
-  // University background images mapping
   const universityImages = {
     Harvard: "https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80",
     Yale: "https://images.unsplash.com/photo-1603487742131-4160ec999306?w=1200&q=80",
@@ -163,50 +149,25 @@ export default function MentorProfile() {
   };
 
   const personalQuestions = [
-    {
-      id: 'achievement',
-      icon: Award,
-      question: "What is your greatest achievement?",
-      answer: mentor?.greatest_achievement
-    },
-    {
-      id: 'advice',
-      icon: Lightbulb,
-      question: "What advice would you give to your younger self?",
-      answer: mentor?.advice_to_younger_self
-    },
-    {
-      id: 'dream',
-      icon: Target,
-      question: "What is your dream job?",
-      answer: mentor?.dream_job
-    },
-    {
-      id: 'major',
-      icon: BookOpen,
-      question: "Why did you choose your major?",
-      answer: mentor?.why_major
-    },
-    {
-      id: 'lifetime',
-      icon: Heart,
-      question: "What is one thing you hope to accomplish in your lifetime?",
-      answer: mentor?.lifetime_goal
-    }
+    { id: 'achievement', icon: Award, question: "What is your greatest achievement?", answer: mentor?.greatest_achievement },
+    { id: 'advice', icon: Lightbulb, question: "What advice would you give to your younger self?", answer: mentor?.advice_to_younger_self },
+    { id: 'dream', icon: Target, question: "What is your dream job?", answer: mentor?.dream_job },
+    { id: 'major', icon: BookOpen, question: "Why did you choose your major?", answer: mentor?.why_major },
+    { id: 'lifetime', icon: Heart, question: "What is one thing you hope to accomplish in your lifetime?", answer: mentor?.lifetime_goal }
   ];
 
-  const isLoading = mentorLoading || userLoading;
+  const isLoading = mentorLoading || usersLoading;
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#FAFAFA] py-12">
+      <div className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Skeleton className="h-64 w-full rounded-3xl mb-8" />
+          <Skeleton className="h-64 w-full rounded-lg mb-8" />
           <div className="grid md:grid-cols-3 gap-8">
             <div className="md:col-span-2">
-              <Skeleton className="h-96 w-full rounded-3xl" />
+              <Skeleton className="h-96 w-full rounded-lg" />
             </div>
-            <Skeleton className="h-96 w-full rounded-3xl" />
+            <Skeleton className="h-96 w-full rounded-lg" />
           </div>
         </div>
       </div>
@@ -215,8 +176,8 @@ export default function MentorProfile() {
 
   if (!mentor) {
     return (
-      <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
-        <Card className="max-w-md mx-4 rounded-3xl border-0 shadow-lg">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="max-w-md mx-4 rounded-lg border-0 shadow-lg">
           <CardContent className="p-12 text-center">
             <h2 className="text-2xl font-bold mb-4">Mentor Not Found</h2>
             <p className="text-gray-600 mb-6">The mentor you're looking for doesn't exist.</p>
@@ -247,14 +208,12 @@ export default function MentorProfile() {
         {isMentor && (
           <div className="bg-blue-50 border border-blue-200 rounded p-4 mb-6">
             <p className="text-sm text-blue-800">
-              <strong>Note:</strong> This is how students see your profile. You cannot subscribe to your own profile.
+              <strong>Note:</strong> This is how students see your profile.
             </p>
           </div>
         )}
 
-        {/* LinkedIn-style Banner Section */}
         <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6 overflow-hidden">
-          {/* University Banner Image */}
           <div 
             className="h-48 bg-cover bg-center relative"
             style={{ 
@@ -265,22 +224,19 @@ export default function MentorProfile() {
             <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent" />
           </div>
 
-          {/* Profile Content */}
           <div className="px-8 pb-6">
-            {/* Profile Photo - Overlapping Banner */}
             <div className="-mt-20 mb-4">
               <Avatar className="w-36 h-36 border-4 border-white shadow-lg">
                 <AvatarImage src={mentor.profile_photo_url || mentorUser?.profile_photo_url} />
                 <AvatarFallback className="bg-[#E6EFEA] text-5xl text-[#0D3B33]">
-                  {userLoading ? <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0D3B33]" /> : (mentorUser?.full_name?.charAt(0) || '?')}
+                  {mentorUser?.full_name?.charAt(0) || 'M'}
                 </AvatarFallback>
               </Avatar>
             </div>
 
-            {/* Name and Info */}
             <div className="mb-4">
               <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
-                {userLoading ? <Skeleton className="h-9 w-48" /> : (mentorUser?.full_name || 'Loading...')}
+                {mentorUser?.full_name || 'Mentor'}
               </h1>
               <div className="flex items-center gap-2 text-gray-600 mb-3">
                 <GraduationCap className="w-5 h-5" />
@@ -291,7 +247,6 @@ export default function MentorProfile() {
               </Badge>
             </div>
 
-            {/* Rating */}
             <div className="flex items-center gap-4 pb-4 border-b border-gray-200">
               <div className="flex items-center gap-1">
                 {[...Array(5)].map((_, i) => (
@@ -307,7 +262,6 @@ export default function MentorProfile() {
               </span>
             </div>
 
-            {/* Expertise Areas */}
             {mentor.expertise_areas && mentor.expertise_areas.length > 0 && (
               <div className="pt-4">
                 <h3 className="text-sm font-semibold text-gray-700 mb-3">Areas of Expertise</h3>
@@ -325,7 +279,6 @@ export default function MentorProfile() {
 
         <div className="grid md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-6">
-            {/* About Me */}
             <div className="bg-white border border-gray-200 rounded shadow-sm p-6 border-l-4 border-l-[#FE6C3A]">
               <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
                 About Me
@@ -335,13 +288,12 @@ export default function MentorProfile() {
               </p>
             </div>
 
-            {/* Personal Questions - FAQ Style */}
             <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
               <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
                 Get to Know Me
               </h2>
               <p className="text-sm text-gray-600 mb-6">
-                Click to read my responses to common questions
+                Click to read my responses
               </p>
               <div className="space-y-3">
                 {personalQuestions.map((item) => {
@@ -387,7 +339,6 @@ export default function MentorProfile() {
               </div>
             </div>
 
-            {/* What You'll Get */}
             <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
               <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
                 What You'll Get
@@ -395,23 +346,23 @@ export default function MentorProfile() {
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Unlimited 1-on-1 messaging throughout your entire application process</span>
+                  <span className="text-gray-700">Unlimited 1-on-1 messaging</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Weekly video meetings for personalized guidance</span>
+                  <span className="text-gray-700">Weekly video meetings</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Detailed essay reviews and edits with tracked feedback</span>
+                  <span className="text-gray-700">Essay reviews and edits</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Strategic application planning and deadline management</span>
+                  <span className="text-gray-700">Application planning</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Mock interviews and comprehensive interview preparation</span>
+                  <span className="text-gray-700">Interview preparation</span>
                 </li>
               </ul>
             </div>

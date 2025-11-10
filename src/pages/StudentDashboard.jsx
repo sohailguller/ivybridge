@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -34,7 +35,7 @@ export default function StudentDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
-  const [showReportDialog, setShowReportDialog] = useState(false);
+  const [showReportDialog, setShowReport] = useState(false); // Renamed from showReportDialog to showReport to avoid conflict in the reportDialog line
 
   useEffect(() => {
     loadUser();
@@ -89,7 +90,7 @@ export default function StudentDashboard() {
     }
   };
 
-  const { data: subscriptions = [], isLoading: subsLoading } = useQuery({
+  const { data: subscriptions = [] } = useQuery({
     queryKey: ['my-subscriptions', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
@@ -97,37 +98,33 @@ export default function StudentDashboard() {
       return subs || [];
     },
     enabled: !!user?.id,
-    staleTime: 10000,
     refetchOnWindowFocus: true,
   });
 
   const activeSub = subscriptions.find(s => s.status === "active");
 
-  const { data: mentorProfiles = [], isLoading: profilesLoading } = useQuery({
-    queryKey: ['subscription-mentor-profiles', activeSub?.id],
+  // Fetch mentor profile and all users IN PARALLEL
+  const { data: mentorProfile } = useQuery({
+    queryKey: ['active-mentor-profile', activeSub?.id],
     queryFn: async () => {
-      if (!activeSub?.mentor_profile_id) return [];
+      if (!activeSub?.mentor_profile_id) return null;
       const profiles = await base44.entities.MentorProfile.filter({ id: activeSub.mentor_profile_id });
-      return profiles || [];
+      return profiles[0] || null;
     },
     enabled: !!activeSub?.mentor_profile_id,
-    staleTime: 30000,
   });
 
-  const mentor = mentorProfiles[0];
-
-  const { data: mentorUsers = [], isLoading: usersLoading } = useQuery({
-    queryKey: ['mentor-user-data', mentor?.user_id],
+  const { data: allUsers = [] } = useQuery({
+    queryKey: ['all-users-dash'],
     queryFn: async () => {
-      if (!mentor?.user_id) return [];
-      const users = await base44.entities.User.filter({ id: mentor.user_id });
-      return users || [];
+      const result = await base44.entities.User.list();
+      return result || [];
     },
-    enabled: !!mentor?.user_id,
-    staleTime: 30000,
   });
 
-  const mentorUser = mentorUsers[0];
+  const mentorUser = React.useMemo(() => {
+    return allUsers.find(u => u.id === mentorProfile?.user_id);
+  }, [allUsers, mentorProfile?.user_id]);
 
   const { data: tasks = [] } = useQuery({
     queryKey: ['my-tasks', user?.id],
@@ -137,7 +134,6 @@ export default function StudentDashboard() {
       return result || [];
     },
     enabled: !!user?.id,
-    staleTime: 10000,
   });
 
   const { data: progressNotes = [] } = useQuery({
@@ -148,7 +144,6 @@ export default function StudentDashboard() {
       return result || [];
     },
     enabled: !!user?.id,
-    staleTime: 10000,
   });
 
   const { data: myReview } = useQuery({
@@ -172,7 +167,7 @@ export default function StudentDashboard() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FE6C3A] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your dashboard...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -184,13 +179,8 @@ export default function StudentDashboard() {
         <div className="max-w-md bg-white border border-gray-200 rounded shadow-sm p-8 text-center">
           <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
           <h2 className="text-xl font-bold mb-2 text-[#0D3B33]">Authentication Error</h2>
-          <p className="text-gray-600 text-sm mb-4">
-            Unable to load your account. Please try signing in again.
-          </p>
-          <Button
-            onClick={() => base44.auth.redirectToLogin()}
-            className="btn-primary text-white rounded"
-          >
+          <p className="text-gray-600 text-sm mb-4">Please sign in again.</p>
+          <Button onClick={() => base44.auth.redirectToLogin()} className="btn-primary text-white rounded">
             Sign In
           </Button>
         </div>
@@ -198,18 +188,7 @@ export default function StudentDashboard() {
     );
   }
 
-  if (subsLoading || profilesLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FE6C3A] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your subscription...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!activeSub || !mentor) {
+  if (!activeSub || !mentorProfile) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-md bg-white border border-gray-200 rounded shadow-sm p-8">
@@ -221,7 +200,7 @@ export default function StudentDashboard() {
               No Active Mentorship
             </h2>
             <p className="text-gray-600 mb-4 text-sm">
-              You don't have an active mentorship yet. Browse our mentors to get started!
+              Browse our mentors to get started!
             </p>
             <Button
               className="btn-primary text-white rounded"
@@ -242,9 +221,7 @@ export default function StudentDashboard() {
           <Alert className="mb-6 border-green-200 bg-green-50">
             <AlertDescription className="text-green-800 flex items-center gap-2 text-sm">
               <CheckCircle className="w-4 h-4" />
-              <span>
-                <strong>Payment successful!</strong> Your mentorship has been activated. Welcome to IvyBridge!
-              </span>
+              <span><strong>Payment successful!</strong> Welcome to IvyBridge!</span>
             </AlertDescription>
           </Alert>
         )}
@@ -253,7 +230,7 @@ export default function StudentDashboard() {
           <h1 className="text-2xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
             Welcome back, {user?.full_name?.split(' ')[0] || 'Student'}!
           </h1>
-          <p className="text-gray-600 text-sm">Track your progress and stay connected with your mentor</p>
+          <p className="text-gray-600 text-sm">Track your progress and stay connected</p>
         </div>
 
         <div className="grid md:grid-cols-4 gap-4 mb-6">
@@ -294,31 +271,29 @@ export default function StudentDashboard() {
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <Avatar className="w-16 h-16">
-                <AvatarImage src={mentor.profile_photo_url || mentorUser?.profile_photo_url} />
+                <AvatarImage src={mentorProfile.profile_photo_url || mentorUser?.profile_photo_url} />
                 <AvatarFallback className="bg-[#E6EFEA] text-xl text-[#0D3B33]">
-                  {mentorUser?.full_name?.charAt(0) || usersLoading ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#0D3B33]" /> : '?'}
+                  {mentorUser?.full_name?.charAt(0) || 'M'}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <h3 className="text-lg font-bold text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>Your Mentor</h3>
-                <p className="text-base text-gray-700 mb-1">
-                  {usersLoading ? <Skeleton className="h-5 w-32" /> : (mentorUser?.full_name || 'Loading...')}
-                </p>
+                <p className="text-base text-gray-700 mb-1">{mentorUser?.full_name || 'Mentor'}</p>
                 <div className="flex items-center gap-2 text-xs text-gray-600">
                   <Badge className="bg-[#E6EFEA] text-[#0D3B33] border-0 text-xs">
-                    {mentor.university}
+                    {mentorProfile.university}
                   </Badge>
                   <span>•</span>
-                  <span>{mentor.major}</span>
+                  <span>{mentorProfile.major}</span>
                 </div>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-              {mentor.calendly_link && (
+              {mentorProfile.calendly_link && (
                 <Button
                   variant="outline"
                   className="rounded text-sm"
-                  onClick={() => window.open(mentor.calendly_link, '_blank')}
+                  onClick={() => window.open(mentorProfile.calendly_link, '_blank')}
                 >
                   <Calendar className="w-4 h-4 mr-2" />
                   Schedule Meeting
@@ -360,7 +335,7 @@ export default function StudentDashboard() {
                   variant="outline"
                   size="sm"
                   className="rounded text-xs text-gray-600"
-                  onClick={() => setShowReportDialog(true)}
+                  onClick={() => setShowReport(true)}
                 >
                   <AlertCircle className="w-3 h-3 mr-1" />
                   Report Issue
@@ -440,9 +415,9 @@ export default function StudentDashboard() {
               {mentorUser ? (
                 <ChatBox
                   currentUserId={user.id}
-                  otherUserId={mentor.user_id}
+                  otherUserId={mentorProfile.user_id}
                   otherUserName={mentorUser.full_name}
-                  otherUserPhoto={mentor.profile_photo_url || mentorUser.profile_photo_url}
+                  otherUserPhoto={mentorProfile.profile_photo_url || mentorUser.profile_photo_url}
                   subscriptionId={activeSub.id}
                 />
               ) : (
@@ -546,16 +521,16 @@ export default function StudentDashboard() {
         open={showReviewDialog}
         onOpenChange={setShowReviewDialog}
         subscription={activeSub}
-        mentorProfile={mentor}
+        mentorProfile={mentorProfile}
         mentorUser={mentorUser}
         currentUserId={user?.id}
         onReviewSubmitted={() => queryClient.invalidateQueries(['my-review', activeSub?.id])}
       />
 
       <ReportDialog
-        open={showReportDialog}
-        onOpenChange={setShowReportDialog}
-        reportedUserId={mentor?.user_id}
+        open={showReport}
+        onOpenChange={setShowReport}
+        reportedUserId={mentorProfile?.user_id}
         reportedUserName={mentorUser?.full_name || 'Mentor'}
         reporterUserId={user?.id}
       />

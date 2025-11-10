@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -32,28 +31,29 @@ export default function BrowseMentors() {
   const [universityFilter, setUniversityFilter] = useState("all");
   const [majorFilter, setMajorFilter] = useState("all");
 
-  // Fetch approved mentors
-  const { data: mentors = [], isLoading: mentorsLoading, error: mentorsError } = useQuery({
+  // Fetch both mentors and users IN PARALLEL
+  const { data: mentors = [], isLoading: mentorsLoading, error } = useQuery({
     queryKey: ['approved-mentors'],
     queryFn: async () => {
       const result = await base44.entities.MentorProfile.filter({ verification_status: "approved" });
       return result || [];
     },
-    staleTime: 30000,
-    refetchOnWindowFocus: false,
   });
 
-  // Fetch ALL users in one query (not filtered)
   const { data: allUsers = [], isLoading: usersLoading } = useQuery({
-    queryKey: ['all-users-for-browse'],
+    queryKey: ['all-users-list'],
     queryFn: async () => {
       const result = await base44.entities.User.list();
       return result || [];
     },
-    enabled: mentors.length > 0,
-    staleTime: 30000,
-    refetchOnWindowFocus: false,
   });
+
+  // Create a fast lookup map
+  const userMap = React.useMemo(() => {
+    const map = new Map();
+    allUsers.forEach(user => map.set(user.id, user));
+    return map;
+  }, [allUsers]);
 
   const universities = ["Harvard", "Yale", "Princeton", "Columbia", "Brown", "Dartmouth", "Cornell", "Penn"];
 
@@ -72,30 +72,23 @@ export default function BrowseMentors() {
     const matchesSearch = !searchQuery ||
       mentor.bio?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       mentor.major?.toLowerCase().includes(searchQuery.toLowerCase());
-
     const matchesUniversity = universityFilter === "all" || mentor.university === universityFilter;
     const matchesMajor = majorFilter === "all" || mentor.major === majorFilter;
-
     return matchesSearch && matchesUniversity && matchesMajor;
   });
 
-  const getMentorUser = (userId) => allUsers.find(u => u.id === userId);
-
   const allMajors = [...new Set(mentors.map(m => m.major).filter(Boolean))];
-
   const isLoading = mentorsLoading || usersLoading;
 
-  if (mentorsError) {
+  if (error) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-md bg-white border border-gray-200 rounded shadow-sm p-8 text-center">
           <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
           <h2 className="text-xl font-bold mb-2 text-[#0D3B33]">Error Loading Mentors</h2>
-          <p className="text-gray-600 text-sm mb-4">
-            We're having trouble loading the mentor list. Please try refreshing the page.
-          </p>
+          <p className="text-gray-600 text-sm mb-4">Please refresh the page.</p>
           <Button onClick={() => window.location.reload()} className="btn-primary text-white rounded">
-            Refresh Page
+            Refresh
           </Button>
         </div>
       </div>
@@ -160,16 +153,17 @@ export default function BrowseMentors() {
         {isLoading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white border border-gray-200 rounded shadow-sm p-6">
-                <div className="flex items-start gap-4 mb-4">
-                  <Skeleton className="w-16 h-16 rounded-full" />
-                  <div className="flex-1">
-                    <Skeleton className="h-5 w-32 mb-2" />
-                    <Skeleton className="h-4 w-24" />
+              <div key={i} className="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
+                <Skeleton className="h-20 w-full" />
+                <div className="px-6 pb-6">
+                  <div className="-mt-12 mb-4">
+                    <Skeleton className="w-24 h-24 rounded-full" />
                   </div>
+                  <Skeleton className="h-6 w-32 mb-2" />
+                  <Skeleton className="h-4 w-40 mb-3" />
+                  <Skeleton className="h-20 w-full mb-4" />
+                  <Skeleton className="h-10 w-full" />
                 </div>
-                <Skeleton className="h-20 w-full mb-4" />
-                <Skeleton className="h-10 w-full" />
               </div>
             ))}
           </div>
@@ -177,12 +171,12 @@ export default function BrowseMentors() {
           <div className="bg-white border border-gray-200 rounded shadow-sm p-12 text-center">
             <Users className="w-16 h-16 mx-auto mb-4 text-gray-300" />
             <h3 className="text-xl font-bold mb-2 text-[#0D3B33]">No mentors found</h3>
-            <p className="text-gray-600">Try adjusting your filters or search query</p>
+            <p className="text-gray-600">Try adjusting your filters</p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredMentors.map((mentor) => {
-              const user = getMentorUser(mentor.user_id);
+              const user = userMap.get(mentor.user_id);
               const universityBg = universityImages[mentor.university] || universityImages.Harvard;
 
               return (
@@ -206,13 +200,13 @@ export default function BrowseMentors() {
                       <Avatar className="w-24 h-24 border-4 border-white shadow-lg ring-2 ring-gray-100">
                         <AvatarImage src={mentor.profile_photo_url || user?.profile_photo_url} />
                         <AvatarFallback className="bg-[#E6EFEA] text-2xl text-[#0D3B33]">
-                          {user?.full_name?.charAt(0) || '?'}
+                          {user?.full_name?.charAt(0) || 'M'}
                         </AvatarFallback>
                       </Avatar>
                     </div>
 
                     <h3 className="text-lg font-bold mb-1 text-[#0D3B33]">
-                      {user?.full_name || <Skeleton className="h-5 w-32" />}
+                      {user?.full_name || 'Mentor'}
                     </h3>
                     <div className="flex items-center gap-2 text-xs text-gray-600 mb-2">
                       <GraduationCap className="w-4 h-4" />
