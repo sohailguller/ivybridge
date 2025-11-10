@@ -266,7 +266,7 @@ export default function MentorProfile() {
               <Avatar className="w-36 h-36 border-4 border-white shadow-lg">
                 <AvatarImage src={mentor.profile_photo_url || mentorUser?.profile_photo_url} />
                 <AvatarFallback className="bg-[#E6EFEA] text-5xl text-[#0D3B33]">
-                  {mentorUser?.full_name?.charAt(0) || 'M'}
+                  {mentorUser?.full_name?.charAt(0) || '?'}
                 </AvatarFallback>
               </Avatar>
             </div>
@@ -274,7 +274,7 @@ export default function MentorProfile() {
             {/* Name and Info */}
             <div className="mb-4">
               <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
-                {mentorUser?.full_name || 'Mentor'}
+                {mentorUser?.full_name || 'Loading...'}
               </h1>
               <div className="flex items-center gap-2 text-gray-600 mb-3">
                 <GraduationCap className="w-5 h-5" />

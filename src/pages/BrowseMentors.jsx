@@ -15,7 +15,7 @@ import {
   Star,
   Users,
   ArrowRight,
-  AlertCircle // Added AlertCircle import
+  AlertCircle
 } from "lucide-react";
 import {
   Select,
@@ -33,29 +33,29 @@ export default function BrowseMentors() {
   const [universityFilter, setUniversityFilter] = useState("all");
   const [majorFilter, setMajorFilter] = useState("all");
 
-  const { data: mentors = [], isLoading, error } = useQuery({ // Added error here
+  const { data: mentors = [], isLoading, error } = useQuery({
     queryKey: ['approved-mentors'],
     queryFn: async () => {
       try {
         return await base44.entities.MentorProfile.filter({ verification_status: "approved" });
       } catch (err) {
         console.error("Error fetching mentors:", err);
-        throw err; // Re-throw to let react-query handle it
+        throw err;
       }
     },
   });
 
   const { data: users = [] } = useQuery({
-    queryKey: ['mentor-users'],
+    queryKey: ['all-users'], // Changed from 'mentor-users' to 'all-users'
     queryFn: async () => {
       try {
         return await base44.entities.User.list();
       } catch (err) {
         console.error("Error fetching users:", err);
-        return []; // Return empty array on error for users, or re-throw if it should halt rendering
+        return [];
       }
     },
-    enabled: mentors.length > 0
+    // Removed enabled: mentors.length > 0
   });
 
   const universities = ["Harvard", "Yale", "Princeton", "Columbia", "Brown", "Dartmouth", "Cornell", "Penn"];
@@ -211,13 +211,13 @@ export default function BrowseMentors() {
                       <Avatar className="w-24 h-24 border-4 border-white shadow-lg ring-2 ring-gray-100">
                         <AvatarImage src={mentor.profile_photo_url || user?.profile_photo_url} />
                         <AvatarFallback className="bg-[#E6EFEA] text-2xl text-[#0D3B33]">
-                          {user?.full_name?.charAt(0) || 'M'}
+                          {user?.full_name?.charAt(0) || '?'} {/* Changed 'M' to '?' */}
                         </AvatarFallback>
                       </Avatar>
                     </div>
 
                     {/* Name and Info */}
-                    <h3 className="text-lg font-bold mb-1 text-[#0D3B33]">{user?.full_name || 'Mentor'}</h3>
+                    <h3 className="text-lg font-bold mb-1 text-[#0D3B33]">{user?.full_name || 'Loading...'}</h3> {/* Changed 'Mentor' to 'Loading...' */}
                     <div className="flex items-center gap-2 text-xs text-gray-600 mb-2">
                       <GraduationCap className="w-4 h-4" />
                       <span>{mentor.university} • {mentor.year}</span>
