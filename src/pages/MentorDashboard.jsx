@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -53,11 +54,34 @@ export default function MentorDashboard() {
       }
       setUser(currentUser);
       
+      // Try to load mentor profile - first by mentor_profile_id, then by user_id
+      let profile = null;
+      
       if (currentUser.mentor_profile_id) {
         const profiles = await base44.entities.MentorProfile.filter({ id: currentUser.mentor_profile_id });
         if (profiles.length > 0) {
-          setMentorProfile(profiles[0]);
+          profile = profiles[0];
         }
+      }
+      
+      // If no profile found via mentor_profile_id, try finding by user_id
+      if (!profile) {
+        const profiles = await base44.entities.MentorProfile.filter({ user_id: currentUser.id });
+        if (profiles.length > 0) {
+          profile = profiles[0];
+          // Update the user record with the mentor_profile_id for future use
+          try {
+            await base44.auth.updateMe({ mentor_profile_id: profile.id });
+            // Update the local currentUser state as well if it was changed
+            setUser(prevUser => ({ ...prevUser, mentor_profile_id: profile.id }));
+          } catch (updateError) {
+            console.log('Could not update mentor_profile_id:', updateError);
+          }
+        }
+      }
+      
+      if (profile) {
+        setMentorProfile(profile);
       }
     } catch (error) {
       base44.auth.redirectToLogin();
