@@ -158,7 +158,7 @@ export default function MentorDashboard() {
   const handleConnectStripe = async () => {
     setConnectingStripe(true);
     try {
-      const response = await base44.functions.invoke('connectMentorStripe', {});
+      const response = await base44.functions.invoke('stripeConnect', {});
       
       if (response.data.onboardingUrl) {
         window.location.href = response.data.onboardingUrl;
