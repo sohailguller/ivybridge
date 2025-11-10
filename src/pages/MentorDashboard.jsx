@@ -365,11 +365,11 @@ export default function MentorDashboard() {
                         <Avatar className="w-12 h-12">
                           <AvatarImage src={student.profile_photo_url} />
                           <AvatarFallback className="bg-[#E6EFEA] text-lg text-[#0D3B33]">
-                            {student.full_name?.charAt(0) || '?'}
+                            {student.full_name?.charAt(0) || 'S'}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-bold text-sm truncate">{student.full_name || 'Student'}</h3>
+                          <h3 className="font-bold text-sm truncate">{student.full_name}</h3>
                           <p className="text-xs text-gray-600 truncate">{student.email}</p>
                         </div>
                       </div>

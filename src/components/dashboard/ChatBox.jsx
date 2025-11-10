@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -105,11 +104,11 @@ export default function ChatBox({
         <Avatar className="w-12 h-12">
           <AvatarImage src={otherUserPhoto} />
           <AvatarFallback className="bg-[#B3E5FC]">
-            {otherUserName?.charAt(0) || '?'}
+            {otherUserName?.charAt(0) || 'U'}
           </AvatarFallback>
         </Avatar>
         <div>
-          <h3 className="font-semibold">{otherUserName || 'User'}</h3>
+          <h3 className="font-semibold">{otherUserName}</h3>
           <p className="text-sm text-gray-500">Active now</p>
         </div>
       </div>

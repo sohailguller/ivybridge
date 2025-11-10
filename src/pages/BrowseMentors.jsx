@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +15,7 @@ import {
   Star,
   Users,
   ArrowRight,
-  AlertCircle
+  AlertCircle // Added AlertCircle import
 } from "lucide-react";
 import {
   Select,
@@ -31,32 +33,34 @@ export default function BrowseMentors() {
   const [universityFilter, setUniversityFilter] = useState("all");
   const [majorFilter, setMajorFilter] = useState("all");
 
-  // Fetch both mentors and users IN PARALLEL
-  const { data: mentors = [], isLoading: mentorsLoading, error } = useQuery({
+  const { data: mentors = [], isLoading, error } = useQuery({ // Added error here
     queryKey: ['approved-mentors'],
     queryFn: async () => {
-      const result = await base44.entities.MentorProfile.filter({ verification_status: "approved" });
-      return result || [];
+      try {
+        return await base44.entities.MentorProfile.filter({ verification_status: "approved" });
+      } catch (err) {
+        console.error("Error fetching mentors:", err);
+        throw err; // Re-throw to let react-query handle it
+      }
     },
   });
 
-  const { data: allUsers = [], isLoading: usersLoading } = useQuery({
-    queryKey: ['all-users-list'],
+  const { data: users = [] } = useQuery({
+    queryKey: ['mentor-users'],
     queryFn: async () => {
-      const result = await base44.entities.User.list();
-      return result || [];
+      try {
+        return await base44.entities.User.list();
+      } catch (err) {
+        console.error("Error fetching users:", err);
+        return []; // Return empty array on error for users, or re-throw if it should halt rendering
+      }
     },
+    enabled: mentors.length > 0
   });
-
-  // Create a fast lookup map
-  const userMap = React.useMemo(() => {
-    const map = new Map();
-    allUsers.forEach(user => map.set(user.id, user));
-    return map;
-  }, [allUsers]);
 
   const universities = ["Harvard", "Yale", "Princeton", "Columbia", "Brown", "Dartmouth", "Cornell", "Penn"];
 
+  // University background images mapping
   const universityImages = {
     Harvard: "https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80",
     Yale: "https://images.unsplash.com/photo-1603487742131-4160ec999306?w=1200&q=80",
@@ -72,23 +76,29 @@ export default function BrowseMentors() {
     const matchesSearch = !searchQuery ||
       mentor.bio?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       mentor.major?.toLowerCase().includes(searchQuery.toLowerCase());
+
     const matchesUniversity = universityFilter === "all" || mentor.university === universityFilter;
     const matchesMajor = majorFilter === "all" || mentor.major === majorFilter;
+
     return matchesSearch && matchesUniversity && matchesMajor;
   });
 
-  const allMajors = [...new Set(mentors.map(m => m.major).filter(Boolean))];
-  const isLoading = mentorsLoading || usersLoading;
+  const getMentorUser = (userId) => users.find(u => u.id === userId);
 
+  const allMajors = [...new Set(mentors.map(m => m.major).filter(Boolean))];
+
+  // Add error state
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-md bg-white border border-gray-200 rounded shadow-sm p-8 text-center">
           <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
           <h2 className="text-xl font-bold mb-2 text-[#0D3B33]">Error Loading Mentors</h2>
-          <p className="text-gray-600 text-sm mb-4">Please refresh the page.</p>
+          <p className="text-gray-600 text-sm mb-4">
+            We're having trouble loading the mentor list. Please try refreshing the page.
+          </p>
           <Button onClick={() => window.location.reload()} className="btn-primary text-white rounded">
-            Refresh
+            Refresh Page
           </Button>
         </div>
       </div>
@@ -153,17 +163,16 @@ export default function BrowseMentors() {
         {isLoading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
-                <Skeleton className="h-20 w-full" />
-                <div className="px-6 pb-6">
-                  <div className="-mt-12 mb-4">
-                    <Skeleton className="w-24 h-24 rounded-full" />
+              <div key={i} className="bg-white border border-gray-200 rounded shadow-sm p-6">
+                <div className="flex items-start gap-4 mb-4">
+                  <Skeleton className="w-16 h-16 rounded-full" />
+                  <div className="flex-1">
+                    <Skeleton className="h-5 w-32 mb-2" />
+                    <Skeleton className="h-4 w-24" />
                   </div>
-                  <Skeleton className="h-6 w-32 mb-2" />
-                  <Skeleton className="h-4 w-40 mb-3" />
-                  <Skeleton className="h-20 w-full mb-4" />
-                  <Skeleton className="h-10 w-full" />
                 </div>
+                <Skeleton className="h-20 w-full mb-4" />
+                <Skeleton className="h-10 w-full" />
               </div>
             ))}
           </div>
@@ -171,12 +180,12 @@ export default function BrowseMentors() {
           <div className="bg-white border border-gray-200 rounded shadow-sm p-12 text-center">
             <Users className="w-16 h-16 mx-auto mb-4 text-gray-300" />
             <h3 className="text-xl font-bold mb-2 text-[#0D3B33]">No mentors found</h3>
-            <p className="text-gray-600">Try adjusting your filters</p>
+            <p className="text-gray-600">Try adjusting your filters or search query</p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredMentors.map((mentor) => {
-              const user = userMap.get(mentor.user_id);
+              const user = getMentorUser(mentor.user_id);
               const universityBg = universityImages[mentor.university] || universityImages.Harvard;
 
               return (
@@ -185,6 +194,7 @@ export default function BrowseMentors() {
                   className="bg-white border border-gray-200 rounded shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden"
                   onClick={() => navigate(createPageUrl(`MentorProfile?id=${mentor.id}`))}
                 >
+                  {/* University Banner */}
                   <div
                     className="h-20 bg-cover bg-center relative"
                     style={{
@@ -196,6 +206,7 @@ export default function BrowseMentors() {
                   </div>
 
                   <div className="px-6 pt-0 pb-6">
+                    {/* Profile Photo - Overlapping LinkedIn Style */}
                     <div className="-mt-12 mb-4">
                       <Avatar className="w-24 h-24 border-4 border-white shadow-lg ring-2 ring-gray-100">
                         <AvatarImage src={mentor.profile_photo_url || user?.profile_photo_url} />
@@ -205,9 +216,8 @@ export default function BrowseMentors() {
                       </Avatar>
                     </div>
 
-                    <h3 className="text-lg font-bold mb-1 text-[#0D3B33]">
-                      {user?.full_name || 'Mentor'}
-                    </h3>
+                    {/* Name and Info */}
+                    <h3 className="text-lg font-bold mb-1 text-[#0D3B33]">{user?.full_name || 'Mentor'}</h3>
                     <div className="flex items-center gap-2 text-xs text-gray-600 mb-2">
                       <GraduationCap className="w-4 h-4" />
                       <span>{mentor.university} • {mentor.year}</span>

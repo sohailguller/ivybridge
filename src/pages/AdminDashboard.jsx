@@ -332,11 +332,11 @@ export default function AdminDashboard() {
                               <Avatar>
                                 <AvatarImage src={mentor.profile_photo_url} />
                                 <AvatarFallback className="bg-[#B3E5FC]">
-                                  {mentorUser?.full_name?.charAt(0) || '?'}
+                                  {mentorUser?.full_name?.charAt(0) || 'M'}
                                 </AvatarFallback>
                               </Avatar>
                               <div>
-                                <p className="font-medium">{mentorUser?.full_name || 'Loading...'}</p>
+                                <p className="font-medium">{mentorUser?.full_name}</p>
                                 <p className="text-sm text-gray-600">{mentor.university}</p>
                               </div>
                             </div>
@@ -429,11 +429,11 @@ export default function AdminDashboard() {
                                 <Avatar className="w-16 h-16">
                                   <AvatarImage src={mentor.profile_photo_url} />
                                   <AvatarFallback className="bg-[#B3E5FC]">
-                                    {mentorUser?.full_name?.charAt(0) || '?'}
+                                    {mentorUser?.full_name?.charAt(0) || 'M'}
                                   </AvatarFallback>
                                 </Avatar>
                                 <div>
-                                  <h3 className="text-lg font-bold">{mentorUser?.full_name || 'Loading...'}</h3>
+                                  <h3 className="text-lg font-bold">{mentorUser?.full_name}</h3>
                                   <div className="flex flex-wrap gap-2 mt-1">
                                     <Badge>{mentor.university}</Badge>
                                     <Badge variant="outline">{mentor.year}</Badge>
@@ -491,11 +491,11 @@ export default function AdminDashboard() {
                               <Avatar className="w-10 h-10">
                                 <AvatarImage src={mentor.profile_photo_url} />
                                 <AvatarFallback className="bg-[#B3E5FC]">
-                                  {mentorUser?.full_name?.charAt(0) || '?'}
+                                  {mentorUser?.full_name?.charAt(0) || 'M'}
                                 </AvatarFallback>
                               </Avatar>
                               <div>
-                                <p className="font-medium">{mentorUser?.full_name || 'Loading...'}</p>
+                                <p className="font-medium">{mentorUser?.full_name}</p>
                                 <p className="text-xs text-gray-500">{mentorUser?.email}</p>
                               </div>
                             </div>
@@ -689,7 +689,7 @@ export default function AdminDashboard() {
                 Mentor Application Review
               </DialogTitle>
               <DialogDescription className="text-gray-600">
-                Review the complete application for {getMentorUser(selectedMentor.user_id)?.full_name || 'this mentor'}
+                Review the complete application for {getMentorUser(selectedMentor.user_id)?.full_name}
               </DialogDescription>
             </DialogHeader>
             
