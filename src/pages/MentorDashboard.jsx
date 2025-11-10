@@ -100,7 +100,7 @@ export default function MentorDashboard() {
   });
 
   const { data: students = [] } = useQuery({
-    queryKey: ['my-students'],
+    queryKey: ['my-students', subscriptions.map(s => s.id).sort().join(',')],
     queryFn: async () => {
       if (subscriptions.length === 0) return [];
       const users = await base44.entities.User.list();
