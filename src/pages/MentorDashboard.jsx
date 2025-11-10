@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -109,6 +108,19 @@ export default function MentorDashboard() {
     refetchInterval: 5000,
   });
 
+  // Fetch ALL users upfront for quick matching
+  const { data: allUsers = [] } = useQuery({
+    queryKey: ['all-users-cache'],
+    queryFn: async () => {
+      console.log('👥 Fetching ALL users for cache...');
+      const users = await base44.entities.User.list();
+      console.log(`📊 Cached ${users.length} total users`);
+      return users;
+    },
+    staleTime: 30000, // Cache for 30 seconds
+    refetchOnMount: false,
+  });
+
   // Fetch active subscriptions for this mentor
   const { data: subscriptions = [], refetch: refetchSubscriptions, isFetching: isFetchingSubscriptions } = useQuery({
     queryKey: ['mentor-subscriptions', mentorProfile?.id],
@@ -133,15 +145,6 @@ export default function MentorDashboard() {
         status: s.status
       })));
       
-      setDebugInfo({
-        mentorProfileId: mentorProfile.id,
-        totalInDb: allSubscriptions.length,
-        forThisMentor: subs.length, // Changed this line
-        active: subs.length,
-        subscriptions: subs,
-        studentIds: subs.map(s => s.student_id) // Added this line
-      });
-      
       return subs;
     },
     enabled: !!mentorProfile?.id,
@@ -151,55 +154,33 @@ export default function MentorDashboard() {
     staleTime: 0,
   });
 
-  // Fetch student users - FIXED VERSION
-  const { data: students = [], isLoading: studentsLoading, error: studentsError } = useQuery({
-    queryKey: ['my-students', subscriptions.length, JSON.stringify(subscriptions.map(s => s.student_id).sort())],
-    queryFn: async () => {
-      if (subscriptions.length === 0) {
-        console.log('⚠️ No subscriptions, skipping student fetch');
-        return [];
-      }
-      
-      const studentIds = subscriptions.map(s => s.student_id);
-      console.log('👥 Attempting to fetch students with IDs:', studentIds);
-      
-      try {
-        // Try filtering by ID directly for each student
-        const studentPromises = studentIds.map(id => 
-          base44.entities.User.filter({ id: id })
-        );
-        
-        const studentArrays = await Promise.all(studentPromises);
-        const fetchedStudents = studentArrays.flat();
-        
-        console.log(`✅ Successfully fetched ${fetchedStudents.length} students`);
-        console.log('📋 Student details:', fetchedStudents.map(s => ({ id: s.id, name: s.full_name, email: s.email })));
-        
-        if (fetchedStudents.length === 0 && studentIds.length > 0) {
-          console.error('❌ ISSUE: Subscriptions exist but no students found!');
-          console.log('🔍 Trying alternative: list all users...');
-          
-          // Fallback: list all users
-          const allUsers = await base44.entities.User.list();
-          console.log(`📊 Total users in system: ${allUsers.length}`);
-          
-          const matched = allUsers.filter(u => studentIds.includes(u.id));
-          console.log(`🎯 Matched ${matched.length} students from all users`);
-          
-          return matched;
-        }
-        
-        return fetchedStudents;
-      } catch (error) {
-        console.error('❌ Error fetching students:', error);
-        throw error;
-      }
-    },
-    enabled: subscriptions.length > 0,
-    refetchOnMount: true,
-    staleTime: 0,
-    retry: 3,
-  });
+  // Match students from cached users - THIS IS THE KEY FIX
+  const students = React.useMemo(() => {
+    if (subscriptions.length === 0 || allUsers.length === 0) {
+      console.log('⚠️ No matching conditions:', { subs: subscriptions.length, users: allUsers.length });
+      return [];
+    }
+    
+    const studentIds = subscriptions.map(s => s.student_id);
+    console.log('🎯 Matching student IDs:', studentIds);
+    
+    const matched = allUsers.filter(u => studentIds.includes(u.id));
+    console.log(`✅ Matched ${matched.length} students from ${allUsers.length} cached users`);
+    console.log('📋 Matched student details:', matched.map(s => ({ id: s.id, name: s.full_name, email: s.email })));
+    
+    setDebugInfo({
+      mentorProfileId: mentorProfile?.id,
+      totalInDb: allSubscriptions.length,
+      forThisMentor: subscriptions.length,
+      active: subscriptions.length,
+      subscriptions: subscriptions,
+      studentIds: studentIds,
+      allUserCount: allUsers.length,
+      matchedStudents: matched.length
+    });
+    
+    return matched;
+  }, [subscriptions, allUsers, allSubscriptions, mentorProfile]);
 
   const { data: allTasks = [] } = useQuery({
     queryKey: ['mentor-tasks', mentorProfile?.id],
@@ -225,18 +206,19 @@ export default function MentorDashboard() {
   const handleRefresh = async () => {
     console.log('🔄 Manual refresh triggered');
     await refetchSubscriptions();
-    queryClient.invalidateQueries(['my-students']);
+    queryClient.invalidateQueries(['all-users-cache']);
     queryClient.invalidateQueries(['mentor-tasks']);
     queryClient.invalidateQueries(['debug-all-subscriptions']);
   };
 
   useEffect(() => {
-    if (subscriptions.length > 0 && students.length === 0 && !studentsLoading) {
-      console.warn('⚠️⚠️⚠️ ALERT: Subscriptions exist but no students loaded!');
+    if (subscriptions.length > 0 && students.length === 0 && allUsers.length > 0) {
+      console.warn('⚠️⚠️⚠️ ALERT: Subscriptions exist but no students matched!');
       console.log('Subscription student IDs:', subscriptions.map(s => s.student_id));
-      console.log('Students loaded:', students);
+      console.log('All user IDs in cache:', allUsers.map(u => u.id));
+      console.log('Students matched:', students);
     }
-  }, [subscriptions, students, studentsLoading]);
+  }, [subscriptions, students, allUsers]);
 
   const totalRevenue = subscriptions.reduce((sum, sub) => sum + sub.amount, 0);
   const monthlyRevenue = totalRevenue * 0.7;
@@ -354,15 +336,9 @@ export default function MentorDashboard() {
                   <div>Mentor Profile ID: <span className="font-mono font-bold">{mentorProfile.id}</span></div>
                   <div>Active Subscriptions: <span className="font-bold">{subscriptions.length}</span></div>
                   <div>Students Loaded: <span className={students.length === 0 && subscriptions.length > 0 ? "font-bold text-red-600" : "font-bold text-green-600"}>{students.length}</span></div>
-                  <div>Students Loading: <span className="font-bold">{studentsLoading ? "YES" : "NO"}</span></div>
-                  <div>Students Error: <span className="font-bold">{studentsError ? "YES" : "NO"}</span></div>
+                  <div>Cached Users: <span className="font-bold">{allUsers.length}</span></div>
                   <div>Total Subs in DB: <span className="font-bold">{allSubscriptions.length}</span></div>
                 </div>
-                {studentsError && (
-                  <div className="p-2 bg-red-100 border border-red-300 rounded text-red-800">
-                    <strong>Error:</strong> {studentsError.message}
-                  </div>
-                )}
                 {debugInfo && (
                   <div className="mt-2 p-2 bg-white border border-yellow-300 rounded max-h-64 overflow-y-auto">
                     <div className="font-semibold mb-1">Query Results:</div>
