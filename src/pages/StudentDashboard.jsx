@@ -58,21 +58,18 @@ export default function StudentDashboard() {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentSuccess = urlParams.get('payment_success');
 
-    if (paymentSuccess === 'true') {
+    if (paymentSuccess === 'true' && user) {
+      console.log('Payment success detected, activating subscription...');
       setShowSuccessAlert(true);
+      
+      // Clean URL
       window.history.replaceState({}, '', window.location.pathname);
       
-      // Auto-activate any pending subscriptions
-      const pendingSubs = await base44.entities.Subscription.filter({ 
-        student_id: user.id, 
-        status: "pending" 
-      });
-      
-      for (const sub of pendingSubs) {
-        await base44.entities.Subscription.update(sub.id, { status: 'active' });
-      }
-      
-      queryClient.invalidateQueries(['my-subscriptions']);
+      // Wait a moment for webhook to process, then refresh data
+      setTimeout(() => {
+        queryClient.invalidateQueries(['my-subscriptions']);
+        console.log('Refreshed subscription data after payment');
+      }, 2000);
     }
   };
 
@@ -279,9 +276,7 @@ export default function StudentDashboard() {
             <div className="flex items-center justify-between mb-2">
               <MessageSquare className="w-6 h-6 text-gray-400" />
             </div>
-            <div className="text-2xl font-bold mb-1 text-[#0D3B33]">
-              {activeSub.status === "active" ? "Active" : "Pending"}
-            </div>
+            <div className="text-2xl font-bold mb-1 text-[#0D3B33]">{activeSub.status === "active" ? "Active" : "Pending"}</div>
             <div className="text-xs text-gray-600">Mentorship Status</div>
           </div>
 

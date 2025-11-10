@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -87,30 +88,38 @@ export default function MentorDashboard() {
     }
   };
 
-  // Fetch active subscriptions for this mentor
+  // Fetch active subscriptions for this mentor with aggressive refetching
   const { data: subscriptions = [], refetch: refetchSubscriptions, isFetching: isFetchingSubscriptions } = useQuery({
     queryKey: ['mentor-subscriptions', mentorProfile?.id],
     queryFn: async () => {
+      if (!mentorProfile?.id) return [];
       const subs = await base44.entities.Subscription.filter({ 
         mentor_profile_id: mentorProfile.id,
         status: "active"
       });
+      console.log(`Fetched ${subs.length} active subscriptions for mentor ${mentorProfile.id}`);
       return subs;
     },
-    enabled: !!mentorProfile,
-    refetchInterval: 5000,
+    enabled: !!mentorProfile?.id,
+    refetchInterval: 3000, // Poll every 3 seconds
     refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    staleTime: 0, // Always consider data stale
   });
 
-  // Fetch student users based on subscriptions
+  // Fetch student users based on subscriptions with proper dependency
   const { data: students = [] } = useQuery({
-    queryKey: ['my-students', subscriptions.map(s => s.student_id).sort().join(',')],
+    queryKey: ['my-students', JSON.stringify(subscriptions.map(s => s.student_id).sort())],
     queryFn: async () => {
       if (subscriptions.length === 0) return [];
+      const studentIds = subscriptions.map(s => s.student_id);
       const allUsers = await base44.entities.User.list();
-      return allUsers.filter(u => subscriptions.some(s => s.student_id === u.id));
+      const filteredStudents = allUsers.filter(u => studentIds.includes(u.id));
+      console.log(`Fetched ${filteredStudents.length} students for ${studentIds.length} subscriptions`);
+      return filteredStudents;
     },
-    enabled: subscriptions.length > 0
+    enabled: subscriptions.length > 0,
+    refetchOnMount: true,
   });
 
   const { data: allTasks = [] } = useQuery({
@@ -135,8 +144,10 @@ export default function MentorDashboard() {
   };
 
   const handleRefresh = async () => {
+    console.log('Manual refresh triggered');
     await refetchSubscriptions();
     queryClient.invalidateQueries(['my-students']);
+    queryClient.invalidateQueries(['mentor-tasks']);
   };
 
   const totalRevenue = subscriptions.reduce((sum, sub) => sum + sub.amount, 0);
@@ -244,6 +255,10 @@ export default function MentorDashboard() {
                 Mentor Dashboard
               </h1>
               <p className="text-gray-600 text-sm">Manage your students and track your mentorship</p>
+              {/* Debug info - remove in production */}
+              <p className="text-xs text-gray-400 mt-1">
+                Active subscriptions: {subscriptions.length} | Students loaded: {students.length}
+              </p>
             </div>
             <Button
               variant="outline"

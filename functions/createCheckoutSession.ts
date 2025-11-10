@@ -66,6 +66,8 @@ Deno.serve(async (req) => {
       months_remaining: monthsRemaining
     });
 
+    console.log('Created pending subscription:', subscription.id);
+
     // Get or create Stripe customer
     let customerId = user.stripe_customer_id;
     if (!customerId) {
@@ -83,6 +85,8 @@ Deno.serve(async (req) => {
       await base44.asServiceRole.entities.User.update(user.id, {
         stripe_customer_id: customerId
       });
+      
+      console.log('Created Stripe customer:', customerId);
     }
 
     // Setup checkout session configuration
@@ -130,8 +134,11 @@ Deno.serve(async (req) => {
       mode = 'payment';
     }
 
-    // Determine origin for redirect URLs
-    const origin = new URL(req.url).origin;
+    // Determine origin for redirect URLs - use the request origin
+    const requestUrl = new URL(req.url);
+    const origin = requestUrl.origin;
+
+    console.log('Creating checkout session with origin:', origin);
 
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
@@ -148,6 +155,8 @@ Deno.serve(async (req) => {
       },
       ...(subscriptionData && { subscription_data: subscriptionData }),
     });
+
+    console.log('Created checkout session:', session.id);
 
     // Update subscription with checkout session ID
     await base44.asServiceRole.entities.Subscription.update(subscription.id, {
