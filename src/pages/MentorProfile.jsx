@@ -114,10 +114,11 @@ export default function MentorProfile() {
       const endDate = new Date();
       endDate.setMonth(endDate.getMonth() + 12);
 
-      await base44.entities.Subscription.create({
+      // Create subscription with correct IDs
+      const newSubscription = await base44.entities.Subscription.create({
         student_id: user.id,
         mentor_id: mentor.user_id,
-        mentor_profile_id: mentor.id,
+        mentor_profile_id: mentor.id, // Use the actual mentor profile ID, not user_id
         plan_type: planType,
         amount: amount,
         status: "pending",
@@ -125,6 +126,12 @@ export default function MentorProfile() {
         end_date: endDate.toISOString().split('T')[0],
         months_remaining: 12,
         stripe_subscription_id: `test_${Date.now()}_${user.id}`
+      });
+
+      // Update mentor's total_students count
+      const currentCount = mentor.total_students || 0;
+      await base44.entities.MentorProfile.update(mentor.id, {
+        total_students: currentCount + 1
       });
 
       // Use test Stripe links - subscription will be activated on return
