@@ -1,154 +1,140 @@
-import Stripe from 'npm:stripe@16.14.0';
-import { createClientFromRequest } from 'npm:@base44/sdk@0.7.1';
+import Stripe from 'npm:stripe@17.5.0';
+import { createClient } from 'npm:@base44/sdk@0.7.1';
 
-const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"), { apiVersion: '2024-11-20.acacia' });
-const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
+const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
+const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
 
 Deno.serve(async (req) => {
+  const signature = req.headers.get('stripe-signature');
+  
+  if (!signature) {
+    return Response.json({ error: 'No signature' }, { status: 400 });
+  }
+
   try {
-    const signature = req.headers.get('stripe-signature');
-    if (!signature) {
-      return Response.json({ error: 'No signature' }, { status: 400 });
-    }
-
     const body = await req.text();
-    
-    // Verify webhook signature
-    let event;
-    try {
-      event = await stripe.webhooks.constructEventAsync(
-        body,
-        signature,
-        webhookSecret
-      );
-    } catch (err) {
-      console.error('Webhook signature verification failed:', err.message);
-      return Response.json({ error: 'Invalid signature' }, { status: 400 });
-    }
+    const event = await stripe.webhooks.constructEventAsync(
+      body,
+      signature,
+      webhookSecret
+    );
 
-    // Initialize Base44 client with service role for admin operations
-    const base44 = createClientFromRequest(req);
-    
-    console.log('Webhook event type:', event.type);
+    // Initialize Base44 client
+    const base44 = createClient({
+      appId: Deno.env.get('BASE44_APP_ID'),
+      serviceRoleKey: Deno.env.get('BASE44_SERVICE_ROLE_KEY'),
+    });
+
+    console.log('Webhook event:', event.type);
 
     // Handle checkout completion
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
-      console.log('Checkout session completed:', session.id);
-      console.log('Session metadata:', session.metadata);
+      const { subscription_id, student_id, mentor_profile_id } = session.metadata;
 
-      const subscriptionId = session.metadata.subscription_id;
-      const userId = session.metadata.user_id;
-      const mentorProfileId = session.metadata.mentor_profile_id;
-      const stripeSubscriptionId = session.subscription;
-
-      if (!subscriptionId) {
-        console.error('No subscription_id in metadata');
-        return Response.json({ error: 'Missing subscription_id' }, { status: 400 });
-      }
-
-      // Update the subscription to active
-      try {
-        await base44.asServiceRole.entities.Subscription.update(subscriptionId, {
+      if (subscription_id) {
+        // Activate the subscription
+        await base44.entities.Subscription.update(subscription_id, {
           status: 'active',
-          stripe_subscription_id: stripeSubscriptionId || session.id
+          stripe_subscription_id: session.subscription || session.payment_intent
         });
-        console.log('Subscription activated:', subscriptionId);
 
-        // Update mentor's total students count
-        if (mentorProfileId) {
-          const mentorProfiles = await base44.asServiceRole.entities.MentorProfile.filter({ id: mentorProfileId });
-          if (mentorProfiles.length > 0) {
-            const mentor = mentorProfiles[0];
-            await base44.asServiceRole.entities.MentorProfile.update(mentorProfileId, {
-              total_students: (mentor.total_students || 0) + 1
-            });
-            console.log('Mentor student count updated');
-          }
+        // Get mentor profile to find mentor user
+        const mentorProfiles = await base44.entities.MentorProfile.filter({ id: mentor_profile_id });
+        if (mentorProfiles.length > 0) {
+          const mentorProfile = mentorProfiles[0];
+          
+          // Count active students for this mentor
+          const activeSubscriptions = await base44.entities.Subscription.filter({
+            mentor_profile_id: mentor_profile_id,
+            status: 'active'
+          });
+          
+          // Update mentor profile student count
+          await base44.entities.MentorProfile.update(mentor_profile_id, {
+            total_students: activeSubscriptions.length
+          });
+
+          // Create notification for student
+          await base44.entities.Notification.create({
+            user_id: student_id,
+            type: 'subscription',
+            title: 'Mentorship Activated!',
+            message: 'Your mentorship has been activated. Start chatting with your mentor now!',
+            link: '/StudentDashboard'
+          });
+
+          // Create notification for mentor
+          await base44.entities.Notification.create({
+            user_id: mentorProfile.user_id,
+            type: 'subscription',
+            title: 'New Student!',
+            message: 'You have a new student. Check your dashboard to get started!',
+            link: '/MentorDashboard'
+          });
         }
 
-        // Send notification to student
-        await base44.asServiceRole.entities.Notification.create({
-          user_id: userId,
-          type: 'subscription',
-          title: 'Mentorship Activated!',
-          message: 'Your mentorship subscription is now active. Start chatting with your mentor!',
-          link: '/StudentDashboard'
-        });
-
-      } catch (error) {
-        console.error('Error updating subscription:', error);
-        return Response.json({ error: 'Failed to update subscription' }, { status: 500 });
+        console.log('Subscription activated:', subscription_id);
       }
     }
 
-    // Handle subscription created
+    // Handle subscription lifecycle events
     if (event.type === 'customer.subscription.created') {
       const subscription = event.data.object;
-      console.log('Subscription created:', subscription.id);
-      console.log('Subscription metadata:', subscription.metadata);
-
-      const subscriptionId = subscription.metadata.subscription_id;
-      if (subscriptionId) {
-        await base44.asServiceRole.entities.Subscription.update(subscriptionId, {
+      const { subscription_id } = subscription.metadata;
+      
+      if (subscription_id) {
+        await base44.entities.Subscription.update(subscription_id, {
           stripe_subscription_id: subscription.id,
           status: 'active'
         });
-        console.log('Subscription status updated to active');
       }
     }
 
-    // Handle subscription updated
     if (event.type === 'customer.subscription.updated') {
       const subscription = event.data.object;
-      console.log('Subscription updated:', subscription.id);
+      const { subscription_id } = subscription.metadata;
       
-      const subscriptionId = subscription.metadata.subscription_id;
-      if (subscriptionId) {
-        let status = 'active';
-        if (subscription.status === 'canceled' || subscription.cancel_at_period_end) {
-          status = 'cancelled';
-        }
-        
-        await base44.asServiceRole.entities.Subscription.update(subscriptionId, {
-          status: status
+      if (subscription_id && subscription.status === 'active') {
+        await base44.entities.Subscription.update(subscription_id, {
+          status: 'active'
         });
-        console.log('Subscription status updated to:', status);
       }
     }
 
-    // Handle subscription deleted/cancelled
     if (event.type === 'customer.subscription.deleted') {
       const subscription = event.data.object;
-      console.log('Subscription deleted:', subscription.id);
+      const { subscription_id } = subscription.metadata;
       
-      const subscriptionId = subscription.metadata.subscription_id;
-      if (subscriptionId) {
-        await base44.asServiceRole.entities.Subscription.update(subscriptionId, {
+      if (subscription_id) {
+        await base44.entities.Subscription.update(subscription_id, {
           status: 'cancelled'
         });
-        console.log('Subscription marked as cancelled');
       }
     }
 
-    // Handle successful payment (monthly)
+    // Handle successful invoice payment (monthly billing)
     if (event.type === 'invoice.payment_succeeded') {
       const invoice = event.data.object;
-      const stripeSubscriptionId = invoice.subscription;
       
-      if (stripeSubscriptionId) {
-        const subscriptions = await base44.asServiceRole.entities.Subscription.filter({ 
-          stripe_subscription_id: stripeSubscriptionId 
-        });
+      if (invoice.subscription) {
+        const stripeSubscription = await stripe.subscriptions.retrieve(invoice.subscription);
+        const { subscription_id } = stripeSubscription.metadata;
         
-        if (subscriptions.length > 0) {
-          const sub = subscriptions[0];
-          const newMonthsRemaining = Math.max(0, (sub.months_remaining || 12) - 1);
-          
-          await base44.asServiceRole.entities.Subscription.update(sub.id, {
-            months_remaining: newMonthsRemaining
-          });
-          console.log('Payment processed, months remaining:', newMonthsRemaining);
+        if (subscription_id) {
+          const subscriptions = await base44.entities.Subscription.filter({ id: subscription_id });
+          if (subscriptions.length > 0) {
+            const sub = subscriptions[0];
+            
+            // Decrease remaining months by 1
+            const newMonthsRemaining = Math.max(0, (sub.months_remaining || 12) - 1);
+            await base44.entities.Subscription.update(subscription_id, {
+              months_remaining: newMonthsRemaining,
+              status: newMonthsRemaining > 0 ? 'active' : 'completed'
+            });
+            
+            console.log(`Updated subscription ${subscription_id}: ${newMonthsRemaining} months remaining`);
+          }
         }
       }
     }
@@ -156,27 +142,24 @@ Deno.serve(async (req) => {
     // Handle failed payment
     if (event.type === 'invoice.payment_failed') {
       const invoice = event.data.object;
-      console.log('Payment failed for invoice:', invoice.id);
       
       // Send notification to customer
-      const customer = await stripe.customers.retrieve(invoice.customer);
-      if (customer.email) {
-        await base44.asServiceRole.integrations.Core.SendEmail({
-          to: customer.email,
-          subject: 'Payment Failed - IvyBridge',
-          body: 'Your payment has failed. Please update your payment method to continue your mentorship.'
-        });
-      }
+      await base44.integrations.Core.SendEmail({
+        to: invoice.customer_email,
+        subject: 'Payment Failed - IvyBridge',
+        body: 'Your recent payment failed. Please update your payment method to continue your mentorship.'
+      });
+      
+      console.log('Payment failed notification sent to:', invoice.customer_email);
     }
 
-    // Handle Connect account updates
+    // Handle Stripe Connect events
     if (event.type === 'account.updated') {
-      console.log('Stripe Connect account updated');
+      console.log('Stripe Connect account updated:', event.data.object.id);
     }
 
-    // Handle payout events
     if (event.type === 'payout.paid') {
-      console.log('Payout paid:', event.data.object.id);
+      console.log('Payout successful:', event.data.object.id);
     }
 
     if (event.type === 'payout.failed') {
@@ -187,8 +170,9 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('Webhook error:', error);
-    return Response.json({ 
-      error: error.message 
-    }, { status: 500 });
+    return Response.json(
+      { error: error.message },
+      { status: 400 }
+    );
   }
 });
