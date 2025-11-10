@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // Card, CardContent, CardHeader, CardTitle are no longer used for main layout but might be used by children components, so keep them.
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -17,13 +16,14 @@ import {
   Clock,
   AlertCircle,
   Plus,
-  ExternalLink
+  ExternalLink,
+  RefreshCw
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import ChatBox from "../components/dashboard/ChatBox";
 import CreateTaskDialog from "../components/dashboard/CreateTaskDialog";
-import CreateProgressNoteDialog from "../components/dashboard/CreateProgressNoteDialog"; // This component is imported but not used, still keep as per original file.
+import CreateProgressNoteDialog from "../components/dashboard/CreateProgressNoteDialog";
 import StudentCard from "../components/dashboard/StudentCard";
 
 export default function MentorDashboard() {
@@ -37,7 +37,7 @@ export default function MentorDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showTaskDialog, setShowTaskDialog] = useState(false);
-  const [showNoteDialog, setShowNoteDialog] = useState(false); // This state is not used, still keep as per original file.
+  const [showNoteDialog, setShowNoteDialog] = useState(false);
   const [connectingStripe, setConnectingStripe] = useState(false);
 
   useEffect(() => {
@@ -66,10 +66,13 @@ export default function MentorDashboard() {
     }
   };
 
-  const { data: subscriptions = [] } = useQuery({
+  // Add refetch interval to automatically check for new subscriptions
+  const { data: subscriptions = [], refetch: refetchSubscriptions, isFetching: isFetchingSubscriptions } = useQuery({
     queryKey: ['mentor-subscriptions', mentorProfile?.id],
     queryFn: () => base44.entities.Subscription.filter({ mentor_profile_id: mentorProfile.id, status: "active" }),
-    enabled: !!mentorProfile
+    enabled: !!mentorProfile,
+    refetchInterval: 5000, // Poll every 5 seconds for new subscriptions
+    refetchOnWindowFocus: true, // Refetch when window regains focus
   });
 
   const { data: students = [] } = useQuery({
@@ -101,6 +104,11 @@ export default function MentorDashboard() {
       alert('Failed to connect Stripe. Please try again.');
     }
     setConnectingStripe(false);
+  };
+
+  const handleRefresh = async () => {
+    await refetchSubscriptions();
+    queryClient.invalidateQueries(['my-students']);
   };
 
   const totalRevenue = subscriptions.reduce((sum, sub) => sum + sub.amount, 0);
@@ -203,10 +211,33 @@ export default function MentorDashboard() {
       <div className="w-full px-6 md:px-12 lg:px-24">
         {/* Header */}
         <div className="mb-6 border-b border-gray-200 pb-4">
-          <h1 className="text-2xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
-            Mentor Dashboard
-          </h1>
-          <p className="text-gray-600 text-sm">Manage your students and track your mentorship</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+                Mentor Dashboard
+              </h1>
+              <p className="text-gray-600 text-sm">Manage your students and track your mentorship</p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isFetchingSubscriptions}
+              className="rounded text-xs"
+            >
+              {isFetchingSubscriptions ? (
+                <>
+                  <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
+                  Refreshing...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-3 h-3 mr-1" />
+                  Refresh
+                </>
+              )}
+            </Button>
+          </div>
         </div>
 
         {/* Stripe Connect Success Alert */}
@@ -304,6 +335,7 @@ export default function MentorDashboard() {
                     <div className="text-center py-6 text-gray-500">
                       <Users className="w-10 h-10 mx-auto mb-2 opacity-30" />
                       <p className="text-sm">No students yet</p>
+                      <p className="text-xs mt-2">New subscriptions will appear here automatically</p>
                     </div>
                   ) : (
                     students.map(student => (
@@ -354,68 +386,76 @@ export default function MentorDashboard() {
 
           <TabsContent value="students">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {students.map(student => {
-                const subscription = subscriptions.find(s => s.student_id === student.id);
-                const studentTasks = allTasks.filter(t => t.student_id === student.id);
-                
-                return (
-                  <div key={student.id} className="bg-white border border-gray-200 rounded shadow-sm">
-                    <div className="p-4">
-                      <div className="flex items-center gap-3 mb-4">
-                        <Avatar className="w-12 h-12">
-                          <AvatarImage src={student.profile_photo_url} />
-                          <AvatarFallback className="bg-[#E6EFEA] text-lg text-[#0D3B33]">
-                            {student.full_name?.charAt(0) || 'S'}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-bold text-sm truncate">{student.full_name}</h3>
-                          <p className="text-xs text-gray-600 truncate">{student.email}</p>
+              {students.length === 0 ? (
+                <div className="col-span-full text-center py-12 text-gray-500">
+                  <Users className="w-16 h-16 mx-auto mb-4 opacity-30" />
+                  <p className="text-lg font-medium mb-2">No students yet</p>
+                  <p className="text-sm">When students subscribe to your mentorship, they'll appear here</p>
+                </div>
+              ) : (
+                students.map(student => {
+                  const subscription = subscriptions.find(s => s.student_id === student.id);
+                  const studentTasks = allTasks.filter(t => t.student_id === student.id);
+                  
+                  return (
+                    <div key={student.id} className="bg-white border border-gray-200 rounded shadow-sm">
+                      <div className="p-4">
+                        <div className="flex items-center gap-3 mb-4">
+                          <Avatar className="w-12 h-12">
+                            <AvatarImage src={student.profile_photo_url} />
+                            <AvatarFallback className="bg-[#E6EFEA] text-lg text-[#0D3B33]">
+                              {student.full_name?.charAt(0) || 'S'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-sm truncate">{student.full_name}</h3>
+                            <p className="text-xs text-gray-600 truncate">{student.email}</p>
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="space-y-2 mb-4">
-                        <div className="flex justify-between text-xs">
-                          <span className="text-gray-600">Plan</span>
-                          <Badge className="capitalize text-xs">{subscription?.plan_type}</Badge>
+                        <div className="space-y-2 mb-4">
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-600">Plan</span>
+                            <Badge className="capitalize text-xs">{subscription?.plan_type}</Badge>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-600">Tasks</span>
+                            <span className="font-medium">{studentTasks.length} assigned</span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-600">Months left</span>
+                            <span className="font-medium">{subscription?.months_remaining || 0}</span>
+                          </div>
                         </div>
-                        <div className="flex justify-between text-xs">
-                          <span className="text-gray-600">Tasks</span>
-                          <span className="font-medium">{studentTasks.length} assigned</span>
-                        </div>
-                        <div className="flex justify-between text-xs">
-                          <span className="text-gray-600">Months left</span>
-                          <span className="font-medium">{subscription?.months_remaining || 0}</span>
-                        </div>
-                      </div>
 
-                      <div className="flex gap-2">
-                        <Button 
-                          variant="outline" 
-                          className="flex-1 rounded text-xs h-8"
-                          onClick={() => {
-                            setSelectedStudent(student);
-                            setShowTaskDialog(true);
-                          }}
-                        >
-                          <Plus className="w-3 h-3 mr-1" />
-                          Task
-                        </Button>
-                        <Button 
-                          className="flex-1 btn-primary text-white rounded text-xs h-8"
-                          onClick={() => {
-                            setSelectedStudent(student);
-                            setActiveTab("chat");
-                          }}
-                        >
-                          <MessageSquare className="w-3 h-3 mr-1" />
-                          Chat
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline" 
+                            className="flex-1 rounded text-xs h-8"
+                            onClick={() => {
+                              setSelectedStudent(student);
+                              setShowTaskDialog(true);
+                            }}
+                          >
+                            <Plus className="w-3 h-3 mr-1" />
+                            Task
+                          </Button>
+                          <Button 
+                            className="flex-1 btn-primary text-white rounded text-xs h-8"
+                            onClick={() => {
+                              setSelectedStudent(student);
+                              setActiveTab("chat");
+                            }}
+                          >
+                            <MessageSquare className="w-3 h-3 mr-1" />
+                            Chat
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           </TabsContent>
 
