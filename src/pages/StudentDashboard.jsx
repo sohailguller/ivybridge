@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
-import { useQuery, useQueryClient } from "@tanstack/react-query"; // Removed useMutation
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,13 +23,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import ChatBox from "../components/dashboard/ChatBox";
 import TaskList from "../components/dashboard/TaskList";
 import ProgressTimeline from "../components/dashboard/ProgressTimeline";
-import {
-  // Dialog, // Dialog components are still used by ReviewDialog/ReportDialog internally, so Dialog import isn't strictly removed here
-  // DialogContent,
-  // DialogDescription,
-  // DialogHeader,
-  // DialogTitle,
-} from "@/components/ui/dialog";
 import ReviewDialog from "../components/dashboard/ReviewDialog";
 import ReportDialog from "../components/dashboard/ReportDialog";
 
@@ -41,9 +33,6 @@ export default function StudentDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  // Removed [checkingPayment, setCheckingPayment] state as per outline
-  // Removed [cancelDialogOpen, setCancelDialogOpen] state
-  // Removed [isCancelling, setIsCancelling] state
   const [showReviewDialog, setShowReviewDialog] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
 
@@ -65,32 +54,23 @@ export default function StudentDashboard() {
       setShowSuccessAlert(true);
       window.history.replaceState({}, '', window.location.pathname);
       
-      // Auto-activate any pending subscriptions
-      // This logic will only run if payment_success is in the URL and a user is loaded
-      if (user) {
-        const pendingSubs = await base44.entities.Subscription.filter({ 
-          student_id: user.id, 
-          status: "pending" 
-        });
-        
-        for (const sub of pendingSubs) {
-          await base44.entities.Subscription.update(sub.id, { status: 'active' });
-        }
-        
-        queryClient.invalidateQueries(['my-subscriptions']);
+      const pendingSubs = await base44.entities.Subscription.filter({ 
+        student_id: user.id, 
+        status: "pending" 
+      });
+      
+      for (const sub of pendingSubs) {
+        await base44.entities.Subscription.update(sub.id, { status: 'active' });
       }
-
-      // Removed setCheckingPayment and setTimeout logic as per outline
-      localStorage.removeItem('pending_subscription_id');
-      localStorage.removeItem('mentor_profile_id');
+      
+      queryClient.invalidateQueries(['my-subscriptions']);
     }
   };
 
   const loadUser = async () => {
     try {
       const currentUser = await base44.auth.me();
-
-      // Check redirects for wrong account types
+      
       if (currentUser.account_type === "mentor") {
         navigate(createPageUrl("MentorDashboard"), { replace: true });
         return;
@@ -99,67 +79,77 @@ export default function StudentDashboard() {
         navigate(createPageUrl("AdminDashboard"), { replace: true });
         return;
       }
-
-      // Set user and stop loading
+      
       setUser(currentUser);
-      setIsLoading(false);
     } catch (error) {
       console.error("Auth error:", error);
-      setIsLoading(false); // Ensure loading state is false on error too
       base44.auth.redirectToLogin();
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Check for both active AND pending subscriptions (now just filters all)
   const { data: subscriptions = [], isLoading: subsLoading } = useQuery({
     queryKey: ['my-subscriptions', user?.id],
     queryFn: async () => {
-      // Modified queryFn to fetch all subscriptions for the student
+      if (!user?.id) return [];
       const subs = await base44.entities.Subscription.filter({ student_id: user.id });
-      return subs;
+      return subs || [];
     },
-    enabled: !!user,
-    // Removed refetchInterval as checkingPayment state is removed
+    enabled: !!user?.id,
+    staleTime: 10000,
+    refetchOnWindowFocus: true,
   });
 
-  const { data: mentorProfiles = [] } = useQuery({
-    queryKey: ['subscription-mentors'],
+  const activeSub = subscriptions.find(s => s.status === "active");
+
+  const { data: mentorProfiles = [], isLoading: profilesLoading } = useQuery({
+    queryKey: ['subscription-mentor-profiles', activeSub?.id],
     queryFn: async () => {
-      if (subscriptions.length === 0) return [];
-      const profiles = await base44.entities.MentorProfile.list();
-      // This will now match against all fetched subscriptions, not just active/pending implicitly from subscriptions[0]
-      return profiles.filter(p => subscriptions.some(s => s.mentor_profile_id === p.id));
+      if (!activeSub?.mentor_profile_id) return [];
+      const profiles = await base44.entities.MentorProfile.filter({ id: activeSub.mentor_profile_id });
+      return profiles || [];
     },
-    enabled: subscriptions.length > 0
+    enabled: !!activeSub?.mentor_profile_id,
+    staleTime: 30000,
   });
 
-  const { data: mentorUsers = [] } = useQuery({
-    queryKey: ['mentor-user-data'],
+  const mentor = mentorProfiles[0];
+
+  const { data: mentorUsers = [], isLoading: usersLoading } = useQuery({
+    queryKey: ['mentor-user-data', mentor?.user_id],
     queryFn: async () => {
-      if (mentorProfiles.length === 0) return [];
-      const users = await base44.entities.User.list();
-      return users.filter(u => mentorProfiles.some(p => p.user_id === u.id));
+      if (!mentor?.user_id) return [];
+      const users = await base44.entities.User.filter({ id: mentor.user_id });
+      return users || [];
     },
-    enabled: mentorProfiles.length > 0
+    enabled: !!mentor?.user_id,
+    staleTime: 30000,
   });
+
+  const mentorUser = mentorUsers[0];
 
   const { data: tasks = [] } = useQuery({
     queryKey: ['my-tasks', user?.id],
-    queryFn: () => base44.entities.Task.filter({ student_id: user.id }),
-    enabled: !!user
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const result = await base44.entities.Task.filter({ student_id: user.id });
+      return result || [];
+    },
+    enabled: !!user?.id,
+    staleTime: 10000,
   });
 
   const { data: progressNotes = [] } = useQuery({
     queryKey: ['my-progress', user?.id],
-    queryFn: () => base44.entities.ProgressNote.filter({ student_id: user.id }),
-    enabled: !!user
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const result = await base44.entities.ProgressNote.filter({ student_id: user.id });
+      return result || [];
+    },
+    enabled: !!user?.id,
+    staleTime: 10000,
   });
-
-  // activeSub now explicitly refers to an active subscription as per outline
-  const activeSub = subscriptions.find(s => s.status === "active");
-  const pendingSub = subscriptions.find(s => s.status === "pending"); // Keep separate check for pending alert if needed
-  const mentor = mentorProfiles.find(p => p.id === activeSub?.mentor_profile_id);
-  const mentorUser = mentorUsers.find(u => u.id === mentor?.user_id);
 
   const { data: myReview } = useQuery({
     queryKey: ['my-review', activeSub?.id],
@@ -169,17 +159,14 @@ export default function StudentDashboard() {
         subscription_id: activeSub.id,
         student_id: user.id
       });
-      return reviews[0];
+      return reviews[0] || null;
     },
-    enabled: !!activeSub && !!user
+    enabled: !!activeSub && !!user,
   });
-
-  // Removed cancelSubscriptionMutation and handleCancelSubscription as per outline
 
   const pendingTasks = tasks.filter(t => t.status === "pending" || t.status === "in_progress");
   const completedTasks = tasks.filter(t => t.status === "completed");
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -191,7 +178,6 @@ export default function StudentDashboard() {
     );
   }
 
-  // No user after loading - shouldn't happen, but safety check
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -212,8 +198,7 @@ export default function StudentDashboard() {
     );
   }
 
-  // Loading subscriptions
-  if (subsLoading) {
+  if (subsLoading || profilesLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -224,11 +209,6 @@ export default function StudentDashboard() {
     );
   }
 
-  // Removed "Show processing state while waiting for webhook" block as per outline changes
-  // The auto-activation in checkPaymentSuccess should make this transient or handled differently.
-
-  // No active subscription found - now explicitly checks for activeSub as per outline
-  // If only pending subscriptions exist, this block will be triggered.
   if (!activeSub || !mentor) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -258,7 +238,6 @@ export default function StudentDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-24">
-        {/* Success Alert */}
         {showSuccessAlert && (
           <Alert className="mb-6 border-green-200 bg-green-50">
             <AlertDescription className="text-green-800 flex items-center gap-2 text-sm">
@@ -270,18 +249,6 @@ export default function StudentDashboard() {
           </Alert>
         )}
 
-        {/* Pending Subscription Alert - now based on pendingSub */}
-        {pendingSub?.status === "pending" && (
-          <Alert className="mb-6 border-yellow-200 bg-yellow-50">
-            <AlertDescription className="text-yellow-800 flex items-center gap-2 text-sm">
-              <Clock className="w-4 h-4" />
-              <span>Your subscription is being processed. Full access will be available shortly.</span>
-            </AlertDescription>
-          </Alert>
-        )}
-        {/* Removed activeSub?.status === "cancelled" alert */}
-
-        {/* Header */}
         <div className="mb-6 border-b border-gray-200 pb-4">
           <h1 className="text-2xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
             Welcome back, {user?.full_name?.split(' ')[0] || 'Student'}!
@@ -289,7 +256,6 @@ export default function StudentDashboard() {
           <p className="text-gray-600 text-sm">Track your progress and stay connected with your mentor</p>
         </div>
 
-        {/* Quick Stats */}
         <div className="grid md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white border-l-4 border-l-[#FE6C3A] border border-gray-200 rounded shadow-sm p-4">
             <div className="flex items-center justify-between mb-2">
@@ -311,9 +277,7 @@ export default function StudentDashboard() {
             <div className="flex items-center justify-between mb-2">
               <MessageSquare className="w-6 h-6 text-gray-400" />
             </div>
-            <div className="text-2xl font-bold mb-1 text-[#0D3B33]">
-              {activeSub.status === "active" ? "Active" : "Pending"}
-            </div>
+            <div className="text-2xl font-bold mb-1 text-[#0D3B33]">Active</div>
             <div className="text-xs text-gray-600">Mentorship Status</div>
           </div>
 
@@ -326,19 +290,20 @@ export default function StudentDashboard() {
           </div>
         </div>
 
-        {/* Mentor Info Card */}
         <div className="bg-white border border-gray-200 rounded shadow-sm mb-6 p-6">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <Avatar className="w-16 h-16">
                 <AvatarImage src={mentor.profile_photo_url || mentorUser?.profile_photo_url} />
                 <AvatarFallback className="bg-[#E6EFEA] text-xl text-[#0D3B33]">
-                  {mentorUser?.full_name?.charAt(0) || '?'}
+                  {mentorUser?.full_name?.charAt(0) || usersLoading ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#0D3B33]" /> : '?'}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <h3 className="text-lg font-bold text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>Your Mentor</h3>
-                <p className="text-base text-gray-700 mb-1">{mentorUser?.full_name || 'Loading...'}</p>
+                <p className="text-base text-gray-700 mb-1">
+                  {usersLoading ? <Skeleton className="h-5 w-32" /> : (mentorUser?.full_name || 'Loading...')}
+                </p>
                 <div className="flex items-center gap-2 text-xs text-gray-600">
                   <Badge className="bg-[#E6EFEA] text-[#0D3B33] border-0 text-xs">
                     {mentor.university}
@@ -370,18 +335,17 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Subscription Management */}
           <div className="mt-4 pt-4 border-t border-gray-200">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
                 <p className="text-sm font-medium text-gray-700">Subscription Plan</p>
                 <p className="text-base font-bold capitalize text-[#0D3B33]">{activeSub.plan_type} Plan</p>
                 <p className="text-xs text-gray-500">
-                  {activeSub.status === "active" ? `${activeSub.months_remaining} months remaining • Non-cancellable` : "Subscription pending activation"}
+                  {activeSub.months_remaining} months remaining • Non-cancellable
                 </p>
               </div>
               <div className="flex gap-2 flex-wrap">
-                {activeSub.status === "active" && !myReview && (
+                {!myReview && (
                   <Button
                     variant="outline"
                     size="sm"
@@ -401,13 +365,11 @@ export default function StudentDashboard() {
                   <AlertCircle className="w-3 h-3 mr-1" />
                   Report Issue
                 </Button>
-                {/* Removed Cancel Subscription Button */}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-white border border-gray-200 rounded p-1 shadow-sm">
             <TabsTrigger value="overview" className="rounded data-[state=active]:bg-[#FE6C3A] data-[state=active]:text-white text-sm">
@@ -475,13 +437,20 @@ export default function StudentDashboard() {
 
           <TabsContent value="chat">
             <div className="bg-white border border-gray-200 rounded shadow-sm">
-              <ChatBox
-                currentUserId={user.id}
-                otherUserId={mentor.user_id}
-                otherUserName={mentorUser?.full_name}
-                otherUserPhoto={mentor.profile_photo_url || mentorUser?.profile_photo_url}
-                subscriptionId={activeSub.id}
-              />
+              {mentorUser ? (
+                <ChatBox
+                  currentUserId={user.id}
+                  otherUserId={mentor.user_id}
+                  otherUserName={mentorUser.full_name}
+                  otherUserPhoto={mentor.profile_photo_url || mentorUser.profile_photo_url}
+                  subscriptionId={activeSub.id}
+                />
+              ) : (
+                <div className="p-12 text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FE6C3A] mx-auto mb-4"></div>
+                  <p className="text-gray-600">Loading chat...</p>
+                </div>
+              )}
             </div>
           </TabsContent>
 
@@ -519,12 +488,8 @@ export default function StudentDashboard() {
                       <p className="text-sm text-gray-600">Current Plan</p>
                       <p className="text-xl font-bold capitalize text-[#0D3B33]">{activeSub.plan_type}</p>
                     </div>
-                    <Badge className={`${
-                      activeSub.status === "active" ? "bg-green-100 text-green-800" :
-                      activeSub.status === "pending" ? "bg-yellow-100 text-yellow-800" :
-                      "bg-red-100 text-red-800"
-                    }`}>
-                      {activeSub.status}
+                    <Badge className="bg-green-100 text-green-800">
+                      active
                     </Badge>
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-sm">
@@ -577,9 +542,6 @@ export default function StudentDashboard() {
         </Tabs>
       </div>
 
-      {/* Removed Cancel Subscription Dialog */}
-
-      {/* Review Dialog */}
       <ReviewDialog
         open={showReviewDialog}
         onOpenChange={setShowReviewDialog}
@@ -590,7 +552,6 @@ export default function StudentDashboard() {
         onReviewSubmitted={() => queryClient.invalidateQueries(['my-review', activeSub?.id])}
       />
 
-      {/* Report Dialog */}
       <ReportDialog
         open={showReportDialog}
         onOpenChange={setShowReportDialog}

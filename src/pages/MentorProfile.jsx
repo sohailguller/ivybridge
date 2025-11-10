@@ -55,22 +55,24 @@ export default function MentorProfile() {
     }
   };
 
-  const { data: mentor, isLoading } = useQuery({
+  const { data: mentor, isLoading: mentorLoading } = useQuery({
     queryKey: ['mentor-profile', mentorId],
     queryFn: async () => {
       const profiles = await base44.entities.MentorProfile.filter({ id: mentorId });
-      return profiles[0];
+      return profiles[0] || null;
     },
-    enabled: !!mentorId
+    enabled: !!mentorId,
+    staleTime: 30000,
   });
 
-  const { data: mentorUser } = useQuery({
+  const { data: mentorUser, isLoading: userLoading } = useQuery({
     queryKey: ['mentor-user', mentor?.user_id],
     queryFn: async () => {
       const users = await base44.entities.User.filter({ id: mentor.user_id });
-      return users[0];
+      return users[0] || null;
     },
-    enabled: !!mentor?.user_id
+    enabled: !!mentor?.user_id,
+    staleTime: 30000,
   });
 
   const { data: reviews = [] } = useQuery({
@@ -80,9 +82,10 @@ export default function MentorProfile() {
         mentor_profile_id: mentorId,
         is_published: true
       }, '-created_date');
-      return allReviews;
+      return allReviews || [];
     },
-    enabled: !!mentorId
+    enabled: !!mentorId,
+    staleTime: 30000,
   });
 
   const { data: reviewStudents = [] } = useQuery({
@@ -91,9 +94,10 @@ export default function MentorProfile() {
       if (reviews.length === 0) return [];
       const studentIds = [...new Set(reviews.map(r => r.student_id))];
       const users = await base44.entities.User.list();
-      return users.filter(u => studentIds.includes(u.id));
+      return users.filter(u => studentIds.includes(u.id)) || [];
     },
-    enabled: reviews.length > 0
+    enabled: reviews.length > 0,
+    staleTime: 30000,
   });
 
   const handleSubscribe = async (planType, amount) => {
@@ -191,6 +195,8 @@ export default function MentorProfile() {
     }
   ];
 
+  const isLoading = mentorLoading || userLoading;
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#FAFAFA] py-12">
@@ -266,7 +272,7 @@ export default function MentorProfile() {
               <Avatar className="w-36 h-36 border-4 border-white shadow-lg">
                 <AvatarImage src={mentor.profile_photo_url || mentorUser?.profile_photo_url} />
                 <AvatarFallback className="bg-[#E6EFEA] text-5xl text-[#0D3B33]">
-                  {mentorUser?.full_name?.charAt(0) || '?'}
+                  {userLoading ? <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0D3B33]" /> : (mentorUser?.full_name?.charAt(0) || '?')}
                 </AvatarFallback>
               </Avatar>
             </div>
@@ -274,7 +280,7 @@ export default function MentorProfile() {
             {/* Name and Info */}
             <div className="mb-4">
               <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
-                {mentorUser?.full_name || 'Loading...'}
+                {userLoading ? <Skeleton className="h-9 w-48" /> : (mentorUser?.full_name || 'Loading...')}
               </h1>
               <div className="flex items-center gap-2 text-gray-600 mb-3">
                 <GraduationCap className="w-5 h-5" />

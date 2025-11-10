@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -33,34 +32,31 @@ export default function BrowseMentors() {
   const [universityFilter, setUniversityFilter] = useState("all");
   const [majorFilter, setMajorFilter] = useState("all");
 
-  const { data: mentors = [], isLoading, error } = useQuery({
+  // Fetch approved mentors
+  const { data: mentors = [], isLoading: mentorsLoading, error: mentorsError } = useQuery({
     queryKey: ['approved-mentors'],
     queryFn: async () => {
-      try {
-        return await base44.entities.MentorProfile.filter({ verification_status: "approved" });
-      } catch (err) {
-        console.error("Error fetching mentors:", err);
-        throw err;
-      }
+      const result = await base44.entities.MentorProfile.filter({ verification_status: "approved" });
+      return result || [];
     },
+    staleTime: 30000,
+    refetchOnWindowFocus: false,
   });
 
-  const { data: users = [] } = useQuery({
-    queryKey: ['all-users'], // Changed from 'mentor-users' to 'all-users'
+  // Fetch ALL users in one query (not filtered)
+  const { data: allUsers = [], isLoading: usersLoading } = useQuery({
+    queryKey: ['all-users-for-browse'],
     queryFn: async () => {
-      try {
-        return await base44.entities.User.list();
-      } catch (err) {
-        console.error("Error fetching users:", err);
-        return [];
-      }
+      const result = await base44.entities.User.list();
+      return result || [];
     },
-    // Removed enabled: mentors.length > 0
+    enabled: mentors.length > 0,
+    staleTime: 30000,
+    refetchOnWindowFocus: false,
   });
 
   const universities = ["Harvard", "Yale", "Princeton", "Columbia", "Brown", "Dartmouth", "Cornell", "Penn"];
 
-  // University background images mapping
   const universityImages = {
     Harvard: "https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80",
     Yale: "https://images.unsplash.com/photo-1603487742131-4160ec999306?w=1200&q=80",
@@ -83,12 +79,13 @@ export default function BrowseMentors() {
     return matchesSearch && matchesUniversity && matchesMajor;
   });
 
-  const getMentorUser = (userId) => users.find(u => u.id === userId);
+  const getMentorUser = (userId) => allUsers.find(u => u.id === userId);
 
   const allMajors = [...new Set(mentors.map(m => m.major).filter(Boolean))];
 
-  // Add error state
-  if (error) {
+  const isLoading = mentorsLoading || usersLoading;
+
+  if (mentorsError) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-md bg-white border border-gray-200 rounded shadow-sm p-8 text-center">
@@ -194,7 +191,6 @@ export default function BrowseMentors() {
                   className="bg-white border border-gray-200 rounded shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden"
                   onClick={() => navigate(createPageUrl(`MentorProfile?id=${mentor.id}`))}
                 >
-                  {/* University Banner */}
                   <div
                     className="h-20 bg-cover bg-center relative"
                     style={{
@@ -206,18 +202,18 @@ export default function BrowseMentors() {
                   </div>
 
                   <div className="px-6 pt-0 pb-6">
-                    {/* Profile Photo - Overlapping LinkedIn Style */}
                     <div className="-mt-12 mb-4">
                       <Avatar className="w-24 h-24 border-4 border-white shadow-lg ring-2 ring-gray-100">
                         <AvatarImage src={mentor.profile_photo_url || user?.profile_photo_url} />
                         <AvatarFallback className="bg-[#E6EFEA] text-2xl text-[#0D3B33]">
-                          {user?.full_name?.charAt(0) || '?'} {/* Changed 'M' to '?' */}
+                          {user?.full_name?.charAt(0) || '?'}
                         </AvatarFallback>
                       </Avatar>
                     </div>
 
-                    {/* Name and Info */}
-                    <h3 className="text-lg font-bold mb-1 text-[#0D3B33]">{user?.full_name || 'Loading...'}</h3> {/* Changed 'Mentor' to 'Loading...' */}
+                    <h3 className="text-lg font-bold mb-1 text-[#0D3B33]">
+                      {user?.full_name || <Skeleton className="h-5 w-32" />}
+                    </h3>
                     <div className="flex items-center gap-2 text-xs text-gray-600 mb-2">
                       <GraduationCap className="w-4 h-4" />
                       <span>{mentor.university} • {mentor.year}</span>
