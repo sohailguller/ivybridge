@@ -110,28 +110,34 @@ export default function MentorProfile() {
     setIsSubscribing(true);
 
     try {
-      console.log('Creating checkout session for:', { mentorProfileId: mentor.id, planType });
-      
-      // Use the backend function to create proper Stripe checkout with metadata
-      const response = await base44.functions.invoke('createCheckoutSession', {
-        mentorProfileId: mentor.id,
-        planType: planType
+      const startDate = new Date().toISOString().split('T')[0];
+      const endDate = new Date();
+      endDate.setMonth(endDate.getMonth() + 12);
+
+      await base44.entities.Subscription.create({
+        student_id: user.id,
+        mentor_id: mentor.user_id,
+        mentor_profile_id: mentor.id,
+        plan_type: planType,
+        amount: amount,
+        status: "pending",
+        start_date: startDate,
+        end_date: endDate.toISOString().split('T')[0],
+        months_remaining: 12,
+        stripe_subscription_id: `test_${Date.now()}_${user.id}`
       });
 
-      console.log('Checkout response:', response);
+      // Use test Stripe links - subscription will be activated on return
+      const stripeUrls = {
+        monthly: `https://buy.stripe.com/test_eVqfZj1uJg5l50e0pH1Fe00`,
+        annual: `https://buy.stripe.com/test_6oUcN78Xb8CT0JY4FX1Fe01`
+      };
 
-      if (response.data?.url) {
-        // Redirect to Stripe checkout
-        window.location.href = response.data.url;
-      } else {
-        console.error('No URL in response:', response);
-        throw new Error(response.data?.error || 'No checkout URL returned');
-      }
+      window.location.href = stripeUrls[planType] + `?client_reference_id=${user.id}&success_url=${window.location.origin}/StudentDashboard?payment_success=true`;
 
     } catch (error) {
-      console.error("Error creating checkout session:", error);
-      const errorMessage = error.response?.data?.error || error.message || "Unknown error";
-      alert(`There was an error starting your subscription: ${errorMessage}`);
+      console.error("Error creating subscription:", error);
+      alert("There was an error starting your subscription. Please try again.");
       setIsSubscribing(false);
     }
   };

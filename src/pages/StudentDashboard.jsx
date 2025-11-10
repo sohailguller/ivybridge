@@ -41,7 +41,7 @@ export default function StudentDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const [checkingPayment, setCheckingPayment] = useState(false);
+  // Removed [checkingPayment, setCheckingPayment] state as per outline
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
@@ -57,21 +57,32 @@ export default function StudentDashboard() {
     }
   }, [user]);
 
-  const checkPaymentSuccess = () => {
+  const checkPaymentSuccess = async () => { // Added async keyword
     const urlParams = new URLSearchParams(window.location.search);
     const paymentSuccess = urlParams.get('payment_success');
 
     if (paymentSuccess === 'true') {
       setShowSuccessAlert(true);
-      setCheckingPayment(true);
       window.history.replaceState({}, '', window.location.pathname);
+      
+      // Auto-activate any pending subscriptions
+      // This logic will only run if payment_success is in the URL and a user is loaded
+      if (user) {
+        const pendingSubs = await base44.entities.Subscription.filter({ 
+          student_id: user.id, 
+          status: "pending" 
+        });
+        
+        for (const sub of pendingSubs) {
+          await base44.entities.Subscription.update(sub.id, { status: 'active' });
+        }
+        
+        queryClient.invalidateQueries(['my-subscriptions']);
+      }
 
-      // Stop checking after 30 seconds max
-      setTimeout(() => {
-        setCheckingPayment(false);
-        localStorage.removeItem('pending_subscription_id');
-        localStorage.removeItem('mentor_profile_id');
-      }, 30000);
+      // Removed setCheckingPayment and setTimeout logic as per outline
+      localStorage.removeItem('pending_subscription_id'); // Keeping this as outline didn't remove it
+      localStorage.removeItem('mentor_profile_id'); // Keeping this as outline didn't remove it
     }
   };
 
@@ -99,16 +110,16 @@ export default function StudentDashboard() {
     }
   };
 
-  // Check for both active AND pending subscriptions
+  // Check for both active AND pending subscriptions (now just filters all)
   const { data: subscriptions = [], isLoading: subsLoading } = useQuery({
     queryKey: ['my-subscriptions', user?.id],
     queryFn: async () => {
-      const active = await base44.entities.Subscription.filter({ student_id: user.id, status: "active" });
-      const pending = await base44.entities.Subscription.filter({ student_id: user.id, status: "pending" });
-      return [...active, ...pending];
+      // Modified queryFn to fetch all subscriptions for the student
+      const subs = await base44.entities.Subscription.filter({ student_id: user.id });
+      return subs;
     },
     enabled: !!user,
-    refetchInterval: checkingPayment ? 3000 : false,
+    // Removed refetchInterval as checkingPayment state is removed
   });
 
   const { data: mentorProfiles = [] } = useQuery({
@@ -116,6 +127,7 @@ export default function StudentDashboard() {
     queryFn: async () => {
       if (subscriptions.length === 0) return [];
       const profiles = await base44.entities.MentorProfile.list();
+      // This will now match against all fetched subscriptions, not just active/pending implicitly from subscriptions[0]
       return profiles.filter(p => subscriptions.some(s => s.mentor_profile_id === p.id));
     },
     enabled: subscriptions.length > 0
@@ -143,7 +155,9 @@ export default function StudentDashboard() {
     enabled: !!user
   });
 
-  const activeSub = subscriptions[0]; // activeSub refers to the first subscription found, whether active or pending
+  // activeSub now explicitly refers to an active subscription as per outline
+  const activeSub = subscriptions.find(s => s.status === "active");
+  const pendingSub = subscriptions.find(s => s.status === "pending"); // Keep separate check for pending alert if needed
   const mentor = mentorProfiles.find(p => p.id === activeSub?.mentor_profile_id);
   const mentorUser = mentorUsers.find(u => u.id === mentor?.user_id);
 
@@ -238,37 +252,11 @@ export default function StudentDashboard() {
     );
   }
 
-  // Show processing state while waiting for webhook
-  if (checkingPayment && activeSub?.status === "pending") {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-md bg-white border border-gray-200 rounded shadow-sm p-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#FE6C3A] mx-auto mb-4"></div>
-            <h2 className="text-xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
-              Processing Your Payment
-            </h2>
-            <p className="text-gray-600 mb-3 text-sm">
-              Please wait while we confirm your payment and activate your mentorship...
-            </p>
-            <p className="text-xs text-gray-500 mb-4">This usually takes just a few seconds.</p>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setCheckingPayment(false);
-                queryClient.invalidateQueries(['my-subscriptions']);
-              }}
-              className="text-sm"
-            >
-              Continue to Dashboard
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Removed "Show processing state while waiting for webhook" block as per outline changes
+  // The auto-activation in checkPaymentSuccess should make this transient or handled differently.
 
-  // No subscription found
+  // No active subscription found - now explicitly checks for activeSub as per outline
+  // If only pending subscriptions exist, this block will be triggered.
   if (!activeSub || !mentor) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -310,8 +298,8 @@ export default function StudentDashboard() {
           </Alert>
         )}
 
-        {/* Pending Subscription Alert */}
-        {activeSub?.status === "pending" && (
+        {/* Pending Subscription Alert - now based on pendingSub */}
+        {pendingSub?.status === "pending" && (
           <Alert className="mb-6 border-yellow-200 bg-yellow-50">
             <AlertDescription className="text-yellow-800 flex items-center gap-2 text-sm">
               <Clock className="w-4 h-4" />
@@ -319,7 +307,7 @@ export default function StudentDashboard() {
             </AlertDescription>
           </Alert>
         )}
-        {activeSub?.status === "cancelled" && (
+        {activeSub?.status === "cancelled" && ( // This refers to the activeSub potentially being cancelled
           <Alert className="mb-6 border-red-200 bg-red-50">
             <AlertDescription className="text-red-800 flex items-center gap-2 text-sm">
               <AlertCircle className="w-4 h-4" />
