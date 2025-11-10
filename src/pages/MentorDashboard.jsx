@@ -48,63 +48,103 @@ export default function MentorDashboard() {
   const loadUser = async () => {
     try {
       const currentUser = await base44.auth.me();
+      
       if (currentUser.account_type !== "mentor" && !currentUser.mentor_profile_id) {
         navigate(createPageUrl("StudentDashboard"));
         return;
       }
+      
       setUser(currentUser);
       
-      // Try to load mentor profile - first by mentor_profile_id, then by user_id
+      // Load mentor profile - try by mentor_profile_id first, then by user_id
       let profile = null;
       
       if (currentUser.mentor_profile_id) {
         const profiles = await base44.entities.MentorProfile.filter({ id: currentUser.mentor_profile_id });
         if (profiles.length > 0) {
           profile = profiles[0];
+          console.log('✓ Mentor profile loaded by ID:', profile.id);
         }
       }
       
-      // If no profile found via mentor_profile_id, try finding by user_id
       if (!profile) {
         const profiles = await base44.entities.MentorProfile.filter({ user_id: currentUser.id });
         if (profiles.length > 0) {
           profile = profiles[0];
-          // Update the user record with the mentor_profile_id for future use
+          console.log('✓ Mentor profile loaded by user_id:', profile.id);
+          
+          // Update user record with mentor_profile_id
           try {
             await base44.auth.updateMe({ mentor_profile_id: profile.id });
-            // Update the local currentUser state as well if it was changed
-            setUser(prevUser => ({ ...prevUser, mentor_profile_id: profile.id }));
-          } catch (updateError) {
-            console.log('Could not update mentor_profile_id:', updateError);
+            console.log('✓ User record updated with mentor_profile_id');
+          } catch (e) {
+            console.log('Could not update user mentor_profile_id:', e);
           }
         }
       }
       
       if (profile) {
         setMentorProfile(profile);
+        console.log('✓ Mentor profile set:', profile.id, 'Total students:', profile.total_students);
       }
     } catch (error) {
+      console.error('Load user error:', error);
       base44.auth.redirectToLogin();
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Add refetch interval to automatically check for new subscriptions
+  // Query active subscriptions - with detailed logging
   const { data: subscriptions = [], refetch: refetchSubscriptions, isFetching: isFetchingSubscriptions } = useQuery({
     queryKey: ['mentor-subscriptions', mentorProfile?.id],
-    queryFn: () => base44.entities.Subscription.filter({ mentor_profile_id: mentorProfile.id, status: "active" }),
+    queryFn: async () => {
+      console.log('=== Fetching Subscriptions ===');
+      console.log('Mentor Profile ID:', mentorProfile.id);
+      
+      const subs = await base44.entities.Subscription.filter({ 
+        mentor_profile_id: mentorProfile.id 
+      });
+      
+      console.log('All subscriptions found:', subs.length);
+      subs.forEach(sub => {
+        console.log('  - Sub ID:', sub.id, 'Status:', sub.status, 'Student:', sub.student_id);
+      });
+      
+      const activeSubs = subs.filter(s => s.status === "active");
+      console.log('Active subscriptions:', activeSubs.length);
+      
+      return activeSubs;
+    },
     enabled: !!mentorProfile,
-    refetchInterval: 5000, // Poll every 5 seconds for new subscriptions
-    refetchOnWindowFocus: true, // Refetch when window regains focus
+    refetchInterval: 5000,
+    refetchOnWindowFocus: true,
   });
 
+  // Query students based on subscriptions
   const { data: students = [] } = useQuery({
     queryKey: ['my-students', subscriptions.map(s => s.id).sort().join(',')],
     queryFn: async () => {
-      if (subscriptions.length === 0) return [];
+      if (subscriptions.length === 0) {
+        console.log('No subscriptions, no students to load');
+        return [];
+      }
+      
+      console.log('=== Fetching Students ===');
+      console.log('Loading students for', subscriptions.length, 'subscriptions');
+      
+      const studentIds = subscriptions.map(s => s.student_id);
+      console.log('Student IDs:', studentIds);
+      
       const users = await base44.entities.User.list();
-      return users.filter(u => subscriptions.some(s => s.student_id === u.id));
+      const matchedStudents = users.filter(u => studentIds.includes(u.id));
+      
+      console.log('Students found:', matchedStudents.length);
+      matchedStudents.forEach(s => {
+        console.log('  - Student:', s.full_name, s.email);
+      });
+      
+      return matchedStudents;
     },
     enabled: subscriptions.length > 0
   });
@@ -131,12 +171,13 @@ export default function MentorDashboard() {
   };
 
   const handleRefresh = async () => {
+    console.log('=== Manual Refresh Triggered ===');
     await refetchSubscriptions();
     queryClient.invalidateQueries(['my-students']);
   };
 
   const totalRevenue = subscriptions.reduce((sum, sub) => sum + sub.amount, 0);
-  const monthlyRevenue = totalRevenue * 0.7; // After 30% commission
+  const monthlyRevenue = totalRevenue * 0.7;
 
   if (isLoading) {
     return (
@@ -240,7 +281,9 @@ export default function MentorDashboard() {
               <h1 className="text-2xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
                 Mentor Dashboard
               </h1>
-              <p className="text-gray-600 text-sm">Manage your students and track your mentorship</p>
+              <p className="text-gray-600 text-sm">
+                Manage your students and track your mentorship
+              </p>
             </div>
             <Button
               variant="outline"
@@ -301,6 +344,9 @@ export default function MentorDashboard() {
             </div>
             <div className="text-2xl font-bold mb-1 text-[#0D3B33]">{students.length}</div>
             <div className="text-xs text-gray-600">Active Students</div>
+            <div className="text-xs text-gray-400 mt-1">
+              ({subscriptions.length} active subscription{subscriptions.length !== 1 ? 's' : ''})
+            </div>
           </div>
 
           <div className="bg-white border border-gray-200 rounded shadow-sm p-4">

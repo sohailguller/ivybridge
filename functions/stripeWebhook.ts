@@ -5,6 +5,8 @@ const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"), { apiVersion: '2024
 const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
 
 Deno.serve(async (req) => {
+  console.log('=== Stripe Webhook Received ===');
+  
   try {
     const signature = req.headers.get('stripe-signature');
     if (!signature) {
@@ -16,29 +18,23 @@ Deno.serve(async (req) => {
     // Verify webhook signature
     let event;
     try {
-      event = await stripe.webhooks.constructEventAsync(
-        body,
-        signature,
-        webhookSecret
-      );
+      event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
     } catch (err) {
       console.error('Webhook signature verification failed:', err.message);
       return Response.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
-    // Initialize Base44 client with service role for admin operations
+    // Initialize Base44 client with service role
     const base44 = createClientFromRequest(req);
     
-    console.log('Webhook event type:', event.type);
+    console.log('Event type:', event.type);
 
-    // Handle checkout completion
+    // Handle checkout session completed
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
-      console.log('Checkout session completed:', session.id);
-      console.log('Session metadata:', session.metadata);
-
+      console.log('Checkout completed for session:', session.id);
+      
       const subscriptionId = session.metadata.subscription_id;
-      const userId = session.metadata.user_id;
       const mentorProfileId = session.metadata.mentor_profile_id;
       const stripeSubscriptionId = session.subscription;
 
@@ -47,58 +43,54 @@ Deno.serve(async (req) => {
         return Response.json({ error: 'Missing subscription_id' }, { status: 400 });
       }
 
-      // Update the subscription to active
-      try {
-        await base44.asServiceRole.entities.Subscription.update(subscriptionId, {
-          status: 'active',
-          stripe_subscription_id: stripeSubscriptionId || session.id
-        });
-        console.log('Subscription activated:', subscriptionId);
+      console.log('Activating subscription:', subscriptionId);
 
-        // Update mentor's total students count
-        if (mentorProfileId) {
-          const mentorProfiles = await base44.asServiceRole.entities.MentorProfile.filter({ id: mentorProfileId });
-          if (mentorProfiles.length > 0) {
-            const mentor = mentorProfiles[0];
-            await base44.asServiceRole.entities.MentorProfile.update(mentorProfileId, {
-              total_students: (mentor.total_students || 0) + 1
-            });
-            console.log('Mentor student count updated');
-          }
+      // Update subscription to ACTIVE
+      await base44.asServiceRole.entities.Subscription.update(subscriptionId, {
+        status: 'active',
+        stripe_subscription_id: stripeSubscriptionId || session.id
+      });
+      console.log('✓ Subscription status: pending → active');
+
+      // Increment mentor's total_students count
+      if (mentorProfileId) {
+        const mentorProfiles = await base44.asServiceRole.entities.MentorProfile.filter({ id: mentorProfileId });
+        if (mentorProfiles.length > 0) {
+          const mentor = mentorProfiles[0];
+          const newCount = (mentor.total_students || 0) + 1;
+          await base44.asServiceRole.entities.MentorProfile.update(mentorProfileId, {
+            total_students: newCount
+          });
+          console.log('✓ Mentor student count updated:', mentor.total_students, '→', newCount);
         }
+      }
 
-        // Send notification to student
+      // Send notification to student
+      if (session.metadata.user_id) {
         await base44.asServiceRole.entities.Notification.create({
-          user_id: userId,
+          user_id: session.metadata.user_id,
           type: 'subscription',
           title: 'Mentorship Activated!',
-          message: 'Your mentorship subscription is now active. Start chatting with your mentor!',
+          message: 'Your mentorship is now active. Start chatting with your mentor!',
           link: '/StudentDashboard'
         });
-
-      } catch (error) {
-        console.error('Error updating subscription:', error);
-        return Response.json({ error: 'Failed to update subscription' }, { status: 500 });
+        console.log('✓ Student notification sent');
       }
-    }
 
-    // Handle subscription created
-    if (event.type === 'customer.subscription.created') {
-      const subscription = event.data.object;
-      console.log('Subscription created:', subscription.id);
-      console.log('Subscription metadata:', subscription.metadata);
-
-      const subscriptionId = subscription.metadata.subscription_id;
-      if (subscriptionId) {
-        await base44.asServiceRole.entities.Subscription.update(subscriptionId, {
-          stripe_subscription_id: subscription.id,
-          status: 'active'
+      // Send notification to mentor
+      if (session.metadata.mentor_user_id) {
+        await base44.asServiceRole.entities.Notification.create({
+          user_id: session.metadata.mentor_user_id,
+          type: 'subscription',
+          title: 'New Student!',
+          message: 'You have a new student. Check your dashboard to get started!',
+          link: '/MentorDashboard'
         });
-        console.log('Subscription status updated to active');
+        console.log('✓ Mentor notification sent');
       }
     }
 
-    // Handle subscription updated
+    // Handle subscription updates (for monthly plans)
     if (event.type === 'customer.subscription.updated') {
       const subscription = event.data.object;
       console.log('Subscription updated:', subscription.id);
@@ -113,11 +105,11 @@ Deno.serve(async (req) => {
         await base44.asServiceRole.entities.Subscription.update(subscriptionId, {
           status: status
         });
-        console.log('Subscription status updated to:', status);
+        console.log('✓ Subscription status updated to:', status);
       }
     }
 
-    // Handle subscription deleted/cancelled
+    // Handle subscription deletion
     if (event.type === 'customer.subscription.deleted') {
       const subscription = event.data.object;
       console.log('Subscription deleted:', subscription.id);
@@ -127,11 +119,11 @@ Deno.serve(async (req) => {
         await base44.asServiceRole.entities.Subscription.update(subscriptionId, {
           status: 'cancelled'
         });
-        console.log('Subscription marked as cancelled');
+        console.log('✓ Subscription marked as cancelled');
       }
     }
 
-    // Handle successful payment (monthly)
+    // Handle monthly payment success
     if (event.type === 'invoice.payment_succeeded') {
       const invoice = event.data.object;
       const stripeSubscriptionId = invoice.subscription;
@@ -148,7 +140,7 @@ Deno.serve(async (req) => {
           await base44.asServiceRole.entities.Subscription.update(sub.id, {
             months_remaining: newMonthsRemaining
           });
-          console.log('Payment processed, months remaining:', newMonthsRemaining);
+          console.log('✓ Payment processed, months remaining:', newMonthsRemaining);
         }
       }
     }
@@ -158,7 +150,6 @@ Deno.serve(async (req) => {
       const invoice = event.data.object;
       console.log('Payment failed for invoice:', invoice.id);
       
-      // Send notification to customer
       const customer = await stripe.customers.retrieve(invoice.customer);
       if (customer.email) {
         await base44.asServiceRole.integrations.Core.SendEmail({
@@ -166,27 +157,17 @@ Deno.serve(async (req) => {
           subject: 'Payment Failed - IvyBridge',
           body: 'Your payment has failed. Please update your payment method to continue your mentorship.'
         });
+        console.log('✓ Payment failure email sent');
       }
     }
 
-    // Handle Connect account updates
-    if (event.type === 'account.updated') {
-      console.log('Stripe Connect account updated');
-    }
-
-    // Handle payout events
-    if (event.type === 'payout.paid') {
-      console.log('Payout paid:', event.data.object.id);
-    }
-
-    if (event.type === 'payout.failed') {
-      console.log('Payout failed:', event.data.object.id);
-    }
-
+    console.log('=== Webhook processed successfully ===');
     return Response.json({ received: true });
 
   } catch (error) {
-    console.error('Webhook error:', error);
+    console.error('=== Webhook Error ===');
+    console.error('Error:', error.message);
+    console.error('Stack:', error.stack);
     return Response.json({ 
       error: error.message 
     }, { status: 500 });

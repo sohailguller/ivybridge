@@ -96,36 +96,39 @@ export default function MentorProfile() {
     enabled: reviews.length > 0
   });
 
-  const handleSubscribe = async (planType, amount) => {
+  const handleSubscribe = async (planType) => {
     if (!user) {
       base44.auth.redirectToLogin(window.location.pathname);
       return;
     }
 
     if (user.account_type === "mentor") {
-      alert("Mentors cannot subscribe to other mentors. This platform is for mentors to guide students.");
+      alert("Mentors cannot subscribe to other mentors.");
       return;
     }
 
     setIsSubscribing(true);
 
     try {
-      // Use the backend function to create a proper Stripe checkout session
+      console.log('Creating checkout session for mentor:', mentor.id, 'plan:', planType);
+      
       const response = await base44.functions.invoke('createCheckoutSession', {
         mentorProfileId: mentor.id,
         planType: planType
       });
 
+      console.log('Checkout session response:', response.data);
+
       if (response.data.url) {
-        // Redirect to Stripe checkout
+        console.log('Redirecting to Stripe checkout:', response.data.url);
         window.location.href = response.data.url;
       } else {
         throw new Error('No checkout URL returned');
       }
 
     } catch (error) {
-      console.error("Error creating checkout session:", error);
-      alert("There was an error starting your subscription. Please try again.");
+      console.error("Checkout error:", error);
+      alert("Failed to start checkout. Please try again.");
       setIsSubscribing(false);
     }
   };
@@ -454,7 +457,7 @@ export default function MentorProfile() {
                 <div className="text-xs text-gray-500 mb-4">12-month commitment</div>
               </div>
               <Button
-                onClick={() => handleSubscribe('monthly', 425)}
+                onClick={() => handleSubscribe('monthly')}
                 disabled={isMentor || isSubscribing}
                 className="w-full btn-primary text-white rounded py-5 mb-3"
               >
@@ -467,7 +470,7 @@ export default function MentorProfile() {
                 <div className="text-xs text-gray-500 mb-4">Save $1,100</div>
               </div>
               <Button
-                onClick={() => handleSubscribe('annual', 5000)}
+                onClick={() => handleSubscribe('annual')}
                 disabled={isMentor || isSubscribing}
                 className="w-full bg-[#FE6C3A] hover:bg-[#FF7B4A] text-white rounded py-5"
               >
