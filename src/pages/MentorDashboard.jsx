@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -108,19 +109,6 @@ export default function MentorDashboard() {
     refetchInterval: 5000,
   });
 
-  // Fetch ALL users upfront for quick matching
-  const { data: allUsers = [] } = useQuery({
-    queryKey: ['all-users-cache'],
-    queryFn: async () => {
-      console.log('👥 Fetching ALL users for cache...');
-      const users = await base44.entities.User.list();
-      console.log(`📊 Cached ${users.length} total users`);
-      return users;
-    },
-    staleTime: 30000, // Cache for 30 seconds
-    refetchOnMount: false,
-  });
-
   // Fetch active subscriptions for this mentor
   const { data: subscriptions = [], refetch: refetchSubscriptions, isFetching: isFetchingSubscriptions } = useQuery({
     queryKey: ['mentor-subscriptions', mentorProfile?.id],
@@ -145,6 +133,15 @@ export default function MentorDashboard() {
         status: s.status
       })));
       
+      setDebugInfo({
+        mentorProfileId: mentorProfile.id,
+        totalInDb: allSubscriptions.length,
+        forThisMentor: subs.length,
+        active: subs.length,
+        subscriptions: subs,
+        studentIds: subs.map(s => s.student_id)
+      });
+      
       return subs;
     },
     enabled: !!mentorProfile?.id,
@@ -154,33 +151,62 @@ export default function MentorDashboard() {
     staleTime: 0,
   });
 
-  // Match students from cached users - THIS IS THE KEY FIX
-  const students = React.useMemo(() => {
-    if (subscriptions.length === 0 || allUsers.length === 0) {
-      console.log('⚠️ No matching conditions:', { subs: subscriptions.length, users: allUsers.length });
-      return [];
-    }
-    
-    const studentIds = subscriptions.map(s => s.student_id);
-    console.log('🎯 Matching student IDs:', studentIds);
-    
-    const matched = allUsers.filter(u => studentIds.includes(u.id));
-    console.log(`✅ Matched ${matched.length} students from ${allUsers.length} cached users`);
-    console.log('📋 Matched student details:', matched.map(s => ({ id: s.id, name: s.full_name, email: s.email })));
-    
-    setDebugInfo({
-      mentorProfileId: mentorProfile?.id,
-      totalInDb: allSubscriptions.length,
-      forThisMentor: subscriptions.length,
-      active: subscriptions.length,
-      subscriptions: subscriptions,
-      studentIds: studentIds,
-      allUserCount: allUsers.length,
-      matchedStudents: matched.length
-    });
-    
-    return matched;
-  }, [subscriptions, allUsers, allSubscriptions, mentorProfile]);
+  // Fetch ALL users to find students (using list which has better permissions)
+  const { data: allUsers = [] } = useQuery({
+    queryKey: ['all-users-for-students'],
+    queryFn: async () => {
+      console.log('👥 Fetching ALL users from database...');
+      try {
+        const users = await base44.entities.User.list();
+        console.log(`📊 Total users in database: ${users.length}`);
+        return users;
+      } catch (error) {
+        console.error('❌ Error fetching users:', error);
+        throw error;
+      }
+    },
+    staleTime: 30000, // Cache for 30 seconds
+    refetchOnMount: true,
+  });
+
+  // Filter students from all users based on subscriptions
+  const { data: students = [], isLoading: studentsLoading, error: studentsError } = useQuery({
+    queryKey: ['my-students', subscriptions.length, JSON.stringify(subscriptions.map(s => s.student_id).sort()), allUsers.length],
+    queryFn: async () => {
+      if (subscriptions.length === 0) {
+        console.log('⚠️ No subscriptions, returning empty students array');
+        return [];
+      }
+      
+      if (allUsers.length === 0) {
+        console.log('⚠️ No users loaded yet, waiting...');
+        return [];
+      }
+      
+      const studentIds = subscriptions.map(s => s.student_id);
+      console.log('👥 Looking for students with IDs:', studentIds);
+      console.log('📊 Searching through', allUsers.length, 'users');
+      
+      const matchedStudents = allUsers.filter(u => studentIds.includes(u.id));
+      
+      console.log(`✅ Found ${matchedStudents.length} matching students`);
+      console.log('📋 Matched student details:', matchedStudents.map(s => ({ 
+        id: s.id, 
+        name: s.full_name, 
+        email: s.email 
+      })));
+      
+      if (matchedStudents.length === 0 && studentIds.length > 0) {
+        console.error('❌ CRITICAL: No students found despite having subscriptions!');
+        console.log('🔍 Student IDs needed:', studentIds);
+        console.log('🔍 Available user IDs:', allUsers.map(u => u.id));
+      }
+      
+      return matchedStudents;
+    },
+    enabled: subscriptions.length > 0 && allUsers.length > 0,
+    staleTime: 0,
+  });
 
   const { data: allTasks = [] } = useQuery({
     queryKey: ['mentor-tasks', mentorProfile?.id],
@@ -206,19 +232,19 @@ export default function MentorDashboard() {
   const handleRefresh = async () => {
     console.log('🔄 Manual refresh triggered');
     await refetchSubscriptions();
-    queryClient.invalidateQueries(['all-users-cache']);
+    queryClient.invalidateQueries(['my-students']);
     queryClient.invalidateQueries(['mentor-tasks']);
     queryClient.invalidateQueries(['debug-all-subscriptions']);
+    queryClient.invalidateQueries(['all-users-for-students']); // Invalidate new query
   };
 
   useEffect(() => {
-    if (subscriptions.length > 0 && students.length === 0 && allUsers.length > 0) {
-      console.warn('⚠️⚠️⚠️ ALERT: Subscriptions exist but no students matched!');
+    if (subscriptions.length > 0 && students.length === 0 && !studentsLoading) {
+      console.warn('⚠️⚠️⚠️ ALERT: Subscriptions exist but no students loaded!');
       console.log('Subscription student IDs:', subscriptions.map(s => s.student_id));
-      console.log('All user IDs in cache:', allUsers.map(u => u.id));
-      console.log('Students matched:', students);
+      console.log('Students loaded:', students);
     }
-  }, [subscriptions, students, allUsers]);
+  }, [subscriptions, students, studentsLoading]);
 
   const totalRevenue = subscriptions.reduce((sum, sub) => sum + sub.amount, 0);
   const monthlyRevenue = totalRevenue * 0.7;
@@ -336,9 +362,15 @@ export default function MentorDashboard() {
                   <div>Mentor Profile ID: <span className="font-mono font-bold">{mentorProfile.id}</span></div>
                   <div>Active Subscriptions: <span className="font-bold">{subscriptions.length}</span></div>
                   <div>Students Loaded: <span className={students.length === 0 && subscriptions.length > 0 ? "font-bold text-red-600" : "font-bold text-green-600"}>{students.length}</span></div>
-                  <div>Cached Users: <span className="font-bold">{allUsers.length}</span></div>
-                  <div>Total Subs in DB: <span className="font-bold">{allSubscriptions.length}</span></div>
+                  <div>All Users Loaded: <span className="font-bold">{allUsers.length}</span></div>
+                  <div>Students Loading: <span className="font-bold">{studentsLoading ? "YES" : "NO"}</span></div>
+                  <div>Students Error: <span className="font-bold">{studentsError ? "YES" : "NO"}</span></div>
                 </div>
+                {studentsError && (
+                  <div className="p-2 bg-red-100 border border-red-300 rounded text-red-800">
+                    <strong>Error:</strong> {studentsError.message}
+                  </div>
+                )}
                 {debugInfo && (
                   <div className="mt-2 p-2 bg-white border border-yellow-300 rounded max-h-64 overflow-y-auto">
                     <div className="font-semibold mb-1">Query Results:</div>
