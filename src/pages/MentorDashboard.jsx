@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -54,7 +53,7 @@ export default function MentorDashboard() {
       }
       setUser(currentUser);
       
-      // Try to load mentor profile - first by mentor_profile_id, then by user_id
+      // Load mentor profile - try by mentor_profile_id first, then by user_id
       let profile = null;
       
       if (currentUser.mentor_profile_id) {
@@ -64,18 +63,16 @@ export default function MentorDashboard() {
         }
       }
       
-      // If no profile found via mentor_profile_id, try finding by user_id
+      // Fallback: try finding by user_id
       if (!profile) {
         const profiles = await base44.entities.MentorProfile.filter({ user_id: currentUser.id });
         if (profiles.length > 0) {
           profile = profiles[0];
-          // Update the user record with the mentor_profile_id for future use
+          // Update user with mentor_profile_id for future
           try {
             await base44.auth.updateMe({ mentor_profile_id: profile.id });
-            // Update the local currentUser state as well if it was changed
-            setUser(prevUser => ({ ...prevUser, mentor_profile_id: profile.id }));
-          } catch (updateError) {
-            console.log('Could not update mentor_profile_id:', updateError);
+          } catch (e) {
+            console.log('Could not update mentor_profile_id:', e);
           }
         }
       }
@@ -90,29 +87,36 @@ export default function MentorDashboard() {
     }
   };
 
-  // Add refetch interval to automatically check for new subscriptions
+  // Fetch active subscriptions for this mentor
   const { data: subscriptions = [], refetch: refetchSubscriptions, isFetching: isFetchingSubscriptions } = useQuery({
     queryKey: ['mentor-subscriptions', mentorProfile?.id],
-    queryFn: () => base44.entities.Subscription.filter({ mentor_profile_id: mentorProfile.id, status: "active" }),
+    queryFn: async () => {
+      const subs = await base44.entities.Subscription.filter({ 
+        mentor_profile_id: mentorProfile.id,
+        status: "active"
+      });
+      return subs;
+    },
     enabled: !!mentorProfile,
-    refetchInterval: 5000, // Poll every 5 seconds for new subscriptions
-    refetchOnWindowFocus: true, // Refetch when window regains focus
+    refetchInterval: 5000,
+    refetchOnWindowFocus: true,
   });
 
+  // Fetch student users based on subscriptions
   const { data: students = [] } = useQuery({
-    queryKey: ['my-students', subscriptions.map(s => s.id).sort().join(',')],
+    queryKey: ['my-students', subscriptions.map(s => s.student_id).sort().join(',')],
     queryFn: async () => {
       if (subscriptions.length === 0) return [];
-      const users = await base44.entities.User.list();
-      return users.filter(u => subscriptions.some(s => s.student_id === u.id));
+      const allUsers = await base44.entities.User.list();
+      return allUsers.filter(u => subscriptions.some(s => s.student_id === u.id));
     },
     enabled: subscriptions.length > 0
   });
 
   const { data: allTasks = [] } = useQuery({
-    queryKey: ['mentor-tasks', user?.id],
-    queryFn: () => base44.entities.Task.filter({ mentor_id: user.id }),
-    enabled: !!user
+    queryKey: ['mentor-tasks', mentorProfile?.id],
+    queryFn: () => base44.entities.Task.filter({ mentor_profile_id: mentorProfile.id }),
+    enabled: !!mentorProfile
   });
 
   const handleConnectStripe = async () => {
@@ -136,7 +140,7 @@ export default function MentorDashboard() {
   };
 
   const totalRevenue = subscriptions.reduce((sum, sub) => sum + sub.amount, 0);
-  const monthlyRevenue = totalRevenue * 0.7; // After 30% commission
+  const monthlyRevenue = totalRevenue * 0.7;
 
   if (isLoading) {
     return (
@@ -233,7 +237,6 @@ export default function MentorDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="w-full px-6 md:px-12 lg:px-24">
-        {/* Header */}
         <div className="mb-6 border-b border-gray-200 pb-4">
           <div className="flex items-center justify-between">
             <div>
@@ -264,7 +267,6 @@ export default function MentorDashboard() {
           </div>
         </div>
 
-        {/* Stripe Connect Success Alert */}
         {connectSuccess && (
           <Alert className="mb-6 border-green-200 bg-green-50">
             <AlertDescription className="text-green-800 text-sm">
@@ -273,7 +275,6 @@ export default function MentorDashboard() {
           </Alert>
         )}
 
-        {/* Stripe Connect Warning */}
         {!mentorProfile.stripe_connect_id && (
           <Alert className="mb-6 border-orange-200 bg-orange-50">
             <AlertDescription className="flex items-center justify-between text-sm">
@@ -293,7 +294,6 @@ export default function MentorDashboard() {
           </Alert>
         )}
 
-        {/* Quick Stats */}
         <div className="grid md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white border-l-4 border-l-[#FE6C3A] border border-gray-200 rounded shadow-sm p-4">
             <div className="flex items-center justify-between mb-2">
@@ -328,7 +328,6 @@ export default function MentorDashboard() {
           </div>
         </div>
 
-        {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-white border border-gray-200 rounded p-1 shadow-sm">
             <TabsTrigger value="overview" className="rounded data-[state=active]:bg-[#FE6C3A] data-[state=active]:text-white text-sm">
@@ -506,12 +505,11 @@ export default function MentorDashboard() {
         </Tabs>
       </div>
 
-      {/* Create Task Dialog */}
       <CreateTaskDialog
         open={showTaskDialog}
         onOpenChange={setShowTaskDialog}
         student={selectedStudent}
-        mentorId={user?.id}
+        mentorProfileId={mentorProfile?.id}
         subscriptionId={subscriptions.find(s => s.student_id === selectedStudent?.id)?.id}
       />
     </div>
