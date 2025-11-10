@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -9,20 +10,24 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   GraduationCap,
+  MapPin,
   Star,
   Calendar,
+  MessageSquare,
   CheckCircle,
   ArrowLeft,
   ExternalLink,
-  Award,
-  Lightbulb,
-  Target,
-  Heart,
-  BookOpen,
+  AlertCircle,
+  Award,       // Added Award icon
+  Lightbulb,   // Added Lightbulb icon
+  Target,      // Added Target icon
+  Heart,       // Added Heart icon
+  BookOpen,     // Added BookOpen icon
   ChevronDown,
   ChevronUp
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Collapsible,
   CollapsibleContent,
@@ -91,42 +96,45 @@ export default function MentorProfile() {
     enabled: reviews.length > 0
   });
 
-  const handleSubscribe = async (planType) => {
+  const handleSubscribe = async (planType, amount) => {
     if (!user) {
       base44.auth.redirectToLogin(window.location.pathname);
       return;
     }
 
     if (user.account_type === "mentor") {
-      alert("Mentors cannot subscribe to other mentors.");
+      alert("Mentors cannot subscribe to other mentors. This platform is for mentors to guide students.");
       return;
     }
 
     setIsSubscribing(true);
 
     try {
-      const response = await base44.functions.invoke('checkout', {
+      // Use the backend function to create a proper Stripe checkout session
+      const response = await base44.functions.invoke('createCheckoutSession', {
         mentorProfileId: mentor.id,
         planType: planType
       });
 
-      if (response.data?.url) {
+      if (response.data.url) {
+        // Redirect to Stripe checkout
         window.location.href = response.data.url;
       } else {
         throw new Error('No checkout URL returned');
       }
 
     } catch (error) {
-      console.error('Checkout error:', error);
-      alert('Failed to start checkout. Please try again.');
+      console.error("Error creating checkout session:", error);
+      alert("There was an error starting your subscription. Please try again.");
       setIsSubscribing(false);
     }
   };
 
   const averageRating = reviews.length > 0
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
-    : 5.0;
+    : 5.0; // Default to 5.0 if no reviews
 
+  // University background images mapping
   const universityImages = {
     Harvard: "https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80",
     Yale: "https://images.unsplash.com/photo-1603487742131-4160ec999306?w=1200&q=80",
@@ -226,7 +234,9 @@ export default function MentorProfile() {
           </div>
         )}
 
+        {/* LinkedIn-style Banner Section */}
         <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6 overflow-hidden">
+          {/* University Banner Image */}
           <div
             className="h-48 bg-cover bg-center relative"
             style={{
@@ -237,7 +247,8 @@ export default function MentorProfile() {
             <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent" />
           </div>
 
-          <div className="-mt-20 mb-4 px-8">
+          {/* Profile Photo - Overlapping Banner */}
+          <div className="-mt-20 mb-4">
             <Avatar className="w-36 h-36 border-4 border-white shadow-lg">
               <AvatarImage src={mentor.profile_photo_url || mentorUser?.profile_photo_url} />
               <AvatarFallback className="bg-[#E6EFEA] text-5xl text-[#0D3B33]">
@@ -246,6 +257,7 @@ export default function MentorProfile() {
             </Avatar>
           </div>
 
+          {/* Name and Info */}
           <div className="px-8 pb-6">
             <div className="mb-4">
               <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
@@ -260,6 +272,7 @@ export default function MentorProfile() {
               </Badge>
             </div>
 
+            {/* Rating */}
             <div className="flex items-center gap-4 pb-4 border-b border-gray-200">
               <div className="flex items-center gap-1">
                 {[...Array(5)].map((_, i) => (
@@ -275,6 +288,7 @@ export default function MentorProfile() {
               </span>
             </div>
 
+            {/* Expertise Areas */}
             {mentor.expertise_areas && mentor.expertise_areas.length > 0 && (
               <div className="pt-4">
                 <h3 className="text-sm font-semibold text-gray-700 mb-3">Areas of Expertise</h3>
@@ -292,6 +306,7 @@ export default function MentorProfile() {
 
         <div className="grid md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-6">
+            {/* About Me */}
             <div className="bg-white border border-gray-200 rounded shadow-sm p-6 border-l-4 border-l-[#FE6C3A]">
               <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
                 About Me
@@ -301,6 +316,7 @@ export default function MentorProfile() {
               </p>
             </div>
 
+            {/* Personal Questions - FAQ Style */}
             <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
               <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
                 Get to Know Me
@@ -352,6 +368,7 @@ export default function MentorProfile() {
               </div>
             </div>
 
+            {/* What You'll Get */}
             <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
               <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
                 What You'll Get
@@ -437,7 +454,7 @@ export default function MentorProfile() {
                 <div className="text-xs text-gray-500 mb-4">12-month commitment</div>
               </div>
               <Button
-                onClick={() => handleSubscribe('monthly')}
+                onClick={() => handleSubscribe('monthly', 425)}
                 disabled={isMentor || isSubscribing}
                 className="w-full btn-primary text-white rounded py-5 mb-3"
               >
@@ -450,7 +467,7 @@ export default function MentorProfile() {
                 <div className="text-xs text-gray-500 mb-4">Save $1,100</div>
               </div>
               <Button
-                onClick={() => handleSubscribe('annual')}
+                onClick={() => handleSubscribe('annual', 5000)}
                 disabled={isMentor || isSubscribing}
                 className="w-full bg-[#FE6C3A] hover:bg-[#FF7B4A] text-white rounded py-5"
               >

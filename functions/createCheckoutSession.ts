@@ -4,114 +4,130 @@ import Stripe from 'npm:stripe@16.14.0';
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"));
 
 Deno.serve(async (req) => {
-  console.log('=== Creating Checkout Session ===');
+  console.log('=== Checkout Session Request ===');
   
   try {
     const base44 = createClientFromRequest(req);
     
     // Authenticate user
-    const user = await base44.auth.me();
-    if (!user) {
-      console.error('❌ User not authenticated');
-      return Response.json({ error: 'Unauthorized - Please log in' }, { status: 401 });
+    let user;
+    try {
+      user = await base44.auth.me();
+      console.log('User authenticated:', user.id);
+    } catch (authError) {
+      console.error('Auth failed:', authError);
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    console.log('✓ User authenticated:', user.id, user.email);
+
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     // Parse request body
-    let body;
+    let requestBody;
     try {
-      const bodyText = await req.text();
-      console.log('Raw request body:', bodyText);
-      body = JSON.parse(bodyText);
-      console.log('Parsed body:', body);
-    } catch (e) {
-      console.error('❌ Failed to parse request body:', e);
-      return Response.json({ error: 'Invalid request body' }, { status: 400 });
+      requestBody = await req.json();
+      console.log('Request body:', requestBody);
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError);
+      return Response.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
-    const { mentorProfileId, planType } = body;
-    
+    const { mentorProfileId, planType } = requestBody;
+
     if (!mentorProfileId || !planType) {
-      console.error('❌ Missing required parameters');
-      console.error('mentorProfileId:', mentorProfileId);
-      console.error('planType:', planType);
+      console.error('Missing params:', { mentorProfileId, planType });
       return Response.json({ error: 'Missing mentorProfileId or planType' }, { status: 400 });
     }
-    console.log('✓ Request params validated');
 
     // Get mentor profile
     console.log('Fetching mentor profile:', mentorProfileId);
-    const mentorProfiles = await base44.asServiceRole.entities.MentorProfile.filter({ id: mentorProfileId });
+    const mentorProfiles = await base44.entities.MentorProfile.filter({ id: mentorProfileId });
     if (mentorProfiles.length === 0) {
-      console.error('❌ Mentor profile not found:', mentorProfileId);
+      console.error('Mentor not found:', mentorProfileId);
       return Response.json({ error: 'Mentor not found' }, { status: 404 });
     }
     const mentorProfile = mentorProfiles[0];
-    console.log('✓ Mentor profile found:', mentorProfile.id, 'User:', mentorProfile.user_id);
+    console.log('Mentor found:', mentorProfile.id);
 
-    // Calculate dates
-    const startDate = new Date();
+    // Create the subscription record FIRST with pending status
+    const startDate = new Date().toISOString().split('T')[0];
     const endDate = new Date();
     endDate.setMonth(endDate.getMonth() + 12);
 
-    // Create subscription record with PENDING status
     console.log('Creating subscription record...');
-    const subscriptionData = {
+    const subscription = await base44.entities.Subscription.create({
       student_id: user.id,
       mentor_id: mentorProfile.user_id,
       mentor_profile_id: mentorProfile.id,
       plan_type: planType,
       amount: planType === 'monthly' ? 425 : 5000,
       status: "pending",
-      start_date: startDate.toISOString().split('T')[0],
+      start_date: startDate,
       end_date: endDate.toISOString().split('T')[0],
-      months_remaining: 12
-    };
-    console.log('Subscription data:', subscriptionData);
-
-    const subscription = await base44.asServiceRole.entities.Subscription.create(subscriptionData);
-    console.log('✓ Subscription created:', subscription.id, 'Status: pending');
+      months_remaining: 12,
+      stripe_subscription_id: `pending_${Date.now()}_${user.id}`
+    });
+    console.log('Subscription created:', subscription.id);
 
     // Get or create Stripe customer
     let customerId = user.stripe_customer_id;
     if (!customerId) {
-      console.log('Creating new Stripe customer...');
+      console.log('Creating Stripe customer...');
       const customer = await stripe.customers.create({
         email: user.email,
         name: user.full_name,
         metadata: { user_id: user.id }
       });
       customerId = customer.id;
-      await base44.asServiceRole.entities.User.update(user.id, { stripe_customer_id: customerId });
-      console.log('✓ Stripe customer created:', customerId);
+      console.log('Stripe customer created:', customerId);
+      await base44.auth.updateMe({ stripe_customer_id: customerId });
     } else {
-      console.log('✓ Using existing Stripe customer:', customerId);
+      console.log('Using existing Stripe customer:', customerId);
     }
 
-    // Setup pricing based on plan type
-    const amount = planType === 'monthly' ? 42500 : 500000;
-    const mode = planType === 'monthly' ? 'subscription' : 'payment';
-    console.log('Stripe mode:', mode, 'Amount:', amount);
+    // Setup pricing
+    let amount, mode, lineItems;
     
-    const lineItems = [{
-      price_data: {
-        currency: 'usd',
-        product_data: {
-          name: `IvyBridge ${planType === 'monthly' ? 'Monthly' : 'Annual'} Mentorship`,
-          description: `Mentorship with ${mentorProfile.university} mentor - ${mentorProfile.major}`,
+    if (planType === 'monthly') {
+      amount = 42500;
+      mode = 'subscription';
+      lineItems = [{
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: 'IvyBridge Monthly Mentorship',
+            description: `Mentorship with ${mentorProfile.university} mentor`,
+          },
+          unit_amount: amount,
+          recurring: { interval: 'month' },
         },
-        unit_amount: amount,
-        ...(planType === 'monthly' ? { recurring: { interval: 'month' } } : {})
-      },
-      quantity: 1,
-    }];
+        quantity: 1,
+      }];
+    } else if (planType === 'annual') {
+      amount = 500000;
+      mode = 'payment';
+      lineItems = [{
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: 'IvyBridge Annual Mentorship',
+            description: `12-month mentorship with ${mentorProfile.university} mentor`,
+          },
+          unit_amount: amount,
+        },
+        quantity: 1,
+      }];
+    } else {
+      console.error('Invalid plan type:', planType);
+      return Response.json({ error: 'Invalid plan type' }, { status: 400 });
+    }
 
-    // Get origin for redirect URLs
+    // Get origin for URLs
     const origin = req.headers.get('origin') || 'https://ivy-bridge-f5bb348d.base44.app';
-    console.log('Origin:', origin);
+    console.log('Using origin:', origin);
 
-    // Create Stripe checkout session
-    console.log('Creating Stripe checkout session...');
+    // Create checkout session with subscription ID in metadata
     const sessionConfig = {
       customer: customerId,
       payment_method_types: ['card'],
@@ -120,11 +136,12 @@ Deno.serve(async (req) => {
       success_url: `${origin}/StudentDashboard?payment_success=true`,
       cancel_url: `${origin}/MentorProfile?id=${mentorProfileId}`,
       metadata: {
-        subscription_id: subscription.id,
         user_id: user.id,
-        mentor_profile_id: mentorProfile.id,
+        subscription_id: subscription.id,
+        mentor_profile_id: mentorProfileId,
         mentor_user_id: mentorProfile.user_id,
-        plan_type: planType
+        plan_type: planType,
+        amount: (amount / 100).toString()
       }
     };
 
@@ -132,16 +149,18 @@ Deno.serve(async (req) => {
     if (planType === 'monthly') {
       sessionConfig.subscription_data = {
         metadata: {
-          subscription_id: subscription.id,
           user_id: user.id,
-          mentor_profile_id: mentorProfile.id
+          subscription_id: subscription.id,
+          mentor_profile_id: mentorProfileId,
+          mentor_user_id: mentorProfile.user_id,
+          plan_type: planType
         }
       };
     }
 
+    console.log('Creating Stripe checkout session...');
     const session = await stripe.checkout.sessions.create(sessionConfig);
-    console.log('✓ Stripe checkout session created:', session.id);
-    console.log('✓ Checkout URL:', session.url);
+    console.log('Stripe session created:', session.id);
 
     return Response.json({
       sessionId: session.id,
@@ -154,11 +173,8 @@ Deno.serve(async (req) => {
     console.error('Error type:', error.constructor.name);
     console.error('Error message:', error.message);
     console.error('Error stack:', error.stack);
-    console.error('Full error:', error);
-    
     return Response.json({ 
-      error: error.message || 'Failed to create checkout session',
-      details: error.stack
+      error: error.message || 'Failed to create checkout' 
     }, { status: 500 });
   }
 });

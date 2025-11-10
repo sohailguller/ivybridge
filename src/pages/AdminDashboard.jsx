@@ -138,14 +138,20 @@ export default function AdminDashboard() {
   });
 
   const createPayoutMutation = useMutation({
-    mutationFn: async ({ mentorId, amount }) => {
-      return await base44.functions.invoke('payout', { mentorId, amount });
+    mutationFn: async ({ mentorProfileId, amount, description }) => {
+      const response = await base44.functions.invoke('createMentorPayout', {
+        mentorProfileId,
+        amount,
+        description
+      });
+      return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['approved-mentors']); // Changed to 'approved-mentors' as per outline
-      alert('Payout created successfully!');
+      queryClient.invalidateQueries(['approved-mentors-admin']);
+      setPayoutDialogOpen(false);
       setSelectedMentorForPayout(null);
-      setPayoutAmount(0); // Changed to 0 as per outline
+      setPayoutAmount("");
+      setPayoutDescription("");
     },
   });
 
@@ -180,14 +186,11 @@ export default function AdminDashboard() {
     setIsProcessingPayout(true);
     try {
       await createPayoutMutation.mutateAsync({
-        mentorId: selectedMentorForPayout.id, // Changed from mentorProfileId to mentorId
+        mentorProfileId: selectedMentorForPayout.id,
         amount: parseFloat(payoutAmount),
-        // description is no longer passed as per the updated mutationFn
+        description: payoutDescription || "Monthly mentorship payout"
       });
-      // The success alert and some state resets are now handled by the mutation's onSuccess.
-      // Explicitly close dialog and reset payout description here.
-      setPayoutDialogOpen(false);
-      setPayoutDescription("");
+      alert("Payout created successfully!");
     } catch (error) {
       alert(`Failed to create payout: ${error.message}`);
     } finally {
@@ -953,7 +956,7 @@ export default function AdminDashboard() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
-              <div className="p-4 bg-gray-50 rounded-lg space-y-3">
+              <div className="p-4 bg-gray-50 rounded-lg space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Mentor:</span>
                   <span className="font-medium">{getMentorUser(selectedMentorForPayout.user_id)?.full_name}</span>
