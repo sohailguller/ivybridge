@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
 import {
   Dialog,
   DialogContent,
@@ -20,14 +20,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export default function CreateTaskDialog({ open, onOpenChange, student, mentorId, subscriptionId }) {
+export default function CreateTaskDialog({ open, onOpenChange, student, mentorProfileId, subscriptionId }) {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     due_date: "",
-    priority: "medium",
-    status: "pending"
+    priority: "medium"
   });
 
   const createTaskMutation = useMutation({
@@ -35,24 +34,22 @@ export default function CreateTaskDialog({ open, onOpenChange, student, mentorId
     onSuccess: () => {
       queryClient.invalidateQueries(['mentor-tasks']);
       queryClient.invalidateQueries(['my-tasks']);
-      setFormData({
-        title: "",
-        description: "",
-        due_date: "",
-        priority: "medium",
-        status: "pending"
-      });
       onOpenChange(false);
+      setFormData({ title: "", description: "", due_date: "", priority: "medium" });
     },
   });
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    await createTaskMutation.mutateAsync({
-      subscription_id: subscriptionId,
-      mentor_id: mentorId,
+    
+    if (!student || !mentorProfileId) return;
+
+    createTaskMutation.mutate({
+      ...formData,
       student_id: student.id,
-      ...formData
+      mentor_profile_id: mentorProfileId,
+      subscription_id: subscriptionId,
+      status: "pending"
     });
   };
 
@@ -62,7 +59,7 @@ export default function CreateTaskDialog({ open, onOpenChange, student, mentorId
         <DialogHeader>
           <DialogTitle>Create Task</DialogTitle>
           <DialogDescription>
-            Assign a new task to {student?.full_name}
+            Assign a new task to {student?.full_name || 'student'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -71,7 +68,7 @@ export default function CreateTaskDialog({ open, onOpenChange, student, mentorId
             <Input
               value={formData.title}
               onChange={(e) => setFormData({...formData, title: e.target.value})}
-              placeholder="e.g., Write personal statement draft"
+              placeholder="e.g., Complete essay draft"
               required
             />
           </div>
@@ -81,21 +78,12 @@ export default function CreateTaskDialog({ open, onOpenChange, student, mentorId
             <Textarea
               value={formData.description}
               onChange={(e) => setFormData({...formData, description: e.target.value})}
-              placeholder="Add details about this task..."
+              placeholder="Task details and instructions..."
               className="h-24"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Due Date</Label>
-              <Input
-                type="date"
-                value={formData.due_date}
-                onChange={(e) => setFormData({...formData, due_date: e.target.value})}
-              />
-            </div>
-
             <div className="space-y-2">
               <Label>Priority</Label>
               <Select
@@ -112,21 +100,31 @@ export default function CreateTaskDialog({ open, onOpenChange, student, mentorId
                 </SelectContent>
               </Select>
             </div>
+
+            <div className="space-y-2">
+              <Label>Due Date</Label>
+              <Input
+                type="date"
+                value={formData.due_date}
+                onChange={(e) => setFormData({...formData, due_date: e.target.value})}
+              />
+            </div>
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Button 
-              type="button" 
-              variant="outline" 
-              className="flex-1"
+            <Button
+              type="button"
+              variant="outline"
               onClick={() => onOpenChange(false)}
+              className="flex-1"
+              disabled={createTaskMutation.isPending}
             >
               Cancel
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="flex-1 btn-primary text-white"
-              disabled={createTaskMutation.isPending || !formData.title}
+              disabled={createTaskMutation.isPending}
             >
               {createTaskMutation.isPending ? "Creating..." : "Create Task"}
             </Button>
