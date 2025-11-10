@@ -49,10 +49,15 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     loadUser();
-    checkPaymentSuccess();
   }, []);
 
-  const checkPaymentSuccess = async () => {
+  useEffect(() => {
+    if (user) {
+      checkPaymentSuccess();
+    }
+  }, [user]);
+
+  const checkPaymentSuccess = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentSuccess = urlParams.get('payment_success');
 
@@ -60,40 +65,42 @@ export default function StudentDashboard() {
       setShowSuccessAlert(true);
       setCheckingPayment(true);
       window.history.replaceState({}, '', window.location.pathname);
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      localStorage.removeItem('pending_subscription_id');
-      localStorage.removeItem('mentor_profile_id');
-      setCheckingPayment(false);
+
+      // Stop checking after 30 seconds max
+      setTimeout(() => {
+        setCheckingPayment(false);
+        localStorage.removeItem('pending_subscription_id');
+        localStorage.removeItem('mentor_profile_id');
+      }, 30000);
     }
   };
 
   const loadUser = async () => {
     try {
       const currentUser = await base44.auth.me();
-      
-      // Check redirects BEFORE setting user state
+
+      // Check redirects for wrong account types
       if (currentUser.account_type === "mentor") {
-        navigate(createPageUrl("MentorDashboard"));
-        return; // Stop execution
+        navigate(createPageUrl("MentorDashboard"), { replace: true });
+        return;
       }
       if (currentUser.role === "admin") {
-        navigate(createPageUrl("AdminDashboard"));
-        return; // Stop execution
+        navigate(createPageUrl("AdminDashboard"), { replace: true });
+        return;
       }
-      
-      // Only set user if not redirecting
+
+      // Set user and stop loading
       setUser(currentUser);
+      setIsLoading(false);
     } catch (error) {
       console.error("Auth error:", error);
+      setIsLoading(false); // Ensure loading state is false on error too
       base44.auth.redirectToLogin();
-      return; // Stop execution after redirect
-    } finally {
-      setIsLoading(false);
     }
   };
 
   // Check for both active AND pending subscriptions
-  const { data: subscriptions = [] } = useQuery({
+  const { data: subscriptions = [], isLoading: subsLoading } = useQuery({
     queryKey: ['my-subscriptions', user?.id],
     queryFn: async () => {
       const active = await base44.entities.Subscription.filter({ student_id: user.id, status: "active" });
@@ -101,7 +108,7 @@ export default function StudentDashboard() {
       return [...active, ...pending];
     },
     enabled: !!user,
-    refetchInterval: checkingPayment ? 2000 : false, // Poll every 2 seconds if checking payment
+    refetchInterval: checkingPayment ? 3000 : false,
   });
 
   const { data: mentorProfiles = [] } = useQuery({
@@ -136,13 +143,17 @@ export default function StudentDashboard() {
     enabled: !!user
   });
 
+  const activeSub = subscriptions[0]; // activeSub refers to the first subscription found, whether active or pending
+  const mentor = mentorProfiles.find(p => p.id === activeSub?.mentor_profile_id);
+  const mentorUser = mentorUsers.find(u => u.id === mentor?.user_id);
+
   const { data: myReview } = useQuery({
     queryKey: ['my-review', activeSub?.id],
     queryFn: async () => {
       if (!activeSub || !user) return null;
-      const reviews = await base44.entities.Review.filter({ 
+      const reviews = await base44.entities.Review.filter({
         subscription_id: activeSub.id,
-        student_id: user.id 
+        student_id: user.id
       });
       return reviews[0];
     },
@@ -179,13 +190,10 @@ export default function StudentDashboard() {
     }
   };
 
-  const activeSub = subscriptions[0]; // activeSub refers to the first subscription found, whether active or pending
-  const mentor = mentorProfiles.find(p => p.id === activeSub?.mentor_profile_id);
-  const mentorUser = mentorUsers.find(u => u.id === mentor?.user_id);
-
   const pendingTasks = tasks.filter(t => t.status === "pending" || t.status === "in_progress");
   const completedTasks = tasks.filter(t => t.status === "completed");
 
+  // Loading state
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -197,19 +205,40 @@ export default function StudentDashboard() {
     );
   }
 
-  // Add safety check - if no user after loading, show error
+  // No user after loading - shouldn't happen, but safety check
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FE6C3A] mx-auto mb-4"></div>
-          <p className="text-gray-600">Redirecting...</p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md bg-white border border-gray-200 rounded shadow-sm p-8 text-center">
+          <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
+          <h2 className="text-xl font-bold mb-2 text-[#0D3B33]">Authentication Error</h2>
+          <p className="text-gray-600 text-sm mb-4">
+            Unable to load your account. Please try signing in again.
+          </p>
+          <Button
+            onClick={() => base44.auth.redirectToLogin()}
+            className="btn-primary text-white rounded"
+          >
+            Sign In
+          </Button>
         </div>
       </div>
     );
   }
 
-  // Show loading state while waiting for webhook to activate subscription
+  // Loading subscriptions
+  if (subsLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FE6C3A] mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your subscription...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show processing state while waiting for webhook
   if (checkingPayment && activeSub?.status === "pending") {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -217,18 +246,29 @@ export default function StudentDashboard() {
           <div className="text-center">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#FE6C3A] mx-auto mb-4"></div>
             <h2 className="text-xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
-              Activating Your Subscription
+              Processing Your Payment
             </h2>
             <p className="text-gray-600 mb-3 text-sm">
               Please wait while we confirm your payment and activate your mentorship...
             </p>
-            <p className="text-xs text-gray-500">This usually takes just a few seconds.</p>
+            <p className="text-xs text-gray-500 mb-4">This usually takes just a few seconds.</p>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCheckingPayment(false);
+                queryClient.invalidateQueries(['my-subscriptions']);
+              }}
+              className="text-sm"
+            >
+              Continue to Dashboard
+            </Button>
           </div>
         </div>
       </div>
     );
   }
 
+  // No subscription found
   if (!activeSub || !mentor) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -583,7 +623,7 @@ export default function StudentDashboard() {
 
                 <div className="bg-blue-50 border border-blue-200 rounded p-4">
                   <p className="text-xs text-blue-800">
-                    <strong>Note:</strong> For any billing questions or to update payment methods, 
+                    <strong>Note:</strong> For any billing questions or to update payment methods,
                     please contact support or manage your subscription through Stripe.
                   </p>
                 </div>
