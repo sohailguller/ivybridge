@@ -110,25 +110,39 @@ export default function MentorProfile() {
     setIsSubscribing(true);
 
     try {
-      console.log('Creating checkout session for mentor:', mentor.id, 'plan:', planType);
+      console.log('=== Starting Checkout ===');
+      console.log('Mentor ID:', mentor.id);
+      console.log('Plan Type:', planType);
+      console.log('User ID:', user.id);
       
       const response = await base44.functions.invoke('createCheckoutSession', {
         mentorProfileId: mentor.id,
         planType: planType
       });
 
-      console.log('Checkout session response:', response.data);
+      console.log('✓ Function response received:', response);
+      console.log('Response data:', response.data);
+      console.log('Response status:', response.status);
 
-      if (response.data.url) {
-        console.log('Redirecting to Stripe checkout:', response.data.url);
+      if (response.data?.url) {
+        console.log('✓ Checkout URL found:', response.data.url);
+        console.log('Redirecting to Stripe...');
         window.location.href = response.data.url;
+      } else if (response.data?.error) {
+        throw new Error(response.data.error);
       } else {
-        throw new Error('No checkout URL returned');
+        console.error('No URL in response:', response.data);
+        throw new Error('No checkout URL returned from server');
       }
 
     } catch (error) {
-      console.error("Checkout error:", error);
-      alert("Failed to start checkout. Please try again.");
+      console.error('=== Checkout Error ===');
+      console.error('Error object:', error);
+      console.error('Error message:', error.message);
+      console.error('Error response:', error.response?.data);
+      
+      const errorMessage = error.response?.data?.error || error.message || 'Unknown error occurred';
+      alert(`Failed to start checkout: ${errorMessage}\n\nCheck browser console for details.`);
       setIsSubscribing(false);
     }
   };

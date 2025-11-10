@@ -12,23 +12,38 @@ Deno.serve(async (req) => {
     // Authenticate user
     const user = await base44.auth.me();
     if (!user) {
-      console.error('User not authenticated');
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      console.error('❌ User not authenticated');
+      return Response.json({ error: 'Unauthorized - Please log in' }, { status: 401 });
     }
     console.log('✓ User authenticated:', user.id, user.email);
 
     // Parse request body
-    const { mentorProfileId, planType } = await req.json();
+    let body;
+    try {
+      const bodyText = await req.text();
+      console.log('Raw request body:', bodyText);
+      body = JSON.parse(bodyText);
+      console.log('Parsed body:', body);
+    } catch (e) {
+      console.error('❌ Failed to parse request body:', e);
+      return Response.json({ error: 'Invalid request body' }, { status: 400 });
+    }
+
+    const { mentorProfileId, planType } = body;
+    
     if (!mentorProfileId || !planType) {
-      console.error('Missing required parameters');
+      console.error('❌ Missing required parameters');
+      console.error('mentorProfileId:', mentorProfileId);
+      console.error('planType:', planType);
       return Response.json({ error: 'Missing mentorProfileId or planType' }, { status: 400 });
     }
-    console.log('✓ Request params:', { mentorProfileId, planType });
+    console.log('✓ Request params validated');
 
     // Get mentor profile
+    console.log('Fetching mentor profile:', mentorProfileId);
     const mentorProfiles = await base44.asServiceRole.entities.MentorProfile.filter({ id: mentorProfileId });
     if (mentorProfiles.length === 0) {
-      console.error('Mentor profile not found:', mentorProfileId);
+      console.error('❌ Mentor profile not found:', mentorProfileId);
       return Response.json({ error: 'Mentor not found' }, { status: 404 });
     }
     const mentorProfile = mentorProfiles[0];
@@ -40,6 +55,7 @@ Deno.serve(async (req) => {
     endDate.setMonth(endDate.getMonth() + 12);
 
     // Create subscription record with PENDING status
+    console.log('Creating subscription record...');
     const subscriptionData = {
       student_id: user.id,
       mentor_id: mentorProfile.user_id,
@@ -51,6 +67,7 @@ Deno.serve(async (req) => {
       end_date: endDate.toISOString().split('T')[0],
       months_remaining: 12
     };
+    console.log('Subscription data:', subscriptionData);
 
     const subscription = await base44.asServiceRole.entities.Subscription.create(subscriptionData);
     console.log('✓ Subscription created:', subscription.id, 'Status: pending');
@@ -58,6 +75,7 @@ Deno.serve(async (req) => {
     // Get or create Stripe customer
     let customerId = user.stripe_customer_id;
     if (!customerId) {
+      console.log('Creating new Stripe customer...');
       const customer = await stripe.customers.create({
         email: user.email,
         name: user.full_name,
@@ -73,6 +91,7 @@ Deno.serve(async (req) => {
     // Setup pricing based on plan type
     const amount = planType === 'monthly' ? 42500 : 500000;
     const mode = planType === 'monthly' ? 'subscription' : 'payment';
+    console.log('Stripe mode:', mode, 'Amount:', amount);
     
     const lineItems = [{
       price_data: {
@@ -89,8 +108,10 @@ Deno.serve(async (req) => {
 
     // Get origin for redirect URLs
     const origin = req.headers.get('origin') || 'https://ivy-bridge-f5bb348d.base44.app';
+    console.log('Origin:', origin);
 
     // Create Stripe checkout session
+    console.log('Creating Stripe checkout session...');
     const sessionConfig = {
       customer: customerId,
       payment_method_types: ['card'],
@@ -130,10 +151,14 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('=== Checkout Error ===');
-    console.error('Error:', error.message);
-    console.error('Stack:', error.stack);
+    console.error('Error type:', error.constructor.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    console.error('Full error:', error);
+    
     return Response.json({ 
-      error: error.message || 'Failed to create checkout session' 
+      error: error.message || 'Failed to create checkout session',
+      details: error.stack
     }, { status: 500 });
   }
 });
