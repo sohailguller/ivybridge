@@ -189,13 +189,13 @@ export default function Home() {
       </section>
 
       {/* Universities Ticker */}
-      <section className="py-16 bg-white border-y border-gray-200">
+      <section className="py-32 bg-white border-y border-gray-200">
         <div className="w-full px-6 md:px-12">
           <p className="text-center text-sm text-gray-500 mb-8 tracking-wider">MENTORS FROM</p>
           <div className="overflow-hidden">
             <div className="flex animate-scroll whitespace-nowrap">
               {[...universities, ...universities].map((uni, idx) => (
-                <div key={idx} className="inline-flex items-center mx-32">
+                <div key={idx} className="inline-flex items-center mx-16">
                   <span className="text-3xl font-semibold text-[#0D3B33]">{uni}</span>
                 </div>
               ))}
