@@ -124,21 +124,21 @@ export default function Home() {
         <div className="absolute inset-0 bg-black/30" />
 
         {/* Content - Bottom Left Aligned */}
-        <div className="relative w-full px-6 md:px-12 lg:px-24 pb-12 md:pb-16">
-          <div className="max-w-7xl">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-white mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+        <div className="relative w-full px-6 md:px-12 lg:px-24 pb-8">
+          <div className="max-w-3xl">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-normal leading-tight text-white mb-3" style={{ fontFamily: 'Crimson Pro, Georgia, serif', fontWeight: 400 }}>
               Get Into Your Dream School
             </h1>
 
-            <p className="text-base md:text-lg lg:text-xl text-white/95 leading-relaxed max-w-2xl mb-6">
+            <p className="text-base md:text-lg text-white/90 leading-relaxed max-w-xl mb-5" style={{ fontFamily: 'Crimson Pro, Georgia, serif' }}>
               Connect with verified Ivy League mentors for personalized admissions guidance.
               From essay reviews to interview prep — get the insider advantage.
             </p>
 
-            <div className="flex flex-wrap gap-3 mb-3">
+            <div className="flex flex-wrap gap-3">
               <Button
                 size="lg"
-                className="btn-primary text-white rounded px-6 py-4 text-sm font-semibold"
+                className="btn-primary text-white rounded px-6 py-3 text-sm font-semibold"
                 onClick={() => user ? navigate(createPageUrl("BrowseMentors")) : base44.auth.redirectToLogin(createPageUrl("BrowseMentors"))}
               >
                 Find Your Mentor
@@ -147,16 +147,12 @@ export default function Home() {
               <Button
                 size="lg"
                 variant="outline"
-                className="rounded px-6 py-4 text-sm font-semibold bg-white/95 border-white text-[#0D3B33] hover:bg-white"
+                className="rounded px-6 py-3 text-sm font-semibold bg-white/95 border-white text-[#0D3B33] hover:bg-white"
                 onClick={() => navigate(createPageUrl("ApplyAsMentor"))}
               >
                 Become a Mentor
               </Button>
             </div>
-
-            <p className="text-xs text-white/70 max-w-2xl">
-              *All of our Ivy League clients apply Early, indicating a student was excluded from our tally for not heeding our advice on their EA/ED choice or for making unapproved application changes.
-            </p>
           </div>
         </div>
       </section>
