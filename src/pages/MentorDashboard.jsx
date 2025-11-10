@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -18,7 +17,8 @@ import {
   AlertCircle,
   Plus,
   ExternalLink,
-  RefreshCw
+  RefreshCw,
+  Bug
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -40,6 +40,7 @@ export default function MentorDashboard() {
   const [showTaskDialog, setShowTaskDialog] = useState(false);
   const [showNoteDialog, setShowNoteDialog] = useState(false);
   const [connectingStripe, setConnectingStripe] = useState(false);
+  const [debugInfo, setDebugInfo] = useState(null);
 
   useEffect(() => {
     loadUser();
@@ -48,6 +49,8 @@ export default function MentorDashboard() {
   const loadUser = async () => {
     try {
       const currentUser = await base44.auth.me();
+      console.log('👤 Current user:', { id: currentUser.id, account_type: currentUser.account_type, mentor_profile_id: currentUser.mentor_profile_id });
+      
       if (currentUser.account_type !== "mentor" && !currentUser.mentor_profile_id) {
         navigate(createPageUrl("StudentDashboard"));
         return;
@@ -59,6 +62,7 @@ export default function MentorDashboard() {
       
       if (currentUser.mentor_profile_id) {
         const profiles = await base44.entities.MentorProfile.filter({ id: currentUser.mentor_profile_id });
+        console.log('🔍 Found profiles by mentor_profile_id:', profiles.length);
         if (profiles.length > 0) {
           profile = profiles[0];
         }
@@ -67,55 +71,109 @@ export default function MentorDashboard() {
       // Fallback: try finding by user_id
       if (!profile) {
         const profiles = await base44.entities.MentorProfile.filter({ user_id: currentUser.id });
+        console.log('🔍 Found profiles by user_id:', profiles.length);
         if (profiles.length > 0) {
           profile = profiles[0];
           // Update user with mentor_profile_id for future
           try {
             await base44.auth.updateMe({ mentor_profile_id: profile.id });
+            console.log('✅ Updated user with mentor_profile_id:', profile.id);
           } catch (e) {
-            console.log('Could not update mentor_profile_id:', e);
+            console.log('❌ Could not update mentor_profile_id:', e);
           }
         }
       }
       
       if (profile) {
+        console.log('📋 Mentor profile loaded:', { id: profile.id, user_id: profile.user_id });
         setMentorProfile(profile);
       }
     } catch (error) {
+      console.error('❌ Error loading user:', error);
       base44.auth.redirectToLogin();
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Fetch active subscriptions for this mentor with aggressive refetching
+  // Fetch ALL subscriptions for debugging
+  const { data: allSubscriptions = [] } = useQuery({
+    queryKey: ['debug-all-subscriptions'],
+    queryFn: async () => {
+      const all = await base44.entities.Subscription.list();
+      console.log('🗂️ ALL SUBSCRIPTIONS IN DATABASE:', all);
+      return all;
+    },
+    enabled: !!mentorProfile,
+    refetchInterval: 5000,
+  });
+
+  // Fetch active subscriptions for this mentor
   const { data: subscriptions = [], refetch: refetchSubscriptions, isFetching: isFetchingSubscriptions } = useQuery({
     queryKey: ['mentor-subscriptions', mentorProfile?.id],
     queryFn: async () => {
-      if (!mentorProfile?.id) return [];
+      if (!mentorProfile?.id) {
+        console.log('⚠️ No mentor profile ID, returning empty array');
+        return [];
+      }
+      
+      console.log('🔎 Fetching subscriptions for mentor_profile_id:', mentorProfile.id);
+      
+      // Try direct filter
       const subs = await base44.entities.Subscription.filter({ 
         mentor_profile_id: mentorProfile.id,
         status: "active"
       });
-      console.log(`Fetched ${subs.length} active subscriptions for mentor ${mentorProfile.id}`);
+      
+      console.log(`📊 Query result: ${subs.length} active subscriptions`);
+      console.log('📋 Subscription details:', subs.map(s => ({
+        id: s.id,
+        student_id: s.student_id,
+        mentor_profile_id: s.mentor_profile_id,
+        status: s.status
+      })));
+      
+      // Also check if there are any subscriptions with different status
+      const allForMentor = await base44.entities.Subscription.filter({ 
+        mentor_profile_id: mentorProfile.id
+      });
+      console.log(`📊 ALL subscriptions for mentor (any status): ${allForMentor.length}`);
+      
+      setDebugInfo({
+        mentorProfileId: mentorProfile.id,
+        totalInDb: allSubscriptions.length,
+        forThisMentor: allForMentor.length,
+        active: subs.length,
+        subscriptions: subs
+      });
+      
       return subs;
     },
     enabled: !!mentorProfile?.id,
-    refetchInterval: 3000, // Poll every 3 seconds
+    refetchInterval: 2000, // Poll every 2 seconds
     refetchOnWindowFocus: true,
     refetchOnMount: true,
-    staleTime: 0, // Always consider data stale
+    staleTime: 0,
   });
 
-  // Fetch student users based on subscriptions with proper dependency
+  // Fetch student users based on subscriptions
   const { data: students = [] } = useQuery({
-    queryKey: ['my-students', JSON.stringify(subscriptions.map(s => s.student_id).sort())],
+    queryKey: ['my-students', subscriptions.length, ...subscriptions.map(s => s.id)],
     queryFn: async () => {
-      if (subscriptions.length === 0) return [];
+      if (subscriptions.length === 0) {
+        console.log('⚠️ No subscriptions, skipping student fetch');
+        return [];
+      }
+      
       const studentIds = subscriptions.map(s => s.student_id);
+      console.log('👥 Fetching students with IDs:', studentIds);
+      
       const allUsers = await base44.entities.User.list();
+      console.log('📋 Total users in database:', allUsers.length);
+      
       const filteredStudents = allUsers.filter(u => studentIds.includes(u.id));
-      console.log(`Fetched ${filteredStudents.length} students for ${studentIds.length} subscriptions`);
+      console.log(`✅ Found ${filteredStudents.length} matching students`);
+      
       return filteredStudents;
     },
     enabled: subscriptions.length > 0,
@@ -144,10 +202,11 @@ export default function MentorDashboard() {
   };
 
   const handleRefresh = async () => {
-    console.log('Manual refresh triggered');
+    console.log('🔄 Manual refresh triggered');
     await refetchSubscriptions();
     queryClient.invalidateQueries(['my-students']);
     queryClient.invalidateQueries(['mentor-tasks']);
+    queryClient.invalidateQueries(['debug-all-subscriptions']);
   };
 
   const totalRevenue = subscriptions.reduce((sum, sub) => sum + sub.amount, 0);
@@ -250,22 +309,38 @@ export default function MentorDashboard() {
       <div className="w-full px-6 md:px-12 lg:px-24">
         <div className="mb-6 border-b border-gray-200 pb-4">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex-1">
               <h1 className="text-2xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
                 Mentor Dashboard
               </h1>
               <p className="text-gray-600 text-sm">Manage your students and track your mentorship</p>
-              {/* Debug info - remove in production */}
-              <p className="text-xs text-gray-400 mt-1">
-                Active subscriptions: {subscriptions.length} | Students loaded: {students.length}
-              </p>
+              
+              {/* Enhanced Debug Panel */}
+              <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs space-y-1">
+                <div className="font-semibold flex items-center gap-2 text-yellow-800">
+                  <Bug className="w-3 h-3" />
+                  Debug Information
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-gray-700">
+                  <div>Mentor Profile ID: <span className="font-mono font-bold">{mentorProfile.id}</span></div>
+                  <div>Active Subscriptions: <span className="font-bold">{subscriptions.length}</span></div>
+                  <div>Students Loaded: <span className="font-bold">{students.length}</span></div>
+                  <div>Total Subs in DB: <span className="font-bold">{allSubscriptions.length}</span></div>
+                </div>
+                {debugInfo && (
+                  <div className="mt-2 p-2 bg-white border border-yellow-300 rounded">
+                    <div className="font-semibold mb-1">Query Results:</div>
+                    <pre className="text-xs overflow-x-auto">{JSON.stringify(debugInfo, null, 2)}</pre>
+                  </div>
+                )}
+              </div>
             </div>
             <Button
               variant="outline"
               size="sm"
               onClick={handleRefresh}
               disabled={isFetchingSubscriptions}
-              className="rounded text-xs"
+              className="rounded text-xs ml-4"
             >
               {isFetchingSubscriptions ? (
                 <>
@@ -374,6 +449,11 @@ export default function MentorDashboard() {
                       <Users className="w-10 h-10 mx-auto mb-2 opacity-30" />
                       <p className="text-sm">No students yet</p>
                       <p className="text-xs mt-2">New subscriptions will appear here automatically</p>
+                      {subscriptions.length > 0 && (
+                        <p className="text-xs mt-2 text-orange-600">
+                          ⚠️ Found {subscriptions.length} subscription(s) but no matching students
+                        </p>
+                      )}
                     </div>
                   ) : (
                     students.map(student => (
