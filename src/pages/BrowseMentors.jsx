@@ -87,7 +87,7 @@ export default function BrowseMentors() {
 
   const allMajors = [...new Set(mentors.map(m => m.major).filter(Boolean))];
 
-  // Add error state display here
+  // Add error state
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -186,7 +186,7 @@ export default function BrowseMentors() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredMentors.map((mentor) => {
               const user = getMentorUser(mentor.user_id);
-              const universityBg = universityImages[mentor.university] || universityImages.Harvard; // Default to Harvard if no image for university
+              const universityBg = universityImages[mentor.university] || universityImages.Harvard;
 
               return (
                 <div
@@ -194,26 +194,31 @@ export default function BrowseMentors() {
                   className="bg-white border border-gray-200 rounded shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden"
                   onClick={() => navigate(createPageUrl(`MentorProfile?id=${mentor.id}`))}
                 >
+                  {/* University Banner */}
                   <div
-                    className="h-24 bg-cover bg-center relative"
+                    className="h-20 bg-cover bg-center relative"
                     style={{
                       backgroundImage: `url(${universityBg})`,
                       backgroundPosition: 'center 30%'
                     }}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/20" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/10" />
                   </div>
 
-                  <div className="p-6 -mt-8">
-                    <Avatar className="w-16 h-16 border-4 border-white shadow-sm mb-4">
-                      <AvatarImage src={mentor.profile_photo_url || user?.profile_photo_url} />
-                      <AvatarFallback className="bg-[#E6EFEA] text-xl text-[#0D3B33]">
-                        {user?.full_name?.charAt(0) || 'M'}
-                      </AvatarFallback>
-                    </Avatar>
+                  <div className="px-6 pt-0 pb-6">
+                    {/* Profile Photo - Overlapping LinkedIn Style */}
+                    <div className="-mt-12 mb-4">
+                      <Avatar className="w-24 h-24 border-4 border-white shadow-lg ring-2 ring-gray-100">
+                        <AvatarImage src={mentor.profile_photo_url || user?.profile_photo_url} />
+                        <AvatarFallback className="bg-[#E6EFEA] text-2xl text-[#0D3B33]">
+                          {user?.full_name?.charAt(0) || 'M'}
+                        </AvatarFallback>
+                      </Avatar>
+                    </div>
 
+                    {/* Name and Info */}
                     <h3 className="text-lg font-bold mb-1 text-[#0D3B33]">{user?.full_name || 'Mentor'}</h3>
-                    <div className="flex items-center gap-2 text-xs text-gray-600 mb-3">
+                    <div className="flex items-center gap-2 text-xs text-gray-600 mb-2">
                       <GraduationCap className="w-4 h-4" />
                       <span>{mentor.university} • {mentor.year}</span>
                     </div>
