@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -58,7 +57,6 @@ export default function MentorDashboard() {
       }
       setUser(currentUser);
       
-      // Load mentor profile - try by mentor_profile_id first, then by user_id
       let profile = null;
       
       if (currentUser.mentor_profile_id) {
@@ -69,13 +67,11 @@ export default function MentorDashboard() {
         }
       }
       
-      // Fallback: try finding by user_id
       if (!profile) {
         const profiles = await base44.entities.MentorProfile.filter({ user_id: currentUser.id });
         console.log('🔍 Found profiles by user_id:', profiles.length);
         if (profiles.length > 0) {
           profile = profiles[0];
-          // Update user with mentor_profile_id for future
           try {
             await base44.auth.updateMe({ mentor_profile_id: profile.id });
             console.log('✅ Updated user with mentor_profile_id:', profile.id);
@@ -97,7 +93,6 @@ export default function MentorDashboard() {
     }
   };
 
-  // Fetch ALL subscriptions for debugging
   const { data: allSubscriptions = [] } = useQuery({
     queryKey: ['debug-all-subscriptions'],
     queryFn: async () => {
@@ -109,7 +104,6 @@ export default function MentorDashboard() {
     refetchInterval: 5000,
   });
 
-  // Fetch active subscriptions for this mentor
   const { data: subscriptions = [], refetch: refetchSubscriptions, isFetching: isFetchingSubscriptions } = useQuery({
     queryKey: ['mentor-subscriptions', mentorProfile?.id],
     queryFn: async () => {
@@ -137,7 +131,6 @@ export default function MentorDashboard() {
     staleTime: 0,
   });
 
-  // NEW APPROACH: Directly fetch students by their IDs from subscriptions
   const { data: students = [], isLoading: studentsLoading, error: studentsError } = useQuery({
     queryKey: ['my-students-direct', JSON.stringify(subscriptions.map(s => s.student_id).sort())],
     queryFn: async () => {
@@ -158,14 +151,13 @@ export default function MentorDashboard() {
       console.log('🎯 DIRECTLY FETCHING students with IDs:', studentIds);
       
       try {
-        // Strategy 1: Try fetching each user individually by ID
         console.log('📍 Strategy 1: Fetch each user individually...');
         const userPromises = studentIds.map(async (id) => {
           console.log(`  → Fetching user with ID: ${id}`);
           try {
             const users = await base44.entities.User.filter({ id: id });
             console.log(`  ✓ Found ${users.length} user(s) for ID ${id}`);
-            return users[0]; // Return first match
+            return users[0];
           } catch (error) {
             console.error(`  ✗ Error fetching user ${id}:`, error);
             return null;
@@ -194,7 +186,6 @@ export default function MentorDashboard() {
           return validUsers;
         }
         
-        // Strategy 2: Fallback - list all users and filter
         console.log('📍 Strategy 2: List all users and filter...');
         const allUsers = await base44.entities.User.list();
         console.log(`  → Total users in system: ${allUsers.length}`);
@@ -215,7 +206,7 @@ export default function MentorDashboard() {
         setDebugInfo({
           mentorProfileId: mentorProfile?.id,
           strategy: 'list-and-filter',
-          totalUsersInSystem: allUsers.length, // This `allUsers` is a local variable from Strategy 2 fetch
+          totalUsersInSystem: allUsers.length,
           totalSubscriptions: allSubscriptions.length,
           activeSubscriptions: subscriptions.length,
           studentIds: studentIds,
@@ -236,7 +227,7 @@ export default function MentorDashboard() {
         throw error;
       }
     },
-    enabled: subscriptions.length > 0 && !!mentorProfile?.id, // Only enable if we have subscriptions and a mentor profile
+    enabled: subscriptions.length > 0 && !!mentorProfile?.id,
     staleTime: 0,
     retry: 2,
   });
@@ -266,7 +257,7 @@ export default function MentorDashboard() {
     console.log('🔄 Manual refresh triggered');
     await Promise.all([
       refetchSubscriptions(),
-      queryClient.invalidateQueries(['my-students-direct']), // Updated query key
+      queryClient.invalidateQueries(['my-students-direct']),
       queryClient.invalidateQueries(['mentor-tasks']),
       queryClient.invalidateQueries(['debug-all-subscriptions'])
     ]);
@@ -378,7 +369,6 @@ export default function MentorDashboard() {
               </h1>
               <p className="text-gray-600 text-sm">Manage your students and track your mentorship</p>
               
-              {/* Enhanced Debug Panel */}
               <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs space-y-1">
                 <div className="font-semibold flex items-center gap-2 text-yellow-800">
                   <Bug className="w-3 h-3" />
@@ -388,12 +378,12 @@ export default function MentorDashboard() {
                   <div>Mentor ID: <span className="font-mono font-bold text-[10px]">{mentorProfile.id.slice(-8)}</span></div>
                   <div>Active Subs: <span className="font-bold">{subscriptions.length}</span></div>
                   <div>Students: <span className={students.length === 0 && subscriptions.length > 0 ? "font-bold text-red-600" : "font-bold text-green-600"}>{students.length}</span></div>
-                  <div>Students Loading: <span className="font-bold">{studentsLoading ? "YES" : "NO"}</span></div> {/* Updated */}
-                  <div>Students Error: <span className="font-bold">{studentsError ? "YES" : "NO"}</span></div> {/* Updated */}
+                  <div>Students Loading: <span className="font-bold">{studentsLoading ? "YES" : "NO"}</span></div>
+                  <div>Students Error: <span className="font-bold">{studentsError ? "YES" : "NO"}</span></div>
                 </div>
-                {studentsError && ( {/* Updated */}
+                {studentsError && (
                   <div className="p-2 bg-red-100 border border-red-300 rounded text-red-800">
-                    <strong>Students Error:</strong> {studentsError.message} {/* Updated */}
+                    <strong>Students Error:</strong> {studentsError.message}
                   </div>
                 )}
                 <div className="mt-2 p-2 bg-white border border-yellow-300 rounded max-h-48 overflow-y-auto">
@@ -511,7 +501,7 @@ export default function MentorDashboard() {
                   </h3>
                 </div>
                 <div className="p-4 space-y-4">
-                  {studentsLoading ? ( {/* Updated */}
+                  {studentsLoading ? (
                     <div className="text-center py-6 text-gray-500">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FE6C3A] mx-auto mb-2"></div>
                       <p className="text-sm">Loading students...</p>
