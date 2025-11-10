@@ -25,6 +25,24 @@ Deno.serve(async (req) => {
     }
     const mentorProfile = mentorProfiles[0];
 
+    // Create the subscription record FIRST with pending status
+    const startDate = new Date().toISOString().split('T')[0];
+    const endDate = new Date();
+    endDate.setMonth(endDate.getMonth() + 12);
+
+    const subscription = await base44.entities.Subscription.create({
+      student_id: user.id,
+      mentor_id: mentorProfile.user_id,
+      mentor_profile_id: mentorProfile.id,
+      plan_type: planType,
+      amount: planType === 'monthly' ? 425 : 5000,
+      status: "pending",
+      start_date: startDate,
+      end_date: endDate.toISOString().split('T')[0],
+      months_remaining: 12,
+      stripe_subscription_id: `pending_${Date.now()}_${user.id}`
+    });
+
     // Get or create Stripe customer
     let customerId = user.stripe_customer_id;
     if (!customerId) {
@@ -76,16 +94,17 @@ Deno.serve(async (req) => {
     // Get origin for URLs
     const origin = req.headers.get('origin') || 'https://ivy-bridge-f5bb348d.base44.app';
 
-    // Create checkout session
+    // Create checkout session with subscription ID in metadata
     const sessionConfig = {
       customer: customerId,
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: mode,
-      success_url: `${origin}/StudentDashboard?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${origin}/StudentDashboard?payment_success=true`,
       cancel_url: `${origin}/MentorProfile?id=${mentorProfileId}`,
       metadata: {
         user_id: user.id,
+        subscription_id: subscription.id, // CRITICAL: Pass subscription ID
         mentor_profile_id: mentorProfileId,
         mentor_user_id: mentorProfile.user_id,
         plan_type: planType,
@@ -98,6 +117,7 @@ Deno.serve(async (req) => {
       sessionConfig.subscription_data = {
         metadata: {
           user_id: user.id,
+          subscription_id: subscription.id, // CRITICAL: Pass subscription ID
           mentor_profile_id: mentorProfileId,
           mentor_user_id: mentorProfile.user_id,
           plan_type: planType
@@ -109,7 +129,8 @@ Deno.serve(async (req) => {
 
     return Response.json({
       sessionId: session.id,
-      url: session.url
+      url: session.url,
+      subscriptionId: subscription.id
     });
 
   } catch (error) {

@@ -110,35 +110,21 @@ export default function MentorProfile() {
     setIsSubscribing(true);
 
     try {
-      const startDate = new Date().toISOString().split('T')[0];
-      const endDate = new Date();
-      endDate.setMonth(endDate.getMonth() + 12);
-
-      const subscription = await base44.entities.Subscription.create({
-        student_id: user.id,
-        mentor_id: mentor.user_id,
-        mentor_profile_id: mentor.id,
-        plan_type: planType,
-        amount: amount,
-        status: "pending",
-        start_date: startDate,
-        end_date: endDate.toISOString().split('T')[0],
-        months_remaining: 12,
-        stripe_subscription_id: `pending_${Date.now()}_${user.id}`
+      // Use the backend function to create proper Stripe checkout with metadata
+      const response = await base44.functions.invoke('createCheckoutSession', {
+        mentorProfileId: mentor.id,
+        planType: planType
       });
 
-      localStorage.setItem('pending_subscription_id', subscription.id);
-      localStorage.setItem('mentor_profile_id', mentor.id);
-
-      const stripeUrls = {
-        monthly: `https://buy.stripe.com/test_eVqfZj1uJg5l50e0pH1Fe00`,
-        annual: `https://buy.stripe.com/test_6oUcN78Xb8CT0JY4FX1Fe01`
-      };
-
-      window.location.href = stripeUrls[planType];
+      if (response.data.url) {
+        // Redirect to Stripe checkout
+        window.location.href = response.data.url;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
 
     } catch (error) {
-      console.error("Error creating subscription:", error);
+      console.error("Error creating checkout session:", error);
       alert("There was an error starting your subscription. Please try again.");
       setIsSubscribing(false);
     }
@@ -470,10 +456,10 @@ export default function MentorProfile() {
               </div>
               <Button
                 onClick={() => handleSubscribe('monthly', 425)}
-                disabled={isMentor}
+                disabled={isMentor || isSubscribing}
                 className="w-full btn-primary text-white rounded py-5 mb-3"
               >
-                Subscribe Monthly
+                {isSubscribing ? 'Processing...' : 'Subscribe Monthly'}
               </Button>
               <div className="text-center">
                 <div className="text-sm font-medium text-gray-600 mb-1">Annual Plan</div>
@@ -483,10 +469,10 @@ export default function MentorProfile() {
               </div>
               <Button
                 onClick={() => handleSubscribe('annual', 5000)}
-                disabled={isMentor}
+                disabled={isMentor || isSubscribing}
                 className="w-full bg-[#FE6C3A] hover:bg-[#FF7B4A] text-white rounded py-5"
               >
-                Subscribe Annually
+                {isSubscribing ? 'Processing...' : 'Subscribe Annually'}
               </Button>
             </div>
 
