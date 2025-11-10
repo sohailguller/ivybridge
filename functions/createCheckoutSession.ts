@@ -4,32 +4,58 @@ import Stripe from 'npm:stripe@16.14.0';
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"));
 
 Deno.serve(async (req) => {
+  console.log('=== Checkout Session Request ===');
+  
   try {
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
+    
+    // Authenticate user
+    let user;
+    try {
+      user = await base44.auth.me();
+      console.log('User authenticated:', user.id);
+    } catch (authError) {
+      console.error('Auth failed:', authError);
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { mentorProfileId, planType } = await req.json();
+    // Parse request body
+    let requestBody;
+    try {
+      requestBody = await req.json();
+      console.log('Request body:', requestBody);
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError);
+      return Response.json({ error: 'Invalid JSON' }, { status: 400 });
+    }
+
+    const { mentorProfileId, planType } = requestBody;
 
     if (!mentorProfileId || !planType) {
+      console.error('Missing params:', { mentorProfileId, planType });
       return Response.json({ error: 'Missing mentorProfileId or planType' }, { status: 400 });
     }
 
     // Get mentor profile
+    console.log('Fetching mentor profile:', mentorProfileId);
     const mentorProfiles = await base44.entities.MentorProfile.filter({ id: mentorProfileId });
     if (mentorProfiles.length === 0) {
+      console.error('Mentor not found:', mentorProfileId);
       return Response.json({ error: 'Mentor not found' }, { status: 404 });
     }
     const mentorProfile = mentorProfiles[0];
+    console.log('Mentor found:', mentorProfile.id);
 
     // Create the subscription record FIRST with pending status
     const startDate = new Date().toISOString().split('T')[0];
     const endDate = new Date();
     endDate.setMonth(endDate.getMonth() + 12);
 
+    console.log('Creating subscription record...');
     const subscription = await base44.entities.Subscription.create({
       student_id: user.id,
       mentor_id: mentorProfile.user_id,
@@ -42,17 +68,22 @@ Deno.serve(async (req) => {
       months_remaining: 12,
       stripe_subscription_id: `pending_${Date.now()}_${user.id}`
     });
+    console.log('Subscription created:', subscription.id);
 
     // Get or create Stripe customer
     let customerId = user.stripe_customer_id;
     if (!customerId) {
+      console.log('Creating Stripe customer...');
       const customer = await stripe.customers.create({
         email: user.email,
         name: user.full_name,
         metadata: { user_id: user.id }
       });
       customerId = customer.id;
+      console.log('Stripe customer created:', customerId);
       await base44.auth.updateMe({ stripe_customer_id: customerId });
+    } else {
+      console.log('Using existing Stripe customer:', customerId);
     }
 
     // Setup pricing
@@ -88,11 +119,13 @@ Deno.serve(async (req) => {
         quantity: 1,
       }];
     } else {
+      console.error('Invalid plan type:', planType);
       return Response.json({ error: 'Invalid plan type' }, { status: 400 });
     }
 
     // Get origin for URLs
     const origin = req.headers.get('origin') || 'https://ivy-bridge-f5bb348d.base44.app';
+    console.log('Using origin:', origin);
 
     // Create checkout session with subscription ID in metadata
     const sessionConfig = {
@@ -104,7 +137,7 @@ Deno.serve(async (req) => {
       cancel_url: `${origin}/MentorProfile?id=${mentorProfileId}`,
       metadata: {
         user_id: user.id,
-        subscription_id: subscription.id, // CRITICAL: Pass subscription ID
+        subscription_id: subscription.id,
         mentor_profile_id: mentorProfileId,
         mentor_user_id: mentorProfile.user_id,
         plan_type: planType,
@@ -117,7 +150,7 @@ Deno.serve(async (req) => {
       sessionConfig.subscription_data = {
         metadata: {
           user_id: user.id,
-          subscription_id: subscription.id, // CRITICAL: Pass subscription ID
+          subscription_id: subscription.id,
           mentor_profile_id: mentorProfileId,
           mentor_user_id: mentorProfile.user_id,
           plan_type: planType
@@ -125,7 +158,9 @@ Deno.serve(async (req) => {
       };
     }
 
+    console.log('Creating Stripe checkout session...');
     const session = await stripe.checkout.sessions.create(sessionConfig);
+    console.log('Stripe session created:', session.id);
 
     return Response.json({
       sessionId: session.id,
@@ -134,7 +169,10 @@ Deno.serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Checkout error:', error);
+    console.error('=== Checkout Error ===');
+    console.error('Error type:', error.constructor.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
     return Response.json({ 
       error: error.message || 'Failed to create checkout' 
     }, { status: 500 });

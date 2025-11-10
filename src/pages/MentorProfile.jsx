@@ -110,22 +110,28 @@ export default function MentorProfile() {
     setIsSubscribing(true);
 
     try {
+      console.log('Creating checkout session for:', { mentorProfileId: mentor.id, planType });
+      
       // Use the backend function to create proper Stripe checkout with metadata
       const response = await base44.functions.invoke('createCheckoutSession', {
         mentorProfileId: mentor.id,
         planType: planType
       });
 
-      if (response.data.url) {
+      console.log('Checkout response:', response);
+
+      if (response.data?.url) {
         // Redirect to Stripe checkout
         window.location.href = response.data.url;
       } else {
-        throw new Error('No checkout URL returned');
+        console.error('No URL in response:', response);
+        throw new Error(response.data?.error || 'No checkout URL returned');
       }
 
     } catch (error) {
       console.error("Error creating checkout session:", error);
-      alert("There was an error starting your subscription. Please try again.");
+      const errorMessage = error.response?.data?.error || error.message || "Unknown error";
+      alert(`There was an error starting your subscription: ${errorMessage}`);
       setIsSubscribing(false);
     }
   };
