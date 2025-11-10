@@ -9,9 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Users,
-  MessageSquare,
+import { 
+  Users, 
+  MessageSquare, 
   CheckCircle,
   DollarSign,
   Clock,
@@ -37,7 +37,7 @@ export default function MentorDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showTaskDialog, setShowTaskDialog] = useState(false);
-  const [showNoteDialog, setShowNoteDialog] = useState(false);
+  const [showNoteDialog, setShowNoteDialog] = useState(false); // This state is not used, still keep as per original file.
   const [connectingStripe, setConnectingStripe] = useState(false);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function MentorDashboard() {
         return;
       }
       setUser(currentUser);
-
+      
       if (currentUser.mentor_profile_id) {
         const profiles = await base44.entities.MentorProfile.filter({ id: currentUser.mentor_profile_id });
         if (profiles.length > 0) {
@@ -66,19 +66,10 @@ export default function MentorDashboard() {
     }
   };
 
-  const { data: subscriptions = [], refetch: refetchSubscriptions } = useQuery({
+  const { data: subscriptions = [] } = useQuery({
     queryKey: ['mentor-subscriptions', mentorProfile?.id],
-    queryFn: async () => {
-      console.log('Fetching subscriptions for mentor profile:', mentorProfile.id);
-      const subs = await base44.entities.Subscription.filter({
-        mentor_profile_id: mentorProfile.id,
-        status: "active"
-      });
-      console.log('Found subscriptions:', subs.length, subs);
-      return subs;
-    },
-    enabled: !!mentorProfile,
-    refetchInterval: 5000, // Refresh every 5 seconds
+    queryFn: () => base44.entities.Subscription.filter({ mentor_profile_id: mentorProfile.id, status: "active" }),
+    enabled: !!mentorProfile
   });
 
   const { data: students = [] } = useQuery({
@@ -101,7 +92,7 @@ export default function MentorDashboard() {
     setConnectingStripe(true);
     try {
       const response = await base44.functions.invoke('connectMentorStripe', {});
-
+      
       if (response.data.onboardingUrl) {
         window.location.href = response.data.onboardingUrl;
       }
@@ -138,7 +129,7 @@ export default function MentorDashboard() {
             <p className="text-gray-600 mb-4 text-sm">
               You need to complete your mentor application first.
             </p>
-            <Button
+            <Button 
               className="btn-primary text-white rounded"
               onClick={() => navigate(createPageUrl("ApplyAsMentor"))}
             >
@@ -162,13 +153,13 @@ export default function MentorDashboard() {
               Application Under Review
             </h2>
             <p className="text-gray-600 mb-4 text-sm">
-              Your mentor application is currently being reviewed by our team.
+              Your mentor application is currently being reviewed by our team. 
               We'll notify you via email once it's been approved.
             </p>
             <p className="text-xs text-gray-500 mb-6">
               This usually takes 1-2 business days.
             </p>
-            <Button
+            <Button 
               variant="outline"
               className="rounded"
               onClick={() => navigate(createPageUrl("Home"))}
@@ -194,7 +185,7 @@ export default function MentorDashboard() {
               Unfortunately, your mentor application was not approved at this time.
               Please contact support for more information.
             </p>
-            <Button
+            <Button 
               variant="outline"
               className="rounded"
               onClick={() => navigate(createPageUrl("Home"))}
@@ -212,22 +203,10 @@ export default function MentorDashboard() {
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-24">
         {/* Header */}
         <div className="mb-6 border-b border-gray-200 pb-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
-                Mentor Dashboard
-              </h1>
-              <p className="text-gray-600 text-sm">Manage your students and track your mentorship</p>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => refetchSubscriptions()}
-              className="rounded text-xs"
-            >
-              Refresh
-            </Button>
-          </div>
+          <h1 className="text-2xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+            Mentor Dashboard
+          </h1>
+          <p className="text-gray-600 text-sm">Manage your students and track your mentorship</p>
         </div>
 
         {/* Stripe Connect Success Alert */}
@@ -246,8 +225,8 @@ export default function MentorDashboard() {
               <span className="text-orange-800">
                 Connect your Stripe account to receive monthly payouts for your mentorship earnings.
               </span>
-              <Button
-                size="sm"
+              <Button 
+                size="sm" 
                 onClick={handleConnectStripe}
                 disabled={connectingStripe}
                 className="bg-orange-600 hover:bg-orange-700 text-white ml-4 text-xs rounded"
@@ -328,8 +307,8 @@ export default function MentorDashboard() {
                     </div>
                   ) : (
                     students.map(student => (
-                      <StudentCard
-                        key={student.id}
+                      <StudentCard 
+                        key={student.id} 
                         student={student}
                         subscription={subscriptions.find(s => s.student_id === student.id)}
                         onSelect={() => {
@@ -361,9 +340,9 @@ export default function MentorDashboard() {
                   <div className="bg-gray-50 border border-gray-200 rounded p-3">
                     <div className="text-sm font-medium mb-1">Payment Info</div>
                     <p className="text-xs text-gray-600">
-                      Earnings are paid monthly via Stripe Connect.
-                      {mentorProfile.stripe_connect_id ?
-                        " Your account is connected." :
+                      Earnings are paid monthly via Stripe Connect. 
+                      {mentorProfile.stripe_connect_id ? 
+                        " Your account is connected." : 
                         " Connect your account above to receive payments."
                       }
                     </p>
@@ -378,7 +357,7 @@ export default function MentorDashboard() {
               {students.map(student => {
                 const subscription = subscriptions.find(s => s.student_id === student.id);
                 const studentTasks = allTasks.filter(t => t.student_id === student.id);
-
+                
                 return (
                   <div key={student.id} className="bg-white border border-gray-200 rounded shadow-sm">
                     <div className="p-4">
@@ -411,8 +390,8 @@ export default function MentorDashboard() {
                       </div>
 
                       <div className="flex gap-2">
-                        <Button
-                          variant="outline"
+                        <Button 
+                          variant="outline" 
                           className="flex-1 rounded text-xs h-8"
                           onClick={() => {
                             setSelectedStudent(student);
@@ -422,7 +401,7 @@ export default function MentorDashboard() {
                           <Plus className="w-3 h-3 mr-1" />
                           Task
                         </Button>
-                        <Button
+                        <Button 
                           className="flex-1 btn-primary text-white rounded text-xs h-8"
                           onClick={() => {
                             setSelectedStudent(student);
@@ -443,7 +422,7 @@ export default function MentorDashboard() {
           <TabsContent value="chat">
             {selectedStudent ? (
               <div className="bg-white border border-gray-200 rounded shadow-sm">
-                <ChatBox
+                <ChatBox 
                   currentUserId={user.id}
                   otherUserId={selectedStudent.id}
                   otherUserName={selectedStudent.full_name}
