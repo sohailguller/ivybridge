@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -129,7 +128,7 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Navigation */}
       <nav className="bg-white border-b border-[#E6EFEA] sticky top-0 z-50 backdrop-blur-sm bg-white/95 shadow-sm">
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-24">
+        <div className="w-full px-6 md:px-12 lg:px-24">
           <div className="flex justify-between items-center h-20">
             {/* Left: Desktop Navigation Links */}
             <div className="hidden md:flex items-center gap-8 flex-1">
@@ -295,7 +294,7 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Footer */}
       <footer className="bg-[#E6EFEA] border-t border-[#0D3B33]/10 mt-20">
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-24 py-12">
+        <div className="w-full px-6 md:px-12 lg:px-24 py-12">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
               <div className="mb-4">
