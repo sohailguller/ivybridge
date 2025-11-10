@@ -110,40 +110,21 @@ export default function MentorProfile() {
     setIsSubscribing(true);
 
     try {
-      const startDate = new Date().toISOString().split('T')[0];
-      const endDate = new Date();
-      endDate.setMonth(endDate.getMonth() + 12);
-
-      // Create subscription with correct IDs
-      const newSubscription = await base44.entities.Subscription.create({
-        student_id: user.id,
-        mentor_id: mentor.user_id,
-        mentor_profile_id: mentor.id, // Use the actual mentor profile ID, not user_id
-        plan_type: planType,
-        amount: amount,
-        status: "pending",
-        start_date: startDate,
-        end_date: endDate.toISOString().split('T')[0],
-        months_remaining: 12,
-        stripe_subscription_id: `test_${Date.now()}_${user.id}`
+      // Use the backend function to create a proper Stripe checkout session
+      const response = await base44.functions.invoke('createCheckoutSession', {
+        mentorProfileId: mentor.id,
+        planType: planType
       });
 
-      // Update mentor's total_students count
-      const currentCount = mentor.total_students || 0;
-      await base44.entities.MentorProfile.update(mentor.id, {
-        total_students: currentCount + 1
-      });
-
-      // Use test Stripe links - subscription will be activated on return
-      const stripeUrls = {
-        monthly: `https://buy.stripe.com/test_eVqfZj1uJg5l50e0pH1Fe00`,
-        annual: `https://buy.stripe.com/test_6oUcN78Xb8CT0JY4FX1Fe01`
-      };
-
-      window.location.href = stripeUrls[planType] + `?client_reference_id=${user.id}&success_url=${window.location.origin}/StudentDashboard?payment_success=true`;
+      if (response.data.url) {
+        // Redirect to Stripe checkout
+        window.location.href = response.data.url;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
 
     } catch (error) {
-      console.error("Error creating subscription:", error);
+      console.error("Error creating checkout session:", error);
       alert("There was an error starting your subscription. Please try again.");
       setIsSubscribing(false);
     }
@@ -266,19 +247,18 @@ export default function MentorProfile() {
             <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent" />
           </div>
 
-          {/* Profile Content */}
-          <div className="px-8 pb-6">
-            {/* Profile Photo - Overlapping Banner */}
-            <div className="-mt-20 mb-4">
-              <Avatar className="w-36 h-36 border-4 border-white shadow-lg">
-                <AvatarImage src={mentor.profile_photo_url || mentorUser?.profile_photo_url} />
-                <AvatarFallback className="bg-[#E6EFEA] text-5xl text-[#0D3B33]">
-                  {mentorUser?.full_name?.charAt(0) || 'M'}
-                </AvatarFallback>
-              </Avatar>
-            </div>
+          {/* Profile Photo - Overlapping Banner */}
+          <div className="-mt-20 mb-4">
+            <Avatar className="w-36 h-36 border-4 border-white shadow-lg">
+              <AvatarImage src={mentor.profile_photo_url || mentorUser?.profile_photo_url} />
+              <AvatarFallback className="bg-[#E6EFEA] text-5xl text-[#0D3B33]">
+                {mentorUser?.full_name?.charAt(0) || 'M'}
+              </AvatarFallback>
+            </Avatar>
+          </div>
 
-            {/* Name and Info */}
+          {/* Name and Info */}
+          <div className="px-8 pb-6">
             <div className="mb-4">
               <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
                 {mentorUser?.full_name || 'Mentor'}
