@@ -110,11 +110,14 @@ export default function AdminDashboard() {
     mutationFn: async ({ id, status }) => {
       await base44.entities.MentorProfile.update(id, { verification_status: status });
       
-      // If approving, also update the user's account_type to "mentor"
+      // If approving, update the user's account_type and mentor_profile_id
       if (status === "approved") {
         const profile = pendingMentors.find(m => m.id === id);
         if (profile) {
-          await base44.entities.User.update(profile.user_id, { account_type: "mentor" });
+          await base44.entities.User.update(profile.user_id, { 
+            account_type: "mentor",
+            mentor_profile_id: id  // Add the mentor_profile_id
+          });
         }
       }
     },
