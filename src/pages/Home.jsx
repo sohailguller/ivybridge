@@ -48,9 +48,9 @@ export default function Home() {
     } catch (error) {
 
 
+
       // Not logged in
-    }};
-  const features = [
+    }};const features = [
   {
     icon: MessageSquare,
     title: "1-on-1 Mentorship",
@@ -105,7 +105,7 @@ export default function Home() {
         {/* Background Video */}
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <iframe
-            src="https://player.cloudinary.com/embed/?cloud_name=dihudketx&public_id=3288308-uhd_2560_1440_30fps_lqr9pt&profile=cld-default&autoplay=true&loop=true&muted=true&controls=false"
+            src="https://player.cloudinary.com/embed/?cloud_name=dihudketx&public_id=AdobeStock_503416191_Video_4K_Preview_ii79ks&profile=cld-default&autoplay=true&loop=true&muted=true&controls=false"
             className="absolute top-1/2 left-1/2 min-w-full min-h-full w-auto h-auto"
             style={{
               border: 'none',
@@ -126,8 +126,8 @@ export default function Home() {
         {/* Content - Bottom Left Aligned */}
         <div className="relative w-full px-8 md:px-16 lg:px-20 pb-16 md:pb-20">
           <div className="max-w-4xl">
-            <h1 className="text-white mb-5 text-4xl font-normal leading-tight md:text-5xl lg:text-6xl" style={{ fontFamily: 'Georgia, serif', fontWeight: 400, letterSpacing: '-0.02em' }}>
-              Get Into Your Dream School
+            <h1 className="text-white mb-5 text-4xl font-normal leading-tight md:text-5xl lg:text-6xl" style={{ fontFamily: 'Georgia, serif', fontWeight: 400, letterSpacing: '-0.02em' }}>Get into Your Dream School
+
             </h1>
 
             <p className="text-base md:text-lg text-white/95 leading-relaxed max-w-2xl mb-6" style={{ fontFamily: 'Georgia, serif' }}>Connect with verified mentors from top U.S. universities for personalized admissions guidance. From essay reviews to interview prep — get the insider advantage.
