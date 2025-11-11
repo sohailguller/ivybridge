@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -93,144 +94,46 @@ export default function MentorDashboard() {
     }
   };
 
-  const { data: allSubscriptions = [] } = useQuery({
-    queryKey: ['debug-all-subscriptions'],
+  // NEW APPROACH: Use backend function to fetch students with service role
+  const { data: studentData, isLoading: studentsLoading, error: studentsError, refetch: refetchStudents } = useQuery({
+    queryKey: ['mentor-students-backend', mentorProfile?.id],
     queryFn: async () => {
-      const all = await base44.entities.Subscription.list();
-      console.log('🗂️ ALL SUBSCRIPTIONS IN DATABASE:', all.length);
-      return all;
-    },
-    enabled: !!mentorProfile,
-    refetchInterval: 5000,
-  });
-
-  const { data: subscriptions = [], refetch: refetchSubscriptions, isFetching: isFetchingSubscriptions } = useQuery({
-    queryKey: ['mentor-subscriptions', mentorProfile?.id],
-    queryFn: async () => {
-      if (!mentorProfile?.id) {
-        console.log('⚠️ No mentor profile ID, returning empty array');
-        return [];
-      }
-      
-      console.log('🔎 Fetching subscriptions for mentor_profile_id:', mentorProfile.id);
-      
-      const subs = await base44.entities.Subscription.filter({ 
-        mentor_profile_id: mentorProfile.id,
-        status: "active"
-      });
-      
-      console.log(`📊 Query result: ${subs.length} active subscriptions`);
-      console.log('📋 Student IDs from subscriptions:', subs.map(s => s.student_id));
-      
-      return subs;
-    },
-    enabled: !!mentorProfile?.id,
-    refetchInterval: 3000,
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
-    staleTime: 0,
-  });
-
-  const { data: students = [], isLoading: studentsLoading, error: studentsError } = useQuery({
-    queryKey: ['my-students-direct', JSON.stringify(subscriptions.map(s => s.student_id).sort())],
-    queryFn: async () => {
-      if (subscriptions.length === 0) {
-        console.log('⚠️ No subscriptions, skipping student fetch');
-        setDebugInfo({
-          mentorProfileId: mentorProfile?.id,
-          strategy: 'no-subscriptions',
-          totalSubscriptions: allSubscriptions.length,
-          activeSubscriptions: subscriptions.length,
-          studentIds: [],
-          matchedStudents: 0
-        });
-        return [];
-      }
-
-      const studentIds = subscriptions.map(s => s.student_id);
-      console.log('🎯 DIRECTLY FETCHING students with IDs:', studentIds);
+      console.log('🎯 Calling backend function to fetch students...');
       
       try {
-        console.log('📍 Strategy 1: Fetch each user individually...');
-        const userPromises = studentIds.map(async (id) => {
-          console.log(`  → Fetching user with ID: ${id}`);
-          try {
-            const users = await base44.entities.User.filter({ id: id });
-            console.log(`  ✓ Found ${users.length} user(s) for ID ${id}`);
-            return users[0];
-          } catch (error) {
-            console.error(`  ✗ Error fetching user ${id}:`, error);
-            return null;
-          }
-        });
-        
-        const individualResults = await Promise.all(userPromises);
-        const validUsers = individualResults.filter(u => u != null);
-        
-        console.log(`📊 Strategy 1 Result: ${validUsers.length}/${studentIds.length} students found`);
-        
-        if (validUsers.length > 0) {
-          console.log('✅ SUCCESS with Strategy 1!');
-          console.log('👥 Loaded students:', validUsers.map(s => ({ id: s.id, name: s.full_name, email: s.email })));
-          
-          setDebugInfo({
-            mentorProfileId: mentorProfile?.id,
-            strategy: 'individual-fetch',
-            totalSubscriptions: allSubscriptions.length,
-            activeSubscriptions: subscriptions.length,
-            studentIds: studentIds,
-            matchedStudents: validUsers.length,
-            matchedDetails: validUsers.map(s => ({ id: s.id, name: s.full_name, email: s.email }))
-          });
-          
-          return validUsers;
-        }
-        
-        console.log('📍 Strategy 2: List all users and filter...');
-        const allUsers = await base44.entities.User.list();
-        console.log(`  → Total users in system: ${allUsers.length}`);
-        console.log(`  → Sample user IDs:`, allUsers.slice(0, 5).map(u => u.id));
-        
-        const matched = allUsers.filter(u => studentIds.includes(u.id));
-        console.log(`📊 Strategy 2 Result: ${matched.length}/${studentIds.length} students found`);
-        
-        if (matched.length > 0) {
-          console.log('✅ SUCCESS with Strategy 2!');
-          console.log('👥 Matched students:', matched.map(s => ({ id: s.id, name: s.full_name, email: s.email })));
-        } else {
-          console.error('❌ CRITICAL: No students found with either strategy!');
-          console.log('🔍 Looking for:', studentIds);
-          console.log('🔍 Available user IDs (first 20):', allUsers.slice(0, 20).map(u => u.id));
-        }
+        const response = await base44.functions.invoke('getMentorStudents', {});
+        console.log('✅ Backend response:', response.data);
         
         setDebugInfo({
           mentorProfileId: mentorProfile?.id,
-          strategy: 'list-and-filter',
-          totalUsersInSystem: allUsers.length,
-          totalSubscriptions: allSubscriptions.length,
-          activeSubscriptions: subscriptions.length,
-          studentIds: studentIds,
-          matchedStudents: matched.length,
-          matchedDetails: matched.map(s => ({ id: s.id, name: s.full_name, email: s.email }))
+          strategy: 'backend-service-role',
+          studentsCount: response.data.students?.length || 0,
+          subscriptionsCount: response.data.subscriptions?.length || 0,
+          students: response.data.students?.map(s => ({ 
+            id: s.id, 
+            name: s.full_name, 
+            email: s.email 
+          })) || []
         });
         
-        return matched;
-        
+        return response.data;
       } catch (error) {
-        console.error('❌ ERROR in student fetch:', error);
+        console.error('❌ Backend function error:', error);
         setDebugInfo({
           mentorProfileId: mentorProfile?.id,
-          strategy: 'error',
-          error: error.message,
-          studentIds: studentIds
+          strategy: 'backend-service-role',
+          error: error.message
         });
         throw error;
       }
     },
-    enabled: subscriptions.length > 0 && !!mentorProfile?.id,
+    enabled: !!mentorProfile?.id,
     staleTime: 0,
-    retry: 2,
+    refetchInterval: 5000,
   });
+
+  const students = studentData?.students || [];
+  const subscriptions = studentData?.subscriptions || [];
 
   const { data: allTasks = [] } = useQuery({
     queryKey: ['mentor-tasks', mentorProfile?.id],
@@ -256,10 +159,8 @@ export default function MentorDashboard() {
   const handleRefresh = async () => {
     console.log('🔄 Manual refresh triggered');
     await Promise.all([
-      refetchSubscriptions(),
-      queryClient.invalidateQueries(['my-students-direct']),
-      queryClient.invalidateQueries(['mentor-tasks']),
-      queryClient.invalidateQueries(['debug-all-subscriptions'])
+      refetchStudents(),
+      queryClient.invalidateQueries(['mentor-tasks'])
     ]);
   };
 
@@ -396,10 +297,10 @@ export default function MentorDashboard() {
               variant="outline"
               size="sm"
               onClick={handleRefresh}
-              disabled={isFetchingSubscriptions}
+              disabled={studentsLoading}
               className="rounded text-xs ml-4"
             >
-              {isFetchingSubscriptions ? (
+              {studentsLoading ? (
                 <>
                   <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
                   Refreshing...
@@ -508,9 +409,9 @@ export default function MentorDashboard() {
                     </div>
                   ) : students.length === 0 ? (
                     <div className="text-center py-6 text-gray-500">
-                      <Users className="w-10 h-10 mx-auto mb-2 opacity-30" />
-                      <p className="text-sm">No students yet</p>
-                      <p className="text-xs mt-2">New subscriptions will appear here automatically</p>
+                      <Users className="w-10 h-10 mx-auto mb-4 opacity-30" />
+                      <p className="text-lg font-medium mb-2">No students yet</p>
+                      <p className="text-sm">When students subscribe to your mentorship, they'll appear here</p>
                       {subscriptions.length > 0 && (
                         <div className="mt-3 p-2 bg-orange-50 border border-orange-200 rounded text-xs text-orange-800">
                           <p className="font-semibold">⚠️ Data Mismatch</p>
