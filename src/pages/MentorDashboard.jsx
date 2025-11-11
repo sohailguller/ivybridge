@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -18,8 +17,7 @@ import {
   AlertCircle,
   Plus,
   ExternalLink,
-  RefreshCw,
-  Bug
+  RefreshCw
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -41,7 +39,6 @@ export default function MentorDashboard() {
   const [showTaskDialog, setShowTaskDialog] = useState(false);
   const [showNoteDialog, setShowNoteDialog] = useState(false);
   const [connectingStripe, setConnectingStripe] = useState(false);
-  const [debugInfo, setDebugInfo] = useState({});
 
   useEffect(() => {
     loadUser();
@@ -50,7 +47,6 @@ export default function MentorDashboard() {
   const loadUser = async () => {
     try {
       const currentUser = await base44.auth.me();
-      console.log('👤 Current user:', { id: currentUser.id, account_type: currentUser.account_type, mentor_profile_id: currentUser.mentor_profile_id });
       
       if (currentUser.account_type !== "mentor" && !currentUser.mentor_profile_id) {
         navigate(createPageUrl("StudentDashboard"));
@@ -62,7 +58,6 @@ export default function MentorDashboard() {
       
       if (currentUser.mentor_profile_id) {
         const profiles = await base44.entities.MentorProfile.filter({ id: currentUser.mentor_profile_id });
-        console.log('🔍 Found profiles by mentor_profile_id:', profiles.length);
         if (profiles.length > 0) {
           profile = profiles[0];
         }
@@ -70,62 +65,32 @@ export default function MentorDashboard() {
       
       if (!profile) {
         const profiles = await base44.entities.MentorProfile.filter({ user_id: currentUser.id });
-        console.log('🔍 Found profiles by user_id:', profiles.length);
         if (profiles.length > 0) {
           profile = profiles[0];
           try {
             await base44.auth.updateMe({ mentor_profile_id: profile.id });
-            console.log('✅ Updated user with mentor_profile_id:', profile.id);
           } catch (e) {
-            console.log('❌ Could not update mentor_profile_id:', e);
+            console.log('Could not update mentor_profile_id:', e);
           }
         }
       }
       
       if (profile) {
-        console.log('📋 Mentor profile loaded:', { id: profile.id, user_id: profile.user_id });
         setMentorProfile(profile);
       }
     } catch (error) {
-      console.error('❌ Error loading user:', error);
+      console.error('Error loading user:', error);
       base44.auth.redirectToLogin();
     } finally {
       setIsLoading(false);
     }
   };
 
-  // NEW APPROACH: Use backend function to fetch students with service role
   const { data: studentData, isLoading: studentsLoading, error: studentsError, refetch: refetchStudents } = useQuery({
     queryKey: ['mentor-students-backend', mentorProfile?.id],
     queryFn: async () => {
-      console.log('🎯 Calling backend function to fetch students...');
-      
-      try {
-        const response = await base44.functions.invoke('getMentorStudents', {});
-        console.log('✅ Backend response:', response.data);
-        
-        setDebugInfo({
-          mentorProfileId: mentorProfile?.id,
-          strategy: 'backend-service-role',
-          studentsCount: response.data.students?.length || 0,
-          subscriptionsCount: response.data.subscriptions?.length || 0,
-          students: response.data.students?.map(s => ({ 
-            id: s.id, 
-            name: s.full_name, 
-            email: s.email 
-          })) || []
-        });
-        
-        return response.data;
-      } catch (error) {
-        console.error('❌ Backend function error:', error);
-        setDebugInfo({
-          mentorProfileId: mentorProfile?.id,
-          strategy: 'backend-service-role',
-          error: error.message
-        });
-        throw error;
-      }
+      const response = await base44.functions.invoke('getMentorStudents', {});
+      return response.data;
     },
     enabled: !!mentorProfile?.id,
     staleTime: 0,
@@ -157,7 +122,6 @@ export default function MentorDashboard() {
   };
 
   const handleRefresh = async () => {
-    console.log('🔄 Manual refresh triggered');
     await Promise.all([
       refetchStudents(),
       queryClient.invalidateQueries(['mentor-tasks'])
@@ -269,29 +233,6 @@ export default function MentorDashboard() {
                 Mentor Dashboard
               </h1>
               <p className="text-gray-600 text-sm">Manage your students and track your mentorship</p>
-              
-              <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs space-y-1">
-                <div className="font-semibold flex items-center gap-2 text-yellow-800">
-                  <Bug className="w-3 h-3" />
-                  Debug Information
-                </div>
-                <div className="grid grid-cols-3 gap-2 text-gray-700">
-                  <div>Mentor ID: <span className="font-mono font-bold text-[10px]">{mentorProfile.id.slice(-8)}</span></div>
-                  <div>Active Subs: <span className="font-bold">{subscriptions.length}</span></div>
-                  <div>Students: <span className={students.length === 0 && subscriptions.length > 0 ? "font-bold text-red-600" : "font-bold text-green-600"}>{students.length}</span></div>
-                  <div>Students Loading: <span className="font-bold">{studentsLoading ? "YES" : "NO"}</span></div>
-                  <div>Students Error: <span className="font-bold">{studentsError ? "YES" : "NO"}</span></div>
-                </div>
-                {studentsError && (
-                  <div className="p-2 bg-red-100 border border-red-300 rounded text-red-800">
-                    <strong>Students Error:</strong> {studentsError.message}
-                  </div>
-                )}
-                <div className="mt-2 p-2 bg-white border border-yellow-300 rounded max-h-48 overflow-y-auto">
-                  <div className="font-semibold mb-1 text-[10px]">Debug Results:</div>
-                  <pre className="text-[9px] overflow-x-auto leading-tight">{JSON.stringify(debugInfo, null, 2)}</pre>
-                </div>
-              </div>
             </div>
             <Button
               variant="outline"
@@ -412,13 +353,6 @@ export default function MentorDashboard() {
                       <Users className="w-10 h-10 mx-auto mb-4 opacity-30" />
                       <p className="text-lg font-medium mb-2">No students yet</p>
                       <p className="text-sm">When students subscribe to your mentorship, they'll appear here</p>
-                      {subscriptions.length > 0 && (
-                        <div className="mt-3 p-2 bg-orange-50 border border-orange-200 rounded text-xs text-orange-800">
-                          <p className="font-semibold">⚠️ Data Mismatch</p>
-                          <p className="mt-1">{subscriptions.length} active subscription(s) found but students not loading</p>
-                          <p className="mt-1 text-[10px]">Check browser console for details</p>
-                        </div>
-                      )}
                     </div>
                   ) : (
                     students.map(student => (
