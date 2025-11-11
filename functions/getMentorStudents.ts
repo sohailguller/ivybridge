@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
 
     console.log('🔐 Authenticated user:', user.id);
 
-    // Get mentor profile
+    // Get mentor profile - using service role to bypass restrictions
     let mentorProfile = null;
     
     if (user.mentor_profile_id) {
@@ -36,13 +36,14 @@ Deno.serve(async (req) => {
     if (!mentorProfile) {
       return Response.json({ 
         error: 'Mentor profile not found',
-        students: []
+        students: [],
+        subscriptions: []
       }, { status: 404 });
     }
 
     console.log('👨‍🏫 Mentor profile:', mentorProfile.id);
 
-    // Get active subscriptions for this mentor (using service role)
+    // Get active subscriptions for this mentor - using service role
     const subscriptions = await base44.asServiceRole.entities.Subscription.filter({
       mentor_profile_id: mentorProfile.id,
       status: 'active'
@@ -61,22 +62,32 @@ Deno.serve(async (req) => {
     const studentIds = subscriptions.map(s => s.student_id);
     console.log('🎯 Student IDs:', studentIds);
 
-    // Fetch student user data using service role (bypasses permission restrictions)
-    const students = await base44.asServiceRole.entities.User.filter({
-      id: { $in: studentIds }
-    });
-
-    console.log(`👥 Found ${students.length} students`);
+    // Fetch ALL users with service role, then filter in memory
+    // This completely bypasses any permission restrictions
+    console.log('🔓 Fetching all users with service role...');
+    const allUsers = await base44.asServiceRole.entities.User.list();
+    console.log(`✅ Fetched ${allUsers.length} total users`);
+    
+    // Filter to only our students
+    const students = allUsers.filter(u => studentIds.includes(u.id));
+    console.log(`👥 Filtered to ${students.length} student users`);
 
     return Response.json({
       students: students,
-      subscriptions: subscriptions
+      subscriptions: subscriptions,
+      debug: {
+        totalUsersFetched: allUsers.length,
+        studentIdCount: studentIds.length,
+        matchedStudents: students.length
+      }
     });
 
   } catch (error) {
     console.error('❌ Error in getMentorStudents:', error);
+    console.error('Error stack:', error.stack);
     return Response.json({ 
       error: error.message,
+      errorType: error.constructor.name,
       students: [],
       subscriptions: []
     }, { status: 500 });
