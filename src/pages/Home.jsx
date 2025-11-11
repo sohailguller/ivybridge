@@ -181,7 +181,7 @@ export default function Home() {
               <div className="text-sm text-gray-600 font-medium">Students Successfully Guided</div>
             </div>
             <div className="bg-white border border-gray-200 rounded p-6 text-center">
-              <div className="text-4xl font-bold text-[#0D3B33] mb-2">98%</div>
+              <div className="text-4xl font-bold text-[#0D3B33] mb-2">NA%</div>
               <div className="text-sm text-gray-600 font-medium">Client Satisfaction Rate</div>
             </div>
           </div>
