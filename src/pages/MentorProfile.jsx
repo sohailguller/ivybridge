@@ -376,23 +376,27 @@ export default function MentorProfile() {
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Unlimited 1-on-1 messaging throughout your entire application process</span>
+                  <span className="text-gray-700">Unlimited 1-on-1 messaging</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Weekly video meetings for personalized guidance</span>
+                  <span className="text-gray-700">Weekly video sessions</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Detailed essay reviews and edits with tracked feedback</span>
+                  <span className="text-gray-700">Essay reviews & feedback</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Strategic application planning and deadline management</span>
+                  <span className="text-gray-700">Application milestone tracking</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Mock interviews and comprehensive interview preparation</span>
+                  <span className="text-gray-700">Interview preparation</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">Monthly progress reports</span>
                 </li>
               </ul>
             </div>
@@ -451,20 +455,21 @@ export default function MentorProfile() {
                 <div className="text-sm font-medium text-gray-600 mb-1">Monthly Plan</div>
                 <div className="text-3xl font-bold mb-1 text-[#0D3B33]">$425</div>
                 <div className="text-sm text-gray-600 mb-2">per month</div>
-                <div className="text-xs text-gray-500 mb-4">12-month commitment</div>
+                <div className="text-xs text-gray-500 mb-4">12-month commitment • Non-cancellable</div>
               </div>
               <Button
                 onClick={() => handleSubscribe('monthly', 425)}
                 disabled={isMentor || isSubscribing}
-                className="w-full btn-primary text-white rounded py-5 mb-3"
+                className="w-full btn-primary text-white rounded py-5 mb-4"
               >
                 {isSubscribing ? 'Processing...' : 'Subscribe Monthly'}
               </Button>
+              <div className="border-t border-gray-200 pt-4 mb-4"></div>
               <div className="text-center">
                 <div className="text-sm font-medium text-gray-600 mb-1">Annual Plan</div>
                 <div className="text-3xl font-bold mb-1 text-[#0D3B33]">$5,000</div>
                 <div className="text-sm text-gray-600 mb-2">one-time payment</div>
-                <div className="text-xs text-gray-500 mb-4">Save $1,100</div>
+                <div className="text-xs text-gray-500 mb-4">Save over $1,100</div>
               </div>
               <Button
                 onClick={() => handleSubscribe('annual', 5000)}
