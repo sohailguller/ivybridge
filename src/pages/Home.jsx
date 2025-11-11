@@ -74,7 +74,7 @@ export default function Home() {
   ];
 
   const universities = [
-    "Harvard", "Yale", "Princeton", "Columbia", "Brown", "Dartmouth", "Cornell", "Penn"
+    "Harvard", "Yale", "Princeton", "Columbia", "Brown", "Dartmouth", "Cornell", "Penn", "Stanford"
   ];
 
   const testimonials = [
