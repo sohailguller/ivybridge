@@ -126,8 +126,8 @@ export default function Home() {
         {/* Content - Bottom Left Aligned */}
         <div className="relative w-full px-8 md:px-16 lg:px-20 pb-16 md:pb-20">
           <div className="max-w-4xl">
-            <h1 className="text-white mb-5 text-4xl font-normal capitalize leading-tight md:text-5xl lg:text-6xl" style={{ fontFamily: 'Georgia, serif', fontWeight: 400, letterSpacing: '-0.02em' }}>GET INTO YOUR DREAM SCHOOL
-
+            <h1 className="text-white mb-5 text-4xl font-normal leading-tight md:text-5xl lg:text-6xl" style={{ fontFamily: 'Georgia, serif', fontWeight: 400, letterSpacing: '-0.02em' }}>
+              Get Into Your Dream School
             </h1>
 
             <p className="text-base md:text-lg text-white/95 leading-relaxed max-w-2xl mb-6" style={{ fontFamily: 'Georgia, serif' }}>Connect with verified mentors from top U.S. universities for personalized admissions guidance. From essay reviews to interview prep — get the insider advantage.
