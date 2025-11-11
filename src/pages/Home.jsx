@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -101,7 +102,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative h-screen flex items-end overflow-hidden">
+      <section className="relative h-[90vh] flex items-end overflow-hidden">
         {/* Background Video */}
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <iframe
