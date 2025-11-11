@@ -101,7 +101,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative h-screen flex items-end overflow-hidden">
+      <section className="relative flex items-end overflow-hidden" style={{ height: '85vh' }}>
         {/* Background Video */}
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <iframe
@@ -121,16 +121,16 @@ export default function Home() {
         </div>
 
         {/* Gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
         {/* Content - Bottom Left Aligned */}
-        <div className="relative w-full px-8 md:px-16 lg:px-20 pb-16 md:pb-20">
+        <div className="relative w-full px-8 md:px-16 lg:px-20 pb-12 md:pb-16">
           <div className="max-w-4xl">
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-normal leading-tight text-white mb-6" style={{ fontFamily: 'Georgia, serif', fontWeight: 400, letterSpacing: '-0.02em' }}>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-normal leading-tight text-white mb-5" style={{ fontFamily: 'Georgia, serif', fontWeight: 400, letterSpacing: '-0.02em' }}>
               Get Into Your Dream School
             </h1>
 
-            <p className="text-lg md:text-xl text-white/95 leading-relaxed max-w-2xl mb-8" style={{ fontFamily: 'Georgia, serif' }}>
+            <p className="text-base md:text-lg text-white/95 leading-relaxed max-w-2xl mb-6" style={{ fontFamily: 'Georgia, serif' }}>
               Connect with verified Ivy League mentors for personalized admissions guidance.
               From essay reviews to interview prep — get the insider advantage.
             </p>
@@ -138,7 +138,7 @@ export default function Home() {
             <div className="flex flex-wrap gap-4">
               <Button
                 size="lg"
-                className="btn-primary text-white rounded px-8 py-4 text-base font-semibold"
+                className="btn-primary text-white rounded px-7 py-3 text-base font-semibold"
                 onClick={() => user ? navigate(createPageUrl("BrowseMentors")) : base44.auth.redirectToLogin(createPageUrl("BrowseMentors"))}
               >
                 Find Your Mentor
@@ -147,7 +147,7 @@ export default function Home() {
               <Button
                 size="lg"
                 variant="outline"
-                className="rounded px-8 py-4 text-base font-semibold bg-white/95 border-2 border-white text-[#0D3B33] hover:bg-white"
+                className="rounded px-7 py-3 text-base font-semibold bg-white/95 border-2 border-white text-[#0D3B33] hover:bg-white"
                 onClick={() => navigate(createPageUrl("ApplyAsMentor"))}
               >
                 Become a Mentor
