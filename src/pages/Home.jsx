@@ -209,7 +209,7 @@ export default function Home() {
           100% { transform: translateX(-50%); }
         }
         .animate-scroll {
-          animation: scroll 40s linear infinite;
+          animation: scroll 20s linear infinite;
         }
       `}</style>
 
