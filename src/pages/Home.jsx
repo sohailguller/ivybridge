@@ -125,7 +125,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
         {/* Content - Bottom Left Aligned */}
-        <div className="relative w-full px-8 md:px-16 lg:px-20 pb-16 md:pb-20">
+        <div className="relative w-full px-8 md:px-16 lg:px-20 pb-24 md:pb-28">
           <div className="max-w-4xl">
             <h1 className="text-white mb-5 text-4xl font-normal leading-tight md:text-5xl lg:text-6xl" style={{ fontFamily: 'Georgia, serif', fontWeight: 400, letterSpacing: '-0.02em' }}>
               Get Into Your Dream School
@@ -373,6 +373,14 @@ export default function Home() {
                     <CheckCircle className="w-4 h-4 text-[#0D3B33] flex-shrink-0 mt-0.5" />
                     <span>Application milestone tracking</span>
                   </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#0D3B33] flex-shrink-0 mt-0.5" />
+                    <span>Interview preparation</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#0D3B33] flex-shrink-0 mt-0.5" />
+                    <span>Monthly progress reports</span>
+                  </li>
                 </ul>
 
                 <Button
@@ -392,12 +400,32 @@ export default function Home() {
                 <div className="text-base font-medium text-gray-600 mb-2">Annual Plan</div>
                 <div className="text-4xl font-bold mb-1 text-[#0D3B33]">$5,000</div>
                 <div className="text-gray-600 mb-4">one-time payment</div>
-                <div className="text-xs text-gray-500 mb-6">12 months of mentorship • Best value</div>
+                <div className="text-xs text-gray-500 mb-6">12 months of mentorship • Save over $1,100</div>
 
                 <ul className="space-y-3 text-left mb-6 text-sm">
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-[#0D3B33] flex-shrink-0 mt-0.5" />
-                    <span>Everything in Monthly Plan</span>
+                    <span>Unlimited 1-on-1 messaging</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#0D3B33] flex-shrink-0 mt-0.5" />
+                    <span>Weekly video sessions</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#0D3B33] flex-shrink-0 mt-0.5" />
+                    <span>Essay reviews & feedback</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#0D3B33] flex-shrink-0 mt-0.5" />
+                    <span>Application milestone tracking</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#0D3B33] flex-shrink-0 mt-0.5" />
+                    <span>Interview preparation</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#0D3B33] flex-shrink-0 mt-0.5" />
+                    <span>Monthly progress reports</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-[#0D3B33] flex-shrink-0 mt-0.5" />
@@ -406,10 +434,6 @@ export default function Home() {
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-[#0D3B33] flex-shrink-0 mt-0.5" />
                     <span><strong>Direct phone access</strong></span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-[#0D3B33] flex-shrink-0 mt-0.5" />
-                    <span><strong>Save over $1,100</strong></span>
                   </li>
                 </ul>
 
