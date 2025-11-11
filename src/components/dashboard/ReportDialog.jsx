@@ -69,40 +69,40 @@ export default function ReportDialog({ open, onOpenChange, reportedUserId, repor
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-white">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2 text-[#0D3B33] text-xl font-bold">
             <AlertCircle className="w-5 h-5 text-red-500" />
             Report User
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-gray-600">
             Report {reportedUserName} for violating platform guidelines
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label>Report Type *</Label>
+            <Label className="text-gray-700 font-medium">Report Type *</Label>
             <Select value={reportType} onValueChange={setReportType} required>
-              <SelectTrigger>
+              <SelectTrigger className="bg-white border-gray-300 text-gray-900">
                 <SelectValue placeholder="Select a reason" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="inappropriate_content">Inappropriate Content</SelectItem>
-                <SelectItem value="contact_sharing">Sharing Personal Contact Info</SelectItem>
-                <SelectItem value="harassment">Harassment or Bullying</SelectItem>
-                <SelectItem value="fraud">Fraud or Scam</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
+              <SelectContent className="bg-white">
+                <SelectItem value="inappropriate_content" className="text-gray-900">Inappropriate Content</SelectItem>
+                <SelectItem value="contact_sharing" className="text-gray-900">Sharing Personal Contact Info</SelectItem>
+                <SelectItem value="harassment" className="text-gray-900">Harassment or Bullying</SelectItem>
+                <SelectItem value="fraud" className="text-gray-900">Fraud or Scam</SelectItem>
+                <SelectItem value="other" className="text-gray-900">Other</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label>Description *</Label>
+            <Label className="text-gray-700 font-medium">Description *</Label>
             <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Provide details about the issue..."
-              className="h-32"
+              className="h-32 bg-white border-gray-300 text-gray-900"
               required
             />
             <p className="text-xs text-gray-500">
@@ -121,7 +121,7 @@ export default function ReportDialog({ open, onOpenChange, reportedUserId, repor
             <Button
               type="button"
               variant="outline"
-              className="flex-1"
+              className="flex-1 bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
               onClick={() => onOpenChange(false)}
               disabled={createReportMutation.isPending}
             >
@@ -129,8 +129,7 @@ export default function ReportDialog({ open, onOpenChange, reportedUserId, repor
             </Button>
             <Button
               type="submit"
-              variant="destructive"
-              className="flex-1"
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white"
               disabled={createReportMutation.isPending || !reportType || !description}
             >
               {createReportMutation.isPending ? "Submitting..." : "Submit Report"}

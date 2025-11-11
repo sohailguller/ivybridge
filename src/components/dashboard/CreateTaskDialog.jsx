@@ -55,58 +55,60 @@ export default function CreateTaskDialog({ open, onOpenChange, student, mentorPr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-white">
         <DialogHeader>
-          <DialogTitle>Create Task</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-[#0D3B33] text-xl font-bold">Create Task</DialogTitle>
+          <DialogDescription className="text-gray-600">
             Assign a new task to {student?.full_name || 'student'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label>Task Title *</Label>
+            <Label className="text-gray-700 font-medium">Task Title *</Label>
             <Input
               value={formData.title}
               onChange={(e) => setFormData({...formData, title: e.target.value})}
               placeholder="e.g., Complete essay draft"
+              className="bg-white border-gray-300 text-gray-900"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Description</Label>
+            <Label className="text-gray-700 font-medium">Description</Label>
             <Textarea
               value={formData.description}
               onChange={(e) => setFormData({...formData, description: e.target.value})}
               placeholder="Task details and instructions..."
-              className="h-24"
+              className="h-24 bg-white border-gray-300 text-gray-900"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Priority</Label>
+              <Label className="text-gray-700 font-medium">Priority</Label>
               <Select
                 value={formData.priority}
                 onValueChange={(value) => setFormData({...formData, priority: value})}
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-white border-gray-300 text-gray-900">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
+                <SelectContent className="bg-white">
+                  <SelectItem value="low" className="text-gray-900">Low</SelectItem>
+                  <SelectItem value="medium" className="text-gray-900">Medium</SelectItem>
+                  <SelectItem value="high" className="text-gray-900">High</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label>Due Date</Label>
+              <Label className="text-gray-700 font-medium">Due Date</Label>
               <Input
                 type="date"
                 value={formData.due_date}
                 onChange={(e) => setFormData({...formData, due_date: e.target.value})}
+                className="bg-white border-gray-300 text-gray-900"
               />
             </div>
           </div>
@@ -116,7 +118,7 @@ export default function CreateTaskDialog({ open, onOpenChange, student, mentorPr
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="flex-1"
+              className="flex-1 bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
               disabled={createTaskMutation.isPending}
             >
               Cancel

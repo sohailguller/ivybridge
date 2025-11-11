@@ -54,16 +54,16 @@ export default function ReviewDialog({ open, onOpenChange, subscription, mentorP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-white">
         <DialogHeader>
-          <DialogTitle>Rate Your Experience</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-[#0D3B33] text-xl font-bold">Rate Your Experience</DialogTitle>
+          <DialogDescription className="text-gray-600">
             Share your experience with {mentorUser?.full_name}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-3">
-            <Label>Your Rating</Label>
+            <Label className="text-gray-700 font-medium">Your Rating</Label>
             <div className="flex justify-center gap-2">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
@@ -77,14 +77,14 @@ export default function ReviewDialog({ open, onOpenChange, subscription, mentorP
                   <Star
                     className={`w-10 h-10 ${
                       star <= (hoveredRating || rating)
-                        ? "fill-[#FF6B5C] text-[#FF6B5C]"
+                        ? "fill-[#FE6C3A] text-[#FE6C3A]"
                         : "text-gray-300"
                     }`}
                   />
                 </button>
               ))}
             </div>
-            <p className="text-center text-sm text-gray-600">
+            <p className="text-center text-sm text-gray-700 font-medium">
               {rating === 5 && "Excellent!"}
               {rating === 4 && "Great!"}
               {rating === 3 && "Good"}
@@ -94,12 +94,12 @@ export default function ReviewDialog({ open, onOpenChange, subscription, mentorP
           </div>
 
           <div className="space-y-2">
-            <Label>Your Review (Optional)</Label>
+            <Label className="text-gray-700 font-medium">Your Review (Optional)</Label>
             <Textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="Share details about your experience..."
-              className="h-32"
+              className="h-32 bg-white border-gray-300 text-gray-900"
             />
             <p className="text-xs text-gray-500">
               Your review will help other students choose the right mentor
@@ -110,7 +110,7 @@ export default function ReviewDialog({ open, onOpenChange, subscription, mentorP
             <Button
               type="button"
               variant="outline"
-              className="flex-1"
+              className="flex-1 bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
               onClick={() => onOpenChange(false)}
               disabled={createReviewMutation.isPending}
             >

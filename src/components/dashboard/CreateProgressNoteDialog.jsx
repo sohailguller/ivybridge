@@ -89,45 +89,47 @@ export default function CreateProgressNoteDialog({ open, onOpenChange, student, 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto bg-white">
         <DialogHeader>
-          <DialogTitle>Add Progress Note</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-[#0D3B33] text-xl font-bold">Add Progress Note</DialogTitle>
+          <DialogDescription className="text-gray-600">
             Document {student?.full_name || 'student'}'s progress and achievements
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label>Month</Label>
+            <Label className="text-gray-700 font-medium">Month</Label>
             <Input
               type="month"
               value={formData.month}
               onChange={(e) => setFormData({...formData, month: e.target.value})}
               placeholder="YYYY-MM"
+              className="bg-white border-gray-300 text-gray-900"
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Progress Note *</Label>
+            <Label className="text-gray-700 font-medium">Progress Note *</Label>
             <Textarea
               value={formData.note}
               onChange={(e) => setFormData({...formData, note: e.target.value})}
               placeholder="Describe the student's overall progress this period..."
-              className="h-32"
+              className="h-32 bg-white border-gray-300 text-gray-900"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Key Achievements</Label>
+            <Label className="text-gray-700 font-medium">Key Achievements</Label>
             <div className="flex gap-2">
               <Input
                 value={newAchievement}
                 onChange={(e) => setNewAchievement(e.target.value)}
                 placeholder="Add an achievement..."
                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addAchievement())}
+                className="bg-white border-gray-300 text-gray-900"
               />
-              <Button type="button" onClick={addAchievement} size="sm">
+              <Button type="button" onClick={addAchievement} size="sm" className="btn-primary text-white">
                 <Plus className="w-4 h-4" />
               </Button>
             </div>
@@ -150,15 +152,16 @@ export default function CreateProgressNoteDialog({ open, onOpenChange, student, 
           </div>
 
           <div className="space-y-2">
-            <Label>Areas for Improvement</Label>
+            <Label className="text-gray-700 font-medium">Areas for Improvement</Label>
             <div className="flex gap-2">
               <Input
                 value={newImprovement}
                 onChange={(e) => setNewImprovement(e.target.value)}
                 placeholder="Add an area to improve..."
                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addImprovement())}
+                className="bg-white border-gray-300 text-gray-900"
               />
-              <Button type="button" onClick={addImprovement} size="sm">
+              <Button type="button" onClick={addImprovement} size="sm" className="btn-primary text-white">
                 <Plus className="w-4 h-4" />
               </Button>
             </div>
@@ -185,7 +188,7 @@ export default function CreateProgressNoteDialog({ open, onOpenChange, student, 
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="flex-1"
+              className="flex-1 bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
               disabled={createNoteMutation.isPending}
             >
               Cancel
