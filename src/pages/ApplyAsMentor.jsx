@@ -29,6 +29,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import ImageCropperDialog from "../components/ImageCropperDialog";
 
 export default function ApplyAsMentor() {
   const navigate = useNavigate();
@@ -36,9 +37,11 @@ export default function ApplyAsMentor() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [isSubmitted, setIsSubmitted] = useState(false); // Renamed from 'success'
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [currentSection, setCurrentSection] = useState(1);
   const [calendlyError, setCalendlyError] = useState("");
+  const [showImageCropper, setShowImageCropper] = useState(false);
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
 
   const [formData, setFormData] = useState({
     university: "",
@@ -68,15 +71,12 @@ export default function ApplyAsMentor() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
-      // Check if user already has a mentor profile
       if (currentUser.mentor_profile_id) {
         const profiles = await base44.entities.MentorProfile.filter({ id: currentUser.mentor_profile_id });
         if (profiles.length > 0) {
           const profile = profiles[0];
-          // If pending or approved, redirect to waiting page or dashboard
           if (profile.verification_status === "pending") {
-            // Show pending status page instead of allowing resubmission
-            setIsSubmitted(true); // Updated to isSubmitted
+            setIsSubmitted(true);
             return;
           }
           if (profile.verification_status === "approved") {
@@ -155,44 +155,51 @@ export default function ApplyAsMentor() {
   };
 
   const validateEmail = () => {
-    // TESTING MODE: Email validation disabled for testing purposes
     return { valid: true, message: "" };
-
-    /* ORIGINAL VALIDATION - Uncomment when ready for production
-    if (!user?.email || !formData.university) return { valid: false, message: "" };
-
-    const university = universities.find(u => u.name === formData.university);
-    if (!university) return { valid: false, message: "" };
-
-    const emailDomain = user.email.split('@')[1];
-    if (emailDomain !== university.domain) {
-      return {
-        valid: false,
-        message: `Your email (${user.email}) must be a ${university.name} email (@${university.domain}) to apply as a mentor from ${university.name}.`
-      };
-    }
-
-    return { valid: true, message: "" };
-    */
   };
 
-  const handleFileUpload = async (file, type) => {
-    if (!file) return;
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedImageFile(file);
+      setShowImageCropper(true);
+    }
+  };
 
-    if (type === "photo") setUploadingPhoto(true);
-    else setUploadingTranscript(true);
+  const handleImageCropSave = async (croppedBlob) => {
+    setUploadingPhoto(true);
+    setShowImageCropper(false);
+
+    try {
+      // Convert blob to file
+      const croppedFile = new File([croppedBlob], "profile-photo.jpg", { type: "image/jpeg" });
+      const { file_url } = await base44.integrations.Core.UploadFile({ file: croppedFile });
+      setFormData(prev => ({
+        ...prev,
+        profile_photo_url: file_url
+      }));
+    } catch (error) {
+      setError("Failed to upload photo. Please try again.");
+    } finally {
+      setUploadingPhoto(false);
+      setSelectedImageFile(null);
+    }
+  };
+
+  const handleFileUpload = async (file) => { // Removed `type` as it's now only for transcript
+    if (!file) return;
+    setUploadingTranscript(true);
 
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setFormData(prev => ({
         ...prev,
-        [type === "photo" ? "profile_photo_url" : "transcript_url"]: file_url
+        transcript_url: file_url
       }));
     } catch (error) {
-      setError(`Failed to upload ${type}. Please try again.`);
+      setError("Failed to upload transcript. Please try again.");
     } finally {
-      if (type === "photo") setUploadingPhoto(false);
-      else setUploadingTranscript(false);
+      setUploadingTranscript(false);
     }
   };
 
@@ -228,7 +235,6 @@ export default function ApplyAsMentor() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate Calendly link
     if (!validateCalendlyLink(formData.calendly_link)) {
       setError("Please enter a valid Calendly link");
       setCalendlyError("Please enter a valid Calendly link (e.g., https://calendly.com/your-username)");
@@ -239,21 +245,18 @@ export default function ApplyAsMentor() {
     setError(null);
 
     try {
-      // Create mentor profile - PENDING for approval
       const profile = await base44.entities.MentorProfile.create({
         user_id: user.id,
         ...formData,
-        verification_status: "pending", // Changed from "approved" to "pending"
+        verification_status: "pending",
         total_students: 0
       });
 
-      // Update user with mentor profile ID but DON'T set account_type yet
       await base44.auth.updateMe({
         mentor_profile_id: profile.id
       });
 
-      setIsSubmitted(true); // Updated to isSubmitted
-      // Don't redirect - show success message
+      setIsSubmitted(true);
     } catch (error) {
       console.error("Application submission error:", error);
       setError("Failed to submit application. Please try again.");
@@ -265,7 +268,6 @@ export default function ApplyAsMentor() {
   const canProceedToNextSection = () => {
     switch(currentSection) {
       case 1:
-        // TESTING MODE: Removed email validation requirement
         return formData.university && formData.year && formData.major;
       case 2:
         return formData.bio.length >= 100 && formData.expertise_areas.length > 0;
@@ -273,7 +275,6 @@ export default function ApplyAsMentor() {
         return formData.greatest_achievement && formData.advice_to_younger_self &&
                formData.dream_job && formData.why_major && formData.lifetime_goal;
       case 4:
-        // Calendly link required and validated
         return formData.calendly_link && validateCalendlyLink(formData.calendly_link);
       default:
         return false;
@@ -291,7 +292,7 @@ export default function ApplyAsMentor() {
     );
   }
 
-  if (isSubmitted) { // Updated from 'success'
+  if (isSubmitted) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-md bg-white border border-gray-200 rounded shadow-sm p-8">
@@ -318,11 +319,9 @@ export default function ApplyAsMentor() {
     );
   }
 
-  const emailValidation = validateEmail();
-
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="w-full px-6 md:px-12 lg:px-24"> {/* Updated width and padding */}
+      <div className="w-full px-6 md:px-12 lg:px-24">
         <div className="text-center mb-8 border-b border-gray-200 pb-6">
           <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
             Become a Mentor
@@ -332,7 +331,6 @@ export default function ApplyAsMentor() {
           </p>
         </div>
 
-        {/* Progress Indicator */}
         <div className="mb-8">
           <div className="flex items-center justify-between max-w-2xl mx-auto">
             {[1, 2, 3, 4].map((section) => (
@@ -368,7 +366,6 @@ export default function ApplyAsMentor() {
         <div className="bg-white border border-gray-200 rounded shadow-sm">
           <div className="p-6">
             <form onSubmit={handleSubmit}>
-              {/* Section 1: Basic Information */}
               {currentSection === 1 && (
                 <div className="space-y-6">
                   <div className="border-b border-gray-200 pb-4">
@@ -444,7 +441,6 @@ export default function ApplyAsMentor() {
                 </div>
               )}
 
-              {/* Section 2: Expertise & Bio */}
               {currentSection === 2 && (
                 <div className="space-y-6">
                   <div className="border-b border-gray-200 pb-4">
@@ -512,7 +508,6 @@ export default function ApplyAsMentor() {
                 </div>
               )}
 
-              {/* Section 3: Personal Essays */}
               {currentSection === 3 && (
                 <div className="space-y-6">
                   <div className="border-b border-gray-200 pb-4">
@@ -583,7 +578,6 @@ export default function ApplyAsMentor() {
                 </div>
               )}
 
-              {/* Section 4: Verification Documents */}
               {currentSection === 4 && (
                 <div className="space-y-6">
                   <div className="border-b border-gray-200 pb-4">
@@ -621,7 +615,7 @@ export default function ApplyAsMentor() {
                           <input
                             type="file"
                             accept="image/*"
-                            onChange={(e) => handleFileUpload(e.target.files[0], "photo")}
+                            onChange={handleImageSelect}
                             className="hidden"
                             disabled={uploadingPhoto}
                           />
@@ -663,7 +657,7 @@ export default function ApplyAsMentor() {
                           <input
                             type="file"
                             accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => handleFileUpload(e.target.files[0], "transcript")}
+                            onChange={(e) => handleFileUpload(e.target.files[0])}
                             className="hidden"
                             disabled={uploadingTranscript}
                           />
@@ -696,7 +690,6 @@ export default function ApplyAsMentor() {
                 </div>
               )}
 
-              {/* Navigation Buttons */}
               <div className="flex justify-between items-center pt-6 border-t border-gray-200 mt-6">
                 <Button
                   type="button"
@@ -737,6 +730,13 @@ export default function ApplyAsMentor() {
           </div>
         </div>
       </div>
+
+      <ImageCropperDialog
+        open={showImageCropper}
+        onOpenChange={setShowImageCropper}
+        imageFile={selectedImageFile}
+        onSave={handleImageCropSave}
+      />
     </div>
   );
 }
