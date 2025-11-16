@@ -380,7 +380,7 @@ export default function MentorProfile() {
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Weekly video sessions</span>
+                  <span className="text-gray-700">Monthly video sessions</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />

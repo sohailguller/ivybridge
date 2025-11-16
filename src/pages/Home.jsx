@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -362,7 +363,7 @@ export default function Home() {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-[#0D3B33] flex-shrink-0 mt-0.5" />
-                    <span>Weekly video sessions</span>
+                    <span>Monthly video sessions</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-[#0D3B33] flex-shrink-0 mt-0.5" />
@@ -408,7 +409,7 @@ export default function Home() {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-[#0D3B33] flex-shrink-0 mt-0.5" />
-                    <span>Weekly video sessions</span>
+                    <span>Monthly video sessions</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-[#0D3B33] flex-shrink-0 mt-0.5" />
