@@ -211,7 +211,7 @@ export default function BrowseMentors() {
                       </Avatar>
                     </div>
 
-                    <h3 className="text-lg font-bold mb-1 text-[#0D3B33]">{user?.full_name || 'Mentor'}</h3>
+                    <h3 className="text-lg font-bold mb-1 text-[#0D3B33]">{user?.full_name || user?.email || 'Mentor Profile'}</h3>
                     <div className="flex items-center gap-2 text-xs text-gray-600 mb-2">
                       <GraduationCap className="w-4 h-4" />
                       <span>{mentor.university} • {mentor.year}</span>

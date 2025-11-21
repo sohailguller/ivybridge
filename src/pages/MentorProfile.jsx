@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -261,7 +260,7 @@ export default function MentorProfile() {
           <div className="px-8 pb-6">
             <div className="mb-4">
               <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
-                {mentorUser?.full_name || 'Mentor'}
+                {mentorUser?.full_name || mentorUser?.email || 'Mentor Profile'}
               </h1>
               <div className="flex items-center gap-2 text-gray-600 mb-3">
                 <GraduationCap className="w-5 h-5" />

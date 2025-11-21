@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -300,7 +299,7 @@ export default function StudentDashboard() {
               </Avatar>
               <div>
                 <h3 className="text-lg font-bold text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>Your Mentor</h3>
-                <p className="text-base text-gray-700 mb-1">{mentorUser?.full_name}</p>
+                <p className="text-base text-gray-700 mb-1">{mentorUser?.full_name || mentorUser?.email || 'Your Mentor'}</p>
                 <div className="flex items-center gap-2 text-xs text-gray-600">
                   <Badge className="bg-[#E6EFEA] text-[#0D3B33] border-0 text-xs">
                     {mentor.university}
