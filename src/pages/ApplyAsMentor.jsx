@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -67,26 +68,17 @@ export default function ApplyAsMentor() {
 
   const loadUser = async () => {
     try {
-      let currentUser;
-      try {
-        currentUser = await base44.auth.me();
-      } catch (error) {
-        // For testing: create a test user if not logged in
-        const testEmail = `mentor_${Date.now()}@test.com`;
-        const testName = `Test Mentor ${Date.now()}`;
-        currentUser = { 
-          id: `test_${Date.now()}`, 
-          email: testEmail,
-          full_name: testName,
-          account_type: 'mentor'
-        };
-      }
+      const currentUser = await base44.auth.me();
       setUser(currentUser);
 
       if (currentUser.mentor_profile_id) {
         const profiles = await base44.entities.MentorProfile.filter({ id: currentUser.mentor_profile_id });
         if (profiles.length > 0) {
           const profile = profiles[0];
+          if (profile.verification_status === "pending") {
+            setIsSubmitted(true);
+            return;
+          }
           if (profile.verification_status === "approved") {
             navigate(createPageUrl("MentorDashboard"));
             return;
@@ -94,7 +86,7 @@ export default function ApplyAsMentor() {
         }
       }
     } catch (error) {
-      console.error("Error loading user:", error);
+      base44.auth.redirectToLogin(window.location.pathname);
     } finally {
       setIsLoading(false);
     }
@@ -256,21 +248,15 @@ export default function ApplyAsMentor() {
       const profile = await base44.entities.MentorProfile.create({
         user_id: user.id,
         ...formData,
-        verification_status: "approved",
+        verification_status: "pending",
         total_students: 0
       });
 
-      try {
-        await base44.auth.updateMe({
-          mentor_profile_id: profile.id,
-          account_type: 'mentor'
-        });
-      } catch (error) {
-        console.log("Could not update user (testing mode)");
-      }
+      await base44.auth.updateMe({
+        mentor_profile_id: profile.id
+      });
 
-      // For testing: immediately redirect to mentor dashboard
-      navigate(createPageUrl("MentorDashboard"));
+      setIsSubmitted(true);
     } catch (error) {
       console.error("Application submission error:", error);
       setError("Failed to submit application. Please try again.");
