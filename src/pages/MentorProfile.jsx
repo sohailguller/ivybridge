@@ -96,12 +96,22 @@ export default function MentorProfile() {
   });
 
   const handleSubscribe = async (planType, amount) => {
-    if (!user) {
-      base44.auth.redirectToLogin(window.location.pathname);
-      return;
+    let currentUser = user;
+    
+    // For testing: create a test student user if not logged in
+    if (!currentUser) {
+      const testEmail = `student_${Date.now()}@test.com`;
+      const testName = `Test Student ${Date.now()}`;
+      currentUser = { 
+        id: `test_student_${Date.now()}`, 
+        email: testEmail,
+        full_name: testName,
+        account_type: 'student'
+      };
+      setUser(currentUser);
     }
 
-    if (user.account_type === "mentor") {
+    if (currentUser.account_type === "mentor") {
       alert("Mentors cannot subscribe to other mentors. This platform is for mentors to guide students.");
       return;
     }
