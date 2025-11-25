@@ -497,7 +497,11 @@ export default function MentorProfile() {
                   <div className="text-lg font-bold text-[#0D3B33] mb-1">New</div>
                 ) : (
                   <>
-                    <div className="text-2xl font-bold mb-1 text-[#0D3B33]">{averageRating}</div>
+                                          {averageRating === "New" ? (
+                        <div className="text-lg font-bold text-[#0D3B33] mb-1">New</div>
+                      ) : (
+                        <div className="text-2xl font-bold mb-1 text-[#0D3B33]">{averageRating}</div>
+                      )}
                     <div className="flex justify-center gap-1 mb-2">
                       {[...Array(5)].map((_, i) => (
                         <Star key={i} className={`w-4 h-4 ${
