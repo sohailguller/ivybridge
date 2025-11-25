@@ -506,7 +506,7 @@ export default function StudentDashboard() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold mb-3 text-sm">Payment History</h3>
+                  <h3 className="font-semibold mb-3 text-sm">Billing Status</h3>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded">
                       <div className="flex items-center gap-3">
@@ -514,12 +514,29 @@ export default function StudentDashboard() {
                           <CheckCircle className="w-4 h-4 text-green-600" />
                         </div>
                         <div>
-                          <p className="font-medium text-sm">Initial Payment</p>
+                          <p className="font-medium text-sm">Last Payment</p>
                           <p className="text-xs text-gray-600">{activeSub.start_date}</p>
                         </div>
                       </div>
                       <p className="font-bold text-sm">${activeSub.amount}</p>
                     </div>
+                    
+                    {activeSub.plan_type === 'monthly' && activeSub.status === 'active' && (
+                      <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <Clock className="w-4 h-4 text-blue-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm">Next Payment Due</p>
+                            <p className="text-xs text-gray-600">
+                              {new Date(new Date(activeSub.start_date).setMonth(new Date(activeSub.start_date).getMonth() + (12 - activeSub.months_remaining + 1))).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                        <p className="font-bold text-sm">${activeSub.amount}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
