@@ -17,7 +17,8 @@ import {
   AlertCircle,
   Plus,
   ExternalLink,
-  RefreshCw
+  RefreshCw,
+  FileText
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -93,8 +94,8 @@ export default function MentorDashboard() {
       return response.data;
     },
     enabled: !!mentorProfile?.id,
-    staleTime: 0,
-    refetchInterval: 5000,
+    staleTime: 30000,
+    refetchInterval: 30000,
   });
 
   const students = studentData?.students || [];
@@ -445,7 +446,7 @@ export default function MentorDashboard() {
                           </div>
                         </div>
 
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-wrap">
                           <Button 
                             variant="outline" 
                             className="flex-1 rounded text-xs h-8"
@@ -458,7 +459,18 @@ export default function MentorDashboard() {
                             Task
                           </Button>
                           <Button 
-                            className="flex-1 btn-primary text-white rounded text-xs h-8"
+                            variant="outline" 
+                            className="flex-1 rounded text-xs h-8"
+                            onClick={() => {
+                              setSelectedStudent(student);
+                              setShowNoteDialog(true);
+                            }}
+                          >
+                            <FileText className="w-3 h-3 mr-1" />
+                            Progress
+                          </Button>
+                          <Button 
+                            className="w-full btn-primary text-white rounded text-xs h-8 mt-1"
                             onClick={() => {
                               setSelectedStudent(student);
                               setActiveTab("chat");
@@ -502,6 +514,14 @@ export default function MentorDashboard() {
       <CreateTaskDialog
         open={showTaskDialog}
         onOpenChange={setShowTaskDialog}
+        student={selectedStudent}
+        mentorProfileId={mentorProfile?.id}
+        subscriptionId={subscriptions.find(s => s.student_id === selectedStudent?.id)?.id}
+      />
+
+      <CreateProgressNoteDialog
+        open={showNoteDialog}
+        onOpenChange={setShowNoteDialog}
         student={selectedStudent}
         mentorProfileId={mentorProfile?.id}
         subscriptionId={subscriptions.find(s => s.student_id === selectedStudent?.id)?.id}

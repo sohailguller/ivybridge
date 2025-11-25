@@ -34,7 +34,8 @@ export default function ChatBox({
       const received = await base44.entities.ChatMessage.filter({ from_user_id: otherUserId, to_user_id: currentUserId });
       return [...sent, ...received].sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
     },
-    refetchInterval: 3000, // Poll for new messages every 3 seconds
+    staleTime: 10000,
+    refetchInterval: 10000, // Poll for new messages every 10 seconds
   });
 
   const sendMessageMutation = useMutation({

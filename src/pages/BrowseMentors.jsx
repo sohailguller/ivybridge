@@ -280,7 +280,9 @@ export default function BrowseMentors() {
                     <div className="flex items-center gap-4 mb-4 py-3 border-t border-gray-100 text-sm">
                       <div className="flex items-center gap-2">
                         <Users className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-600">{mentor.total_students || 0} Students</span>
+                        <span className="text-gray-600">
+                          {typeof mentor.total_students === 'number' ? mentor.total_students : 0} Students
+                        </span>
                       </div>
                       <div className="flex items-center gap-1">
                         {(() => {
