@@ -203,7 +203,7 @@ export default function Layout({ children, currentPageName }) {
                       </Button>
                       <Button
                         onClick={() => base44.auth.redirectToLogin(location.pathname)}
-                        className="btn-primary text-white rounded-lg px-6 uppercase tracking-wider font-semibold"
+                        className="bg-[#FE6C3A] hover:bg-[#FF7B4A] text-white rounded-lg px-6 uppercase tracking-wider font-semibold"
                         style={{ fontFamily: 'Oswald, sans-serif' }}
                       >
                         Get Started
@@ -274,7 +274,7 @@ export default function Layout({ children, currentPageName }) {
                         base44.auth.redirectToLogin(location.pathname);
                         setMobileMenuOpen(false);
                       }}
-                      className="w-full btn-primary text-white rounded-lg uppercase tracking-wider font-semibold"
+                      className="w-full bg-[#FE6C3A] hover:bg-[#FF7B4A] text-white rounded-lg uppercase tracking-wider font-semibold"
                       style={{ fontFamily: 'Oswald, sans-serif' }}
                     >
                       Get Started
