@@ -48,7 +48,8 @@ export default function BrowseMentors() {
     queryKey: ['mentor-users'],
     queryFn: async () => {
       try {
-        return await base44.entities.User.list();
+        // Increase limit to ensure we get all users (default is often 50)
+        return await base44.entities.User.list(null, 1000);
       } catch (err) {
         console.error("Error fetching users:", err);
         return [];

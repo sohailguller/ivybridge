@@ -43,6 +43,7 @@ export default function ApplyAsMentor() {
   const [selectedImageFile, setSelectedImageFile] = useState(null);
 
   const [formData, setFormData] = useState({
+    full_name: "",
     university: "",
     major: "",
     year: "",
@@ -69,6 +70,7 @@ export default function ApplyAsMentor() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
+      setFormData(prev => ({ ...prev, full_name: currentUser.full_name || "" }));
 
       if (currentUser.mentor_profile_id) {
         const profiles = await base44.entities.MentorProfile.filter({ id: currentUser.mentor_profile_id });
@@ -244,9 +246,16 @@ export default function ApplyAsMentor() {
     setError(null);
 
     try {
+      const { full_name, ...mentorData } = formData;
+
+      // Update user's name if changed
+      if (full_name && full_name !== user.full_name) {
+        await base44.auth.updateMe({ full_name });
+      }
+
       const profile = await base44.entities.MentorProfile.create({
         user_id: user.id,
-        ...formData,
+        ...mentorData,
         verification_status: "pending",
         total_students: 0
       });
@@ -267,7 +276,7 @@ export default function ApplyAsMentor() {
   const canProceedToNextSection = () => {
     switch(currentSection) {
       case 1:
-        return formData.university && formData.year && formData.major;
+        return formData.full_name && formData.university && formData.year && formData.major;
       case 2:
         return formData.bio.length >= 100 && formData.expertise_areas.length > 0;
       case 3:
@@ -370,6 +379,17 @@ export default function ApplyAsMentor() {
                   <div className="border-b border-gray-200 pb-4">
                     <h2 className="text-xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>Basic Information</h2>
                     <p className="text-sm text-gray-600">Tell us about your university and academic background</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Full Name *</Label>
+                    <Input
+                      value={formData.full_name}
+                      onChange={(e) => setFormData({...formData, full_name: e.target.value})}
+                      placeholder="e.g. Jane Doe"
+                      className="h-10 rounded"
+                      required
+                    />
                   </div>
 
                   <div className="space-y-2">
