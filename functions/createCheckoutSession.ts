@@ -134,9 +134,8 @@ Deno.serve(async (req) => {
       mode = 'payment';
     }
 
-    // Determine origin for redirect URLs - use the request origin
-    const requestUrl = new URL(req.url);
-    const origin = requestUrl.origin;
+    // Determine origin for redirect URLs - use the origin header
+    const origin = req.headers.get("origin") || req.headers.get("referer")?.replace(/\/$/, "");
 
     console.log('Creating checkout session with origin:', origin);
 

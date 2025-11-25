@@ -131,7 +131,7 @@ export default function MentorProfile() {
 
   const averageRating = reviews.length > 0
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
-    : 5.0; // Default to 5.0 if no reviews
+    : "New";
 
   // University background images mapping
   const universityImages = {
@@ -274,17 +274,23 @@ export default function MentorProfile() {
             {/* Rating */}
             <div className="flex items-center gap-4 pb-4 border-b border-gray-200">
               <div className="flex items-center gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className={`w-5 h-5 ${
-                    i < Math.round(averageRating)
-                      ? 'fill-[#FE6C3A] text-[#FE6C3A]'
-                      : 'text-gray-300'
-                  }`} />
-                ))}
+                {averageRating === "New" ? (
+                   <Badge className="bg-blue-100 text-blue-800 border-0">New Mentor</Badge>
+                ) : (
+                  [...Array(5)].map((_, i) => (
+                    <Star key={i} className={`w-5 h-5 ${
+                      i < Math.round(Number(averageRating))
+                        ? 'fill-[#FE6C3A] text-[#FE6C3A]'
+                        : 'text-gray-300'
+                    }`} />
+                  ))
+                )}
               </div>
-              <span className="text-sm text-gray-600">
-                {averageRating} ({reviews.length} {reviews.length === 1 ? 'review' : 'reviews'})
-              </span>
+              {averageRating !== "New" && (
+                <span className="text-sm text-gray-600">
+                  {averageRating} ({reviews.length} {reviews.length === 1 ? 'review' : 'reviews'})
+                </span>
+              )}
             </div>
 
             {/* Expertise Areas */}
@@ -487,16 +493,22 @@ export default function MentorProfile() {
                 <div className="text-sm text-gray-600">Current Students</div>
               </div>
               <div className="border-t border-gray-200 pt-4 text-center">
-                <div className="text-2xl font-bold mb-1 text-[#0D3B33]">{averageRating}</div>
-                <div className="flex justify-center gap-1 mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className={`w-4 h-4 ${
-                      i < Math.round(averageRating)
-                        ? 'fill-[#FE6C3A] text-[#FE6C3A]'
-                        : 'text-gray-300'
-                    }`} />
-                  ))}
-                </div>
+                {averageRating === "New" ? (
+                  <div className="text-lg font-bold text-[#0D3B33] mb-1">New</div>
+                ) : (
+                  <>
+                    <div className="text-2xl font-bold mb-1 text-[#0D3B33]">{averageRating}</div>
+                    <div className="flex justify-center gap-1 mb-2">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className={`w-4 h-4 ${
+                          i < Math.round(Number(averageRating))
+                            ? 'fill-[#FE6C3A] text-[#FE6C3A]'
+                            : 'text-gray-300'
+                        }`} />
+                      ))}
+                    </div>
+                  </>
+                )}
                 <div className="text-xs text-gray-600">
                   {reviews.length} {reviews.length === 1 ? 'Review' : 'Reviews'}
                 </div>

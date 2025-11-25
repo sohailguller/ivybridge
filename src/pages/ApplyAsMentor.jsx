@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -275,7 +274,7 @@ export default function ApplyAsMentor() {
         return formData.greatest_achievement && formData.advice_to_younger_self &&
                formData.dream_job && formData.why_major && formData.lifetime_goal;
       case 4:
-        return formData.calendly_link && validateCalendlyLink(formData.calendly_link);
+        return formData.calendly_link && validateCalendlyLink(formData.calendly_link) && formData.transcript_url;
       default:
         return false;
     }
@@ -381,7 +380,7 @@ export default function ApplyAsMentor() {
                       className="h-10 rounded bg-gray-50"
                     />
                     <p className="text-xs text-gray-500">
-                      Email verification is disabled for testing
+                      We'll use the email associated with your account
                     </p>
                   </div>
 
