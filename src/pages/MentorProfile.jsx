@@ -247,7 +247,7 @@ export default function MentorProfile() {
           </div>
 
           {/* Profile Photo - Overlapping Banner */}
-          <div className="-mt-20 mb-4">
+          <div className="-mt-20 mb-4 px-8">
             <Avatar className="w-36 h-36 border-4 border-white shadow-lg">
               <AvatarImage src={mentor.profile_photo_url || mentorUser?.profile_photo_url} />
               <AvatarFallback className="bg-[#E6EFEA] text-5xl text-[#0D3B33]">
