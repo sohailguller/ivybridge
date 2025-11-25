@@ -126,7 +126,7 @@ export default function Home() {
         {/* Content - Bottom Left Aligned */}
         <div className="relative w-full px-8 md:px-16 lg:px-20 pb-24 md:pb-28">
           <div className="max-w-4xl">
-            <h1 className="text-white mb-5 text-4xl font-normal leading-tight md:text-5xl lg:text-6xl" style={{ fontFamily: 'Georgia, serif', fontWeight: 400, letterSpacing: '-0.02em' }}>
+            <h1 className="text-white mb-5 text-4xl font-normal leading-tight md:text-5xl lg:text-6xl" style={{ fontFamily: 'Georgia, serif', fontWeight: 400, letterSpacing: '-0.02em', textTransform: 'none' }}>
               Get Into Your Dream School
             </h1>
 
