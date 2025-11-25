@@ -490,7 +490,7 @@ export default function MentorProfile() {
             <div className="bg-gray-50 border border-gray-200 rounded shadow-sm p-6">
               <div className="text-center mb-4">
                 <div className="text-3xl font-bold text-[#0D3B33] mb-1">
-                  {mentor.total_students || 0}
+                  {typeof mentor.total_students === 'number' ? mentor.total_students : 0}
                 </div>
                 <div className="text-sm text-gray-600">Current Students</div>
               </div>
