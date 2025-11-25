@@ -93,20 +93,10 @@ Deno.serve(async (req) => {
     let lineItems, mode, subscriptionData;
 
     if (planType === 'monthly') {
-      // Monthly recurring subscription
+      // Monthly recurring subscription - Use Catalog Price ID
+      // Price ID: price_1SPAhYPVHYXDQ24FbMDRdZJc
       lineItems = [{
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: `Monthly Mentorship with ${mentorUser?.full_name || 'Mentor'}`,
-            description: `12-month commitment • ${mentorProfile.university} • ${mentorProfile.major}`,
-          },
-          unit_amount: amount * 100,
-          recurring: {
-            interval: 'month',
-            interval_count: 1,
-          },
-        },
+        price: 'price_1SPAhYPVHYXDQ24FbMDRdZJc',
         quantity: 1,
       }];
       mode = 'subscription';
@@ -119,16 +109,10 @@ Deno.serve(async (req) => {
         },
       };
     } else {
-      // Annual one-time payment
+      // Annual one-time payment - Use Catalog Price ID
+      // Price ID: price_1SPAiCPVHYXDQ24FPps95Yw5
       lineItems = [{
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: `Annual Mentorship with ${mentorUser?.full_name || 'Mentor'}`,
-            description: `12-month program • ${mentorProfile.university} • ${mentorProfile.major}`,
-          },
-          unit_amount: amount * 100,
-        },
+        price: 'price_1SPAiCPVHYXDQ24FPps95Yw5',
         quantity: 1,
       }];
       mode = 'payment';
