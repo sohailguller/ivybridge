@@ -281,7 +281,7 @@ export default function BrowseMentors() {
                       <div className="flex items-center gap-2">
                         <Users className="w-4 h-4 text-gray-400" />
                         <span className="text-gray-600">
-                          {typeof mentor.total_students === 'number' ? mentor.total_students : 0} Students
+                          {mentor.total_students > 0 ? mentor.total_students : 0} Students
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
