@@ -72,18 +72,32 @@ export default function ApplyAsMentor() {
       setUser(currentUser);
       setFormData(prev => ({ ...prev, full_name: currentUser.full_name || "" }));
 
+      // Check for existing mentor profile - first by mentor_profile_id, then by user_id
+      let existingProfile = null;
+
       if (currentUser.mentor_profile_id) {
         const profiles = await base44.entities.MentorProfile.filter({ id: currentUser.mentor_profile_id });
         if (profiles.length > 0) {
-          const profile = profiles[0];
-          if (profile.verification_status === "pending") {
-            setIsSubmitted(true);
-            return;
-          }
-          if (profile.verification_status === "approved") {
-            navigate(createPageUrl("MentorDashboard"));
-            return;
-          }
+          existingProfile = profiles[0];
+        }
+      }
+
+      // Also check by user_id in case mentor_profile_id wasn't set
+      if (!existingProfile) {
+        const profilesByUserId = await base44.entities.MentorProfile.filter({ user_id: currentUser.id });
+        if (profilesByUserId.length > 0) {
+          existingProfile = profilesByUserId[0];
+        }
+      }
+
+      if (existingProfile) {
+        if (existingProfile.verification_status === "pending") {
+          setIsSubmitted(true);
+          return;
+        }
+        if (existingProfile.verification_status === "approved") {
+          navigate(createPageUrl("MentorDashboard"));
+          return;
         }
       }
     } catch (error) {

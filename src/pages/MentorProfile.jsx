@@ -69,7 +69,9 @@ export default function MentorProfile() {
       const users = await base44.entities.User.filter({ id: mentor.user_id });
       return users[0];
     },
-    enabled: !!mentor?.user_id
+    enabled: !!mentor?.user_id,
+    staleTime: 0,
+    refetchOnMount: 'always'
   });
 
   const { data: reviews = [] } = useQuery({

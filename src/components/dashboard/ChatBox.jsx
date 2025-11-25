@@ -24,6 +24,7 @@ export default function ChatBox({
   const queryClient = useQueryClient();
   const [message, setMessage] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [pendingAttachment, setPendingAttachment] = useState(null);
   const messagesEndRef = useRef(null);
 
   const { data: messages = [], isLoading } = useQuery({
@@ -61,34 +62,43 @@ export default function ChatBox({
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!message.trim()) return;
+    if (!message.trim() && !pendingAttachment) return;
 
-    await sendMessageMutation.mutateAsync({
+    const messageData = {
       from_user_id: currentUserId,
       to_user_id: otherUserId,
       subscription_id: subscriptionId,
-      message: message.trim(),
+      message: message.trim() || (pendingAttachment ? pendingAttachment.name : ''),
       is_read: false
-    });
+    };
+
+    if (pendingAttachment) {
+      messageData.attachment_url = pendingAttachment.url;
+    }
+
+    await sendMessageMutation.mutateAsync(messageData);
+    setPendingAttachment(null);
   };
 
   const handleFileUpload = async (file) => {
+    if (!file) return;
     setUploading(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      await sendMessageMutation.mutateAsync({
-        from_user_id: currentUserId,
-        to_user_id: otherUserId,
-        subscription_id: subscriptionId,
-        message: file.name,
-        attachment_url: file_url,
-        is_read: false
+      setPendingAttachment({
+        url: file_url,
+        name: file.name,
+        isImage: file.type.startsWith('image/')
       });
     } catch (error) {
       console.error("Error uploading file:", error);
     } finally {
       setUploading(false);
     }
+  };
+
+  const removePendingAttachment = () => {
+    setPendingAttachment(null);
   };
 
   const handleFlag = async (messageId) => {
@@ -195,11 +205,44 @@ export default function ChatBox({
 
       {/* Input */}
       <form onSubmit={handleSend} className="p-4 border-t bg-white">
+        {/* Pending Attachment Preview */}
+        {pendingAttachment && (
+          <div className="mb-3 p-2 bg-gray-100 rounded-lg flex items-center gap-3">
+            {pendingAttachment.isImage ? (
+              <img 
+                src={pendingAttachment.url} 
+                alt="Attachment preview" 
+                className="w-16 h-16 object-cover rounded"
+              />
+            ) : (
+              <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
+                <FileText className="w-6 h-6 text-gray-500" />
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">{pendingAttachment.name}</p>
+              <p className="text-xs text-gray-500">Ready to send</p>
+            </div>
+            <Button 
+              type="button" 
+              variant="ghost" 
+              size="sm"
+              onClick={removePendingAttachment}
+              className="text-red-500 hover:text-red-700"
+            >
+              Remove
+            </Button>
+          </div>
+        )}
+        
         <div className="flex items-center gap-3">
           <label className="cursor-pointer">
             <input
               type="file"
-              onChange={(e) => handleFileUpload(e.target.files[0])}
+              onChange={(e) => {
+                handleFileUpload(e.target.files[0]);
+                e.target.value = '';
+              }}
               className="hidden"
               disabled={uploading}
             />
@@ -209,25 +252,28 @@ export default function ChatBox({
               size="icon"
               className="rounded-full"
               disabled={uploading}
+              asChild
             >
-              {uploading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600" />
-              ) : (
-                <Paperclip className="w-5 h-5" />
-              )}
+              <span>
+                {uploading ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600" />
+                ) : (
+                  <Paperclip className="w-5 h-5" />
+                )}
+              </span>
             </Button>
           </label>
 
           <Input
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Type your message..."
+            placeholder={pendingAttachment ? "Add a message (optional)..." : "Type your message..."}
             className="flex-1 rounded-full h-12 px-6"
           />
 
           <Button 
             type="submit" 
-            disabled={!message.trim() || sendMessageMutation.isPending}
+            disabled={(!message.trim() && !pendingAttachment) || sendMessageMutation.isPending}
             className="btn-primary text-white rounded-full h-12 w-12 p-0"
           >
             <Send className="w-5 h-5" />

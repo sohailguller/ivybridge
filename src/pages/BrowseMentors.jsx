@@ -45,7 +45,7 @@ export default function BrowseMentors() {
   });
 
   const { data: users = [] } = useQuery({
-    queryKey: ['mentor-users'],
+    queryKey: ['mentor-users', mentors.map(m => m.user_id).join(',')],
     queryFn: async () => {
       try {
         // Increase limit to ensure we get all users (default is often 50)
@@ -55,7 +55,9 @@ export default function BrowseMentors() {
         return [];
       }
     },
-    enabled: mentors.length > 0
+    enabled: mentors.length > 0,
+    staleTime: 0,
+    refetchOnMount: 'always'
   });
 
   const { data: reviews = [] } = useQuery({
