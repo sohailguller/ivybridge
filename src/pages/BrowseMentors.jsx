@@ -68,6 +68,17 @@ export default function BrowseMentors() {
     }
   });
 
+  const { data: reviews = [] } = useQuery({
+    queryKey: ['all-reviews'],
+    queryFn: async () => {
+      try {
+        return await base44.entities.Review.filter({ is_published: true });
+      } catch (err) {
+        return [];
+      }
+    }
+  });
+
   const universities = ["Harvard", "Yale", "Princeton", "Columbia", "Brown", "Dartmouth", "Cornell", "Penn"];
 
   const universityImages = {

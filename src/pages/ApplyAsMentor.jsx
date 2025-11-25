@@ -629,7 +629,7 @@ export default function ApplyAsMentor() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>University Transcript (Optional for testing)</Label>
+                    <Label>University Transcript *</Label>
                     <div className="border border-gray-200 rounded p-4 text-center hover:border-[#FE6C3A] transition-colors">
                       {formData.transcript_url ? (
                         <div className="flex items-center justify-between">
