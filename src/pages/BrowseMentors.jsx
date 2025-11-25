@@ -57,6 +57,17 @@ export default function BrowseMentors() {
     enabled: mentors.length > 0
   });
 
+  const { data: reviews = [] } = useQuery({
+    queryKey: ['all-reviews'],
+    queryFn: async () => {
+      try {
+        return await base44.entities.Review.filter({ is_published: true });
+      } catch (err) {
+        return [];
+      }
+    }
+  });
+
   const universities = ["Harvard", "Yale", "Princeton", "Columbia", "Brown", "Dartmouth", "Cornell", "Penn"];
 
   const universityImages = {
@@ -70,10 +81,33 @@ export default function BrowseMentors() {
     Penn: "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1200&q=80"
   };
 
+  // Create lookup maps for performance
+  const userMap = React.useMemo(() => {
+    return users.reduce((acc, user) => {
+      acc[user.id] = user;
+      return acc;
+    }, {});
+  }, [users]);
+
+  const reviewStats = React.useMemo(() => {
+    return reviews.reduce((acc, review) => {
+      if (!acc[review.mentor_profile_id]) {
+        acc[review.mentor_profile_id] = { sum: 0, count: 0 };
+      }
+      acc[review.mentor_profile_id].sum += review.rating;
+      acc[review.mentor_profile_id].count += 1;
+      return acc;
+    }, {});
+  }, [reviews]);
+
   const filteredMentors = mentors.filter(mentor => {
+    const user = userMap[mentor.user_id];
+    const fullName = user?.full_name || "";
+    
     const matchesSearch = !searchQuery ||
       mentor.bio?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      mentor.major?.toLowerCase().includes(searchQuery.toLowerCase());
+      mentor.major?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      fullName.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesUniversity = universityFilter === "all" || mentor.university === universityFilter;
     const matchesMajor = majorFilter === "all" || mentor.major === majorFilter;
@@ -81,7 +115,7 @@ export default function BrowseMentors() {
     return matchesSearch && matchesUniversity && matchesMajor;
   });
 
-  const getMentorUser = (userId) => users.find(u => u.id === userId);
+  const getMentorUser = (userId) => userMap[userId];
 
   const allMajors = [...new Set(mentors.map(m => m.major).filter(Boolean))];
 
@@ -243,12 +277,26 @@ export default function BrowseMentors() {
                     <div className="flex items-center gap-4 mb-4 py-3 border-t border-gray-100 text-sm">
                       <div className="flex items-center gap-2">
                         <Users className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-600">{mentor.total_students || 0}</span>
+                        <span className="text-gray-600">{mentor.total_students || 0} Students</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 fill-[#FE6C3A] text-[#FE6C3A]" />
-                        ))}
+                        {(() => {
+                          const stats = reviewStats[mentor.id];
+                          const rating = stats ? (stats.sum / stats.count) : 0;
+                          const count = stats ? stats.count : 0;
+                          
+                          if (count === 0) {
+                             return <span className="text-xs font-medium bg-blue-100 text-blue-800 px-2 py-0.5 rounded">New</span>;
+                          }
+
+                          return (
+                            <>
+                              <Star className="w-4 h-4 fill-[#FE6C3A] text-[#FE6C3A]" />
+                              <span className="font-medium text-[#0D3B33]">{rating.toFixed(1)}</span>
+                              <span className="text-gray-400 text-xs">({count})</span>
+                            </>
+                          );
+                        })()}
                       </div>
                     </div>
 

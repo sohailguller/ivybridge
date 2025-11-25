@@ -457,7 +457,7 @@ export default function ApplyAsMentor() {
                       required
                     />
                     <p className="text-xs text-gray-500">
-                      {countWords(formData.bio)}/250 words • {formData.bio.length >= 100 ? '✓' : ''} {formData.bio.length}/100 characters minimum
+                      {countWords(formData.bio)}/250 words
                     </p>
                   </div>
 
