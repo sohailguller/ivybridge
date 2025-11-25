@@ -120,13 +120,17 @@ export default function MentorProfile() {
       if (response.data.url) {
         // Redirect to Stripe checkout
         window.location.href = response.data.url;
+      } else if (response.data.error) {
+        alert(response.data.error);
+        setIsSubscribing(false);
       } else {
         throw new Error('No checkout URL returned');
       }
 
     } catch (error) {
       console.error("Error creating checkout session:", error);
-      alert("There was an error starting your subscription. Please try again.");
+      const errorMessage = error?.response?.data?.error || "There was an error starting your subscription. Please try again.";
+      alert(errorMessage);
       setIsSubscribing(false);
     }
   };

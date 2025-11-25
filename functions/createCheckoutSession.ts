@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.7.1';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
 import Stripe from 'npm:stripe@17.5.0';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'), {
@@ -22,6 +22,18 @@ Deno.serve(async (req) => {
 
     // Parse request
     const { mentorProfileId, planType } = await req.json();
+
+    // Check if student already has an active subscription
+    const existingSubscriptions = await base44.asServiceRole.entities.Subscription.filter({
+      student_id: user.id,
+      status: 'active'
+    });
+
+    if (existingSubscriptions.length > 0) {
+      return Response.json({ 
+        error: 'You already have an active mentorship subscription. Please complete or cancel your current subscription before subscribing to another mentor.' 
+      }, { status: 400 });
+    }
 
     if (!mentorProfileId || !planType) {
       return Response.json({ error: 'Missing required fields' }, { status: 400 });

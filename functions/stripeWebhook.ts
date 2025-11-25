@@ -1,5 +1,5 @@
 import Stripe from 'npm:stripe@17.5.0';
-import { createClient } from 'npm:@base44/sdk@0.7.1';
+import { createClient } from 'npm:@base44/sdk@0.8.4';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'), {
   apiVersion: '2024-12-18.acacia',
