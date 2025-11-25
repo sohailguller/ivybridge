@@ -480,7 +480,7 @@ export default function MentorProfile() {
                 <div className="text-sm font-medium text-gray-600 mb-1">Annual Plan</div>
                 <div className="text-3xl font-bold mb-1 text-[#0D3B33]">$5,000</div>
                 <div className="text-sm text-gray-600 mb-2">one-time payment</div>
-                <div className="text-xs text-gray-500 mb-4">Save over $1,100</div>
+                <div className="text-xs text-gray-500 mb-4">Save $100</div>
               </div>
               <Button
                 onClick={() => handleSubscribe('annual', 5000)}

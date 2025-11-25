@@ -399,7 +399,7 @@ export default function Home() {
                 <div className="text-base font-medium text-gray-600 mb-2">Annual Plan</div>
                 <div className="text-4xl font-bold mb-1 text-[#0D3B33]">$5,000</div>
                 <div className="text-gray-600 mb-4">one-time payment</div>
-                <div className="text-xs text-gray-500 mb-6">12 months of mentorship • Save over $1,100</div>
+                <div className="text-xs text-gray-500 mb-6">12 months of mentorship • Save $100</div>
 
                 <ul className="space-y-3 text-left mb-6 text-sm">
                   <li className="flex items-start gap-2">
