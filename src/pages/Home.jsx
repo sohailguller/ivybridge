@@ -236,7 +236,6 @@ export default function Home() {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold mb-1 font-serif group-hover:text-[#800000] transition-colors">{feature.title}</h3>
-                    <p className="text-gray-600 font-sans text-sm">{feature.description}</p>
                   </div>
                 </div>
               ))}
