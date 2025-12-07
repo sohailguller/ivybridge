@@ -315,8 +315,8 @@ export default function Home() {
             </section>
 
             {/* CTA Section */}
-            <section className="relative z-10 py-24 px-6 md:px-12 bg-[#00204E] text-white">
-            <div className="max-w-4xl mx-auto text-center">
+            <section className="relative z-10 py-32 px-6 md:px-12 bg-[#00204E]/90 backdrop-blur-sm text-white border-t border-white/10">
+              <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-4xl md:text-5xl font-bold mb-6 font-serif">
             Ready to Start Your Journey?
             </h2>
