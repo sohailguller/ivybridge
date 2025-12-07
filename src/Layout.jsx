@@ -173,7 +173,7 @@ export default function Layout({ children, currentPageName }) {
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/65bfd119d_Untitleddesign3.png"
                 alt="IvyBridge"
-                className={`transition-all duration-300 ${isTransparent ? 'h-14 brightness-0 invert' : 'h-12'}`}
+                className={`transition-all duration-300 ${isTransparent ? 'h-20 brightness-0 invert' : 'h-16'}`}
               />
             </Link>
 
