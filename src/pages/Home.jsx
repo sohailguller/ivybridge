@@ -285,28 +285,28 @@ export default function Home() {
 
                 <ul className="space-y-3 text-left mb-6 text-sm">
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-[#C90000] flex-shrink-0 mt-0.5" />
-                    <span className="text-white/90">Unlimited 1-on-1 messaging</span>
+                    <CheckCircle className="w-4 h-4 text-[#00204E] flex-shrink-0 mt-0.5" />
+                    <span>Unlimited 1-on-1 messaging</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-[#C90000] flex-shrink-0 mt-0.5" />
-                    <span className="text-white/90">Monthly video sessions</span>
+                    <CheckCircle className="w-4 h-4 text-[#00204E] flex-shrink-0 mt-0.5" />
+                    <span>Monthly video sessions</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-[#C90000] flex-shrink-0 mt-0.5" />
-                    <span className="text-white/90">Essay reviews & feedback</span>
+                    <CheckCircle className="w-4 h-4 text-[#00204E] flex-shrink-0 mt-0.5" />
+                    <span>Essay reviews & feedback</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-[#C90000] flex-shrink-0 mt-0.5" />
-                    <span className="text-white/90">Application milestone tracking</span>
+                    <CheckCircle className="w-4 h-4 text-[#00204E] flex-shrink-0 mt-0.5" />
+                    <span>Application milestone tracking</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-[#C90000] flex-shrink-0 mt-0.5" />
-                    <span className="text-white/90">Interview preparation</span>
+                    <CheckCircle className="w-4 h-4 text-[#00204E] flex-shrink-0 mt-0.5" />
+                    <span>Interview preparation</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-[#C90000] flex-shrink-0 mt-0.5" />
-                    <span className="text-white/90">Monthly progress reports</span>
+                    <CheckCircle className="w-4 h-4 text-[#00204E] flex-shrink-0 mt-0.5" />
+                    <span>Monthly progress reports</span>
                   </li>
                 </ul>
 
