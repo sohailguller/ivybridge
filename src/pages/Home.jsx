@@ -214,30 +214,66 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-16 bg-white">
+      {/* Features - Redesigned with Dashboard Image */}
+      <section className="py-24 bg-white overflow-hidden">
         <div className="w-full px-6 md:px-12 lg:px-24">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
-              Everything You Need to Succeed
-            </h2>
-            <p className="text-gray-600">Comprehensive tools and support for your college journey</p>
-          </div>
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left Side: Content & Features List */}
+            <div>
+              <div className="mb-10">
+                <h2 className="text-3xl md:text-4xl font-normal mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+                  Everything You Need to Succeed
+                </h2>
+                <p className="text-gray-600 text-lg">
+                  Comprehensive tools and support for your college journey, all in one place.
+                </p>
+              </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            {features.map((feature, index) =>
-            <div key={index} className="bg-white border border-gray-200 rounded p-6">
-                <div className="flex gap-4">
-                  <div className="w-12 h-12 bg-[#0D3B33]/5 rounded flex items-center justify-center flex-shrink-0">
-                    <feature.icon className="w-6 h-6 text-[#0D3B33]" />
+              <div className="space-y-8">
+                {features.map((feature, index) =>
+                  <div key={index} className="flex gap-5 group">
+                    <div className="w-14 h-14 bg-[#E6EFEA] rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-[#FE6C3A] group-hover:text-white transition-colors duration-300">
+                      <feature.icon className="w-6 h-6 text-[#0D3B33] group-hover:text-white transition-colors duration-300" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold mb-2 text-[#0D3B33]">{feature.title}</h3>
+                      <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-bold mb-2 text-[#0D3B33]">{feature.title}</h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Right Side: Dashboard Screenshot */}
+            <div className="relative mt-12 lg:mt-0">
+              {/* Decorative elements */}
+              <div className="absolute -top-10 -right-10 w-64 h-64 bg-[#FE6C3A]/5 rounded-full blur-3xl"></div>
+              <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-[#0D3B33]/5 rounded-full blur-3xl"></div>
+              
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-gray-100 bg-white">
+                <div className="bg-gray-100 border-b border-gray-200 px-4 py-3 flex gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                </div>
+                {/* Dashboard Placeholder Image */}
+                <img
+                  src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1974&auto=format&fit=crop"
+                  alt="Student Dashboard Interface"
+                  className="w-full h-auto object-cover"
+                />
+                
+                {/* Floating Badge */}
+                <div className="absolute bottom-8 left-8 bg-white/90 backdrop-blur-md p-4 rounded-lg shadow-lg border border-gray-100 max-w-xs">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                    <span className="text-xs font-bold text-[#0D3B33] uppercase tracking-wider">Next Session</span>
                   </div>
+                  <p className="font-semibold text-sm mb-1">Essay Review with Sarah</p>
+                  <p className="text-xs text-gray-500">Tomorrow at 4:00 PM</p>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </section>
