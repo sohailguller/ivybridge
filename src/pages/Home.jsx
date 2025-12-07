@@ -217,39 +217,30 @@ export default function Home() {
       {/* Features - Redesigned with Dashboard Image */}
       <section className="py-24 bg-white overflow-hidden">
         <div className="w-full px-6 md:px-12 lg:px-24">
+          <div className="max-w-4xl mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-[#0D3B33] tracking-tight" style={{ fontFamily: 'Georgia, serif' }}>
+              Everything You Need to Succeed
+            </h2>
+          </div>
+
           <div className="grid lg:grid-cols-12 gap-12 items-center">
             {/* Left Side: Content & Features List */}
             <div className="lg:col-span-5">
               <div className="mb-8">
-                <h2 className="text-4xl md:text-5xl font-bold mb-6 text-[#0D3B33] tracking-tight" style={{ fontFamily: 'Georgia, serif' }}>
-                  Everything You Need to Succeed
-                </h2>
-                <p className="text-gray-600 text-lg leading-relaxed">
+                <p className="text-gray-600 text-lg leading-relaxed mb-8">
                   Comprehensive tools and support for your college journey, all in one place.
                   Manage your applications, schedule meetings, and track your progress effortlessly.
                 </p>
-              </div>
-
-              <div className="mb-8">
                 <p className="text-xs font-bold text-gray-400 tracking-wider uppercase mb-5">Key Features</p>
                 <div className="space-y-4">
                   {features.map((feature, index) =>
                     <div key={index} className="flex gap-3 items-center">
-                      <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                      <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0" />
                       <span className="text-lg font-medium text-[#0D3B33]">{feature.title}</span>
                     </div>
                   )}
                 </div>
               </div>
-
-              <Button 
-                size="lg"
-                className="bg-[#0D3B33] hover:bg-[#0D3B33]/90 text-white rounded-full px-8 py-6 text-lg"
-                onClick={() => navigate(createPageUrl("BrowseMentors"))}
-              >
-                Find a Mentor
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
             </div>
 
             {/* Right Side: Dashboard Screenshot */}
@@ -258,7 +249,7 @@ export default function Home() {
               <div className="absolute -top-10 -right-10 w-64 h-64 bg-[#FE6C3A]/5 rounded-full blur-3xl"></div>
               <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-[#0D3B33]/5 rounded-full blur-3xl"></div>
               
-              <div className="relative rounded-xl overflow-hidden shadow-2xl border border-gray-200 bg-white transform hover:scale-[1.01] transition-transform duration-500">
+              <div className="relative rounded-xl overflow-hidden shadow-lg border border-gray-200 bg-white transform hover:scale-[1.01] transition-transform duration-500">
                 <div className="bg-gray-50 border-b border-gray-200 px-4 py-3 flex gap-2">
                   <div className="w-3 h-3 rounded-full bg-[#FF5F57]"></div>
                   <div className="w-3 h-3 rounded-full bg-[#FEBC2E]"></div>
