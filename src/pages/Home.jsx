@@ -71,29 +71,56 @@ export default function Home() {
       `}</style>
 
       {/* Hero Section */}
-      <section className="pt-24 pb-20 px-6 md:px-12 lg:px-24 text-center max-w-6xl mx-auto">
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-[1.1] tracking-tight text-black">
-          Your Insider Path<br className="hidden md:block" /> to the Ivy League
-        </h1>
-        
-        <p className="text-xl md:text-2xl text-gray-600 font-light max-w-3xl mx-auto mb-12 font-sans leading-relaxed">
-          Don't just apply. Stand out. Get personalized 1-on-1 guidance from verified students who have already cracked the code.
-        </p>
+      <section className="relative h-screen flex items-end overflow-hidden">
+        {/* Background Video */}
+        <div className="absolute inset-0 w-full h-full overflow-hidden">
+          <iframe
+            src="https://player.cloudinary.com/embed/?cloud_name=dihudketx&public_id=copy_1B6020D0-9018-4FE7-AA40-A66AFE768D32_alwvzo&profile=cld-default&autoplay=true&loop=true&muted=true&controls=false"
+            className="absolute top-1/2 left-1/2 min-w-full min-h-full w-auto h-auto grayscale-[20%]"
+            style={{
+              border: 'none',
+              pointerEvents: 'none',
+              transform: 'translate(-50%, -50%) scale(1.5)',
+              width: '177.77vh',
+              height: '56.25vw',
+              minWidth: '100%',
+              minHeight: '100%'
+            }}
+            allow="autoplay; fullscreen"
+          />
+        </div>
 
-        <div className="flex flex-col sm:flex-row justify-center gap-6">
-          <Button 
-            onClick={() => user ? navigate(createPageUrl("BrowseMentors")) : base44.auth.redirectToLogin(createPageUrl("BrowseMentors"))}
-            className="bg-[#1a1a1a] text-white hover:bg-[#333] rounded-none px-10 py-6 text-lg font-sans tracking-wide uppercase transition-transform hover:-translate-y-1"
-          >
-            Find Your Mentor
-          </Button>
-          <Button 
-            onClick={() => navigate(createPageUrl("ApplyAsMentor"))}
-            variant="outline"
-            className="border-[#1a1a1a] text-[#1a1a1a] hover:bg-gray-50 rounded-none px-10 py-6 text-lg font-sans tracking-wide uppercase"
-          >
-            Become a Mentor
-          </Button>
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+
+        {/* Content - Bottom Left Aligned */}
+        <div className="relative w-full px-6 md:px-12 lg:px-24 pb-24 md:pb-32">
+          <div className="max-w-4xl">
+            <h1 className="text-white mb-8 text-6xl md:text-7xl lg:text-9xl font-bold leading-[0.9] tracking-tighter font-serif">
+              Your Insider Path <br /> to the Ivy League
+            </h1>
+
+            <p className="text-xl md:text-2xl text-white/90 leading-relaxed max-w-2xl mb-12 font-sans font-light">
+              Don't just apply. Stand out. Get personalized 1-on-1 guidance from verified students who have already cracked the code.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-5">
+              <Button
+                size="lg"
+                className="bg-[#C90000] hover:bg-[#A00000] text-white rounded-none px-12 py-8 text-lg font-sans font-bold uppercase tracking-widest shadow-xl transition-all duration-300"
+                onClick={() => user ? navigate(createPageUrl("BrowseMentors")) : base44.auth.redirectToLogin(createPageUrl("BrowseMentors"))}>
+                Find Your Mentor
+                <ArrowRight className="w-5 h-5 ml-3" />
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="rounded-none px-12 py-8 text-lg font-sans font-bold uppercase tracking-widest border-2 border-white text-white bg-transparent hover:bg-white hover:text-black transition-all duration-300"
+                onClick={() => navigate(createPageUrl("ApplyAsMentor"))}>
+                Become a Mentor
+              </Button>
+            </div>
+          </div>
         </div>
       </section>
 
