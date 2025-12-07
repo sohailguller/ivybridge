@@ -147,11 +147,11 @@ export default function Home() {
           <div className="flex animate-scroll whitespace-nowrap items-center">
             {/* Duplicating enough times to ensure smooth loop on large screens */}
             {[...universities, ...universities, ...universities, ...universities, ...universities, ...universities].map((uni, idx) => (
-              <div key={idx} className="inline-flex items-center mx-8 md:mx-12 shrink-0 h-24">
+              <div key={idx} className="inline-flex items-center mx-2 md:mx-4 shrink-0 h-24 overflow-hidden">
                 <img 
                   src={uni.logo} 
                   alt={uni.name} 
-                  className="h-full w-auto object-contain brightness-0 opacity-80 hover:opacity-100 transition-all duration-300"
+                  className="h-full w-auto object-contain scale-125 transition-all duration-300"
                   style={{ maxWidth: '200px' }}
                 />
               </div>
