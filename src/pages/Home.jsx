@@ -217,8 +217,8 @@ export default function Home() {
 
       {/* Features Section */}
       <section className="relative z-10 py-24 bg-[#f4f4f4] px-6 md:px-12">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
-          <div>
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-12 gap-12 items-center">
+          <div className="lg:col-span-5">
             <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight">
               Everything You Need <br/>
               <span className="text-[#800000]">To Succeed</span>
@@ -227,7 +227,7 @@ export default function Home() {
               Comprehensive tools and support for your college journey, all in one place.
               Manage your applications, schedule meetings, and track your progress effortlessly.
             </p>
-            
+
             <div className="space-y-6">
               {features.map((feature, index) => (
                 <div key={index} className="flex gap-4 items-start group">
@@ -241,8 +241,8 @@ export default function Home() {
               ))}
             </div>
           </div>
-          
-          <div className="rounded-xl overflow-hidden shadow-2xl border border-gray-200 bg-white">
+
+          <div className="lg:col-span-7 rounded-xl overflow-hidden shadow-2xl border border-gray-200 bg-white transform transition-transform hover:scale-[1.02] duration-500">
             <div className="bg-gray-100 px-4 py-3 flex gap-2 border-b border-gray-200">
               <div className="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E]"></div>
               <div className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123]"></div>
@@ -310,11 +310,36 @@ export default function Home() {
                 Get Started
               </Button>
             </div>
-          </div>
-        </div>
-      </section>
+            </div>
+            </div>
+            </section>
 
+            {/* CTA Section */}
+            <section className="relative z-10 py-24 px-6 md:px-12 bg-[#00204E] text-white">
+            <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 font-serif">
+            Ready to Start Your Journey?
+            </h2>
+            <p className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto font-sans font-light">
+            Join hundreds of students who have already secured their spot at top universities with IvyBridge guidance.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Button
+              className="bg-[#C90000] hover:bg-[#A00000] text-white rounded-none px-10 py-7 text-base font-sans font-bold uppercase tracking-widest shadow-lg transition-all duration-300"
+              onClick={() => user ? navigate(createPageUrl("BrowseMentors")) : base44.auth.redirectToLogin(createPageUrl("BrowseMentors"))}>
+              Find Your Mentor
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+            <Button
+              variant="outline"
+              className="rounded-none px-10 py-7 text-base font-sans font-bold uppercase tracking-widest border border-white text-white bg-transparent hover:bg-white hover:text-[#00204E] transition-all duration-300"
+              onClick={() => navigate(createPageUrl("ApplyAsMentor"))}>
+              Become a Mentor
+            </Button>
+            </div>
+            </div>
+            </section>
 
-    </div>
-  );
-}
+            </div>
+            );
+            }

@@ -326,7 +326,7 @@ export default function Layout({ children, currentPageName }) {
       </main>
 
       {/* Footer - relative z-10 ensures it covers fixed video background */}
-      <footer className="relative z-10 bg-[#F3F4F6] border-t border-[#00204E]/10 mt-20">
+      <footer className="relative z-10 bg-[#F3F4F6] border-t border-[#00204E]/10">
         <div className="w-full px-6 md:px-12 lg:px-24 py-12">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
