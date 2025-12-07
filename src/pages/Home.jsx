@@ -41,15 +41,15 @@ export default function Home() {
   };
 
   const universities = [
-    { name: "Harvard", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/bd962c17c_6c895e7efa47946d1c38ce6708738b2e.png", className: "h-12 md:h-14" },
-    { name: "Yale", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/bd05af430_b0e2c73ddee682723b94be44d649efed.png", className: "h-10 md:h-12" },
-    { name: "Princeton", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/b4846c341_3be0c75087fab2b95c19f47961a8e836.png", className: "h-12 md:h-14" },
-    { name: "Columbia", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/5a15421e7_Columbia-University-Logo-500x281.png", className: "h-8 md:h-10" },
-    { name: "Brown", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/21bd68040_073ed53307201e36c0e63d0a2bf08cf5.png", className: "h-10 md:h-12" },
-    { name: "Dartmouth", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/d54095ab4_Dartmouth-Logo-before-2018.png", className: "h-10 md:h-12" },
-    { name: "Cornell", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/8d245439e_075a87e86282d666b1c6dc97f2f7f870.png", className: "h-10 md:h-12" },
-    { name: "Penn", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/870a3abd2_969ca20ef6492d9cf4f3217248711afe.png", className: "h-12 md:h-14" },
-    { name: "Stanford", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/cc89dbca0_815d6f6856083d96a7b6c374208c2a9f.png", className: "h-12 md:h-14" }
+    { name: "Harvard", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/e43613884_Untitleddesign6.png", className: "h-16 md:h-20" },
+    { name: "Yale", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/586f85967_Untitleddesign5.png", className: "h-16 md:h-20" },
+    { name: "Princeton", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/2b7b1186c_Untitleddesign1.png", className: "h-16 md:h-20" },
+    { name: "Columbia", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/efd381c88_Untitleddesign2.png", className: "h-16 md:h-20" },
+    { name: "Brown", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/ee520777c_Untitleddesign4.png", className: "h-16 md:h-20" },
+    { name: "Dartmouth", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/f54f5b94c_Untitleddesign3.png", className: "h-16 md:h-20" },
+    { name: "Cornell", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/af5470f99_Untitleddesign8.png", className: "h-16 md:h-20" },
+    { name: "Penn", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/af5778215_Untitleddesign7.png", className: "h-16 md:h-20" },
+    { name: "Stanford", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/700a17a11_Untitleddesign.png", className: "h-16 md:h-20" }
   ];
 
   const features = [
@@ -139,18 +139,19 @@ export default function Home() {
       </section>
 
       {/* Universities Ticker */}
-      <div className="border-y border-gray-200 bg-[#fafafa] py-12">
-        <div className="text-center mb-8">
+      <div className="border-y border-gray-200 bg-[#fafafa] py-16">
+        <div className="text-center mb-10">
           <p className="text-xs font-sans font-bold tracking-[0.2em] uppercase text-gray-400">Mentors from</p>
         </div>
-        <div className="overflow-hidden">
+        <div className="overflow-hidden w-full">
           <div className="flex animate-scroll whitespace-nowrap items-center">
-            {[...universities, ...universities, ...universities, ...universities].map((uni, idx) => (
-              <div key={idx} className="inline-flex items-center mx-8 md:mx-12 shrink-0">
+            {/* Duplicating enough times to ensure smooth loop on large screens */}
+            {[...universities, ...universities, ...universities, ...universities, ...universities, ...universities].map((uni, idx) => (
+              <div key={idx} className="inline-flex items-center mx-12 md:mx-16 shrink-0">
                 <img 
                   src={uni.logo} 
                   alt={uni.name} 
-                  className={`${uni.className || "h-10 md:h-12"} w-auto object-contain transition-all duration-300`}
+                  className={`${uni.className} w-auto object-contain brightness-0 opacity-80 hover:opacity-100 transition-all duration-300`}
                 />
               </div>
             ))}
@@ -163,7 +164,11 @@ export default function Home() {
           100% { transform: translateX(-50%); }
         }
         .animate-scroll {
-          animation: scroll 30s linear infinite;
+          animation: scroll 60s linear infinite;
+          will-change: transform;
+        }
+        .animate-scroll:hover {
+          animation-play-state: paused;
         }
       `}</style>
 
