@@ -105,7 +105,7 @@ export default function Home() {
         {/* Background Video */}
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <iframe
-            src="https://player.cloudinary.com/embed/?cloud_name=dihudketx&public_id=AdobeStock_503416191_Video_4K_Preview_ii79ks&profile=cld-default&autoplay=true&loop=true&muted=true&controls=false"
+            src="https://player.cloudinary.com/embed/?cloud_name=dihudketx&public_id=copy_1B6020D0-9018-4FE7-AA40-A66AFE768D32_alwvzo&profile=cld-default&autoplay=true&loop=true&muted=true&controls=false"
             className="absolute top-1/2 left-1/2 min-w-full min-h-full w-auto h-auto"
             style={{
               border: 'none',
