@@ -21,35 +21,18 @@ import {
 export default function Home() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [stats, setStats] = useState({
-    mentors: 0,
-    students: 0,
-    sessions: 0
-  });
-
   useEffect(() => {
-    loadData();
+    loadUser();
   }, []);
 
-  const loadData = async () => {
+  const loadUser = async () => {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
-
-      // Load stats
-      const mentors = await base44.entities.MentorProfile.filter({ verification_status: "approved" });
-      const subscriptions = await base44.entities.Subscription.list();
-
-      setStats({
-        mentors: mentors.length,
-        students: subscriptions.length,
-        sessions: subscriptions.length * 12
-      });
     } catch (error) {
-
-
       // Not logged in
-    }};
+    }
+  };
   const features = [
   {
     icon: MessageSquare,
@@ -120,36 +103,36 @@ export default function Home() {
 
         </div>
 
-        {/* Gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+        {/* Darker Gradient overlay for better text readability and premium feel */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0D3B33]/90 via-[#0D3B33]/40 to-black/20" />
 
         {/* Content - Bottom Left Aligned */}
-        <div className="relative w-full px-8 md:px-16 lg:px-20 pb-24 md:pb-28">
-          <div className="max-w-4xl">
-            <h1 className="text-white mb-5 text-4xl font-normal leading-tight md:text-5xl lg:text-6xl" style={{ fontFamily: 'Georgia, serif', fontWeight: 400, letterSpacing: '-0.02em', textTransform: 'none' }}>
-              Get Into Your Dream School
+        <div className="relative w-full px-6 md:px-12 lg:px-24 pb-20 md:pb-32">
+          <div className="max-w-3xl">
+            <div className="inline-block bg-[#FE6C3A] text-white text-xs font-bold px-3 py-1 rounded-sm mb-6 tracking-widest uppercase">
+              Launching Soon
+            </div>
+            <h1 className="text-white mb-6 text-5xl md:text-6xl lg:text-7xl font-normal leading-tight" style={{ fontFamily: 'Georgia, serif', letterSpacing: '-0.02em' }}>
+              Your Insider Path to the Ivy League
             </h1>
 
-            <p className="text-base md:text-lg text-white/95 leading-relaxed max-w-2xl mb-6" style={{ fontFamily: 'Georgia, serif' }}>Connect with verified mentors from top U.S. universities for personalized admissions guidance. From essay reviews to interview prep — get the insider advantage.
-
-
+            <p className="text-lg md:text-xl text-white/90 leading-relaxed max-w-2xl mb-10 font-light">
+              Don't just apply. Stand out. Get personalized 1-on-1 guidance from verified students who have already cracked the code to Harvard, Yale, Princeton, and more.
             </p>
 
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               <Button
                 size="lg"
-                className="btn-primary text-white rounded px-8 py-4 text-base font-semibold"
+                className="btn-primary text-white rounded-sm px-10 py-7 text-lg font-medium shadow-xl hover:translate-y-[-2px] transition-transform"
                 onClick={() => user ? navigate(createPageUrl("BrowseMentors")) : base44.auth.redirectToLogin(createPageUrl("BrowseMentors"))}>
-
                 Find Your Mentor
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="rounded px-8 py-4 text-base font-semibold bg-white/95 border-2 border-white text-[#0D3B33] hover:bg-white"
+                className="rounded-sm px-10 py-7 text-lg font-medium bg-transparent border-2 border-white text-white hover:bg-white hover:text-[#0D3B33] transition-colors"
                 onClick={() => navigate(createPageUrl("ApplyAsMentor"))}>
-
                 Become a Mentor
               </Button>
             </div>
@@ -159,33 +142,6 @@ export default function Home() {
 
       {/* Orange Border Accent */}
       <div className="border-b-4 border-[#FE6C3A]" />
-
-      {/* Track Record Section */}
-      <section className="py-12 bg-gray-50">
-        <div className="w-full px-6 md:px-12 lg:px-24">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
-              Our Track Record
-            </h2>
-            <p className="text-gray-600">Trusted by students worldwide</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white border border-gray-200 rounded p-6 text-center">
-              <div className="text-4xl font-bold text-[#0D3B33] mb-2">{stats.mentors}+</div>
-              <div className="text-sm text-gray-600 font-medium">Verified Ivy League Mentors</div>
-            </div>
-            <div className="bg-white border border-gray-200 rounded p-6 text-center">
-              <div className="text-4xl font-bold text-[#0D3B33] mb-2">{stats.students}+</div>
-              <div className="text-sm text-gray-600 font-medium">Students Successfully Guided</div>
-            </div>
-            <div className="bg-white border border-gray-200 rounded p-6 text-center">
-              <div className="text-4xl font-bold text-[#0D3B33] mb-2">NA%</div>
-              <div className="text-sm text-gray-600 font-medium">Client Satisfaction Rate</div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Universities Ticker */}
       <section className="py-16 bg-white border-y border-gray-200">
@@ -213,66 +169,49 @@ export default function Home() {
         }
       `}</style>
 
-      {/* How It Works */}
-      <section className="py-16 bg-gray-50">
+      {/* How It Works - Redesigned */}
+      <section className="py-24 bg-white">
         <div className="w-full px-6 md:px-12 lg:px-24">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
-              How IvyBridge Works
+          <div className="text-center mb-16">
+            <span className="text-[#FE6C3A] font-bold tracking-widest text-sm uppercase mb-2 block">The Process</span>
+            <h2 className="text-4xl md:text-5xl font-normal mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+              Your Journey to Acceptance
             </h2>
-            <p className="text-gray-600">A proven process to get you into your dream school</p>
+            <p className="text-gray-500 max-w-2xl mx-auto text-lg">A structured, personalized approach designed to maximize your admissions chances.</p>
           </div>
 
-          <div className="space-y-6">
-            <div className="bg-white border border-gray-200 rounded p-6 border-l-4 border-l-[#FE6C3A]">
-              <div className="flex gap-6">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
-                    <span className="text-2xl font-bold text-[#0D3B33]">1</span>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-2 text-[#0D3B33]">Choose Your Mentor</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    Browse verified Ivy League mentors by university, major, and expertise.
-                    Read profiles and select the perfect match for your goals.
-                  </p>
-                </div>
+          <div className="grid md:grid-cols-3 gap-12 relative">
+             {/* Connecting Line (Desktop) */}
+            <div className="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-gray-100 z-0"></div>
+
+            <div className="relative z-10 text-center group">
+              <div className="w-24 h-24 bg-white border-2 border-[#E6EFEA] rounded-full flex items-center justify-center mx-auto mb-8 shadow-sm group-hover:border-[#FE6C3A] transition-colors duration-300">
+                <span className="text-3xl font-bold text-[#0D3B33]">1</span>
               </div>
+              <h3 className="text-2xl font-bold mb-4 text-[#0D3B33]">Choose Your Mentor</h3>
+              <p className="text-gray-600 leading-relaxed px-4">
+                Browse our curated network of verified Ivy League students. Filter by university, major, and expertise to find the perfect role model who shares your dream.
+              </p>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded p-6 border-l-4 border-l-[#0D3B33]">
-              <div className="flex gap-6">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
-                    <span className="text-2xl font-bold text-[#0D3B33]">2</span>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-2 text-[#0D3B33]">Start Your Journey</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    Subscribe to unlock 1-on-1 chat, video meetings, task tracking, and ongoing support
-                    throughout your entire application process.
-                  </p>
-                </div>
+            <div className="relative z-10 text-center group">
+              <div className="w-24 h-24 bg-white border-2 border-[#E6EFEA] rounded-full flex items-center justify-center mx-auto mb-8 shadow-sm group-hover:border-[#FE6C3A] transition-colors duration-300">
+                <span className="text-3xl font-bold text-[#0D3B33]">2</span>
               </div>
+              <h3 className="text-2xl font-bold mb-4 text-[#0D3B33]">Start the Partnership</h3>
+              <p className="text-gray-600 leading-relaxed px-4">
+                Unlock direct access via chat and video calls. Build a roadmap, set milestones, and get real-time feedback on your essays and strategy.
+              </p>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded p-6 border-l-4 border-l-[#FE6C3A]">
-              <div className="flex gap-6">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
-                    <span className="text-2xl font-bold text-[#0D3B33]">3</span>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-2 text-[#0D3B33]">Get Accepted</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    Receive personalized guidance on essays, applications, and interviews.
-                    Join hundreds of students who got into their dream schools.
-                  </p>
-                </div>
+            <div className="relative z-10 text-center group">
+              <div className="w-24 h-24 bg-white border-2 border-[#E6EFEA] rounded-full flex items-center justify-center mx-auto mb-8 shadow-sm group-hover:border-[#FE6C3A] transition-colors duration-300">
+                <span className="text-3xl font-bold text-[#0D3B33]">3</span>
               </div>
+              <h3 className="text-2xl font-bold mb-4 text-[#0D3B33]">Craft Your Story</h3>
+              <p className="text-gray-600 leading-relaxed px-4">
+                Submit an application that truly stands out. With insider knowledge and personalized coaching, you'll walk into interviews with confidence.
+              </p>
             </div>
           </div>
         </div>
@@ -306,36 +245,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-16 bg-gray-50">
-        <div className="w-full px-6 md:px-12 lg:px-24">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
-              Success Stories
-            </h2>
-            <p className="text-gray-600">Hear from students who got into their dream schools</p>
-          </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial, index) =>
-            <div key={index} className="bg-white border border-gray-200 rounded p-6">
-                <div className="flex gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) =>
-                <Star key={i} className="w-4 h-4 fill-[#FE6C3A] text-[#FE6C3A]" />
-                )}
-                </div>
-                <p className="text-gray-700 mb-4 italic text-sm leading-relaxed">
-                  "{testimonial.text}"
-                </p>
-                <div className="border-t border-gray-100 pt-4">
-                  <div className="font-semibold text-sm text-[#0D3B33]">{testimonial.name}</div>
-                  <div className="text-xs text-gray-600">{testimonial.university}</div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
 
       {/* Pricing */}
       <section className="py-16 bg-white border-t-4 border-t-[#FE6C3A]">

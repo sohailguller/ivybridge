@@ -206,7 +206,7 @@ export default function Layout({ children, currentPageName }) {
                         className="bg-[#FE6C3A] hover:bg-[#FF7B4A] text-white rounded-lg px-6 uppercase tracking-wider font-semibold"
                         style={{ fontFamily: 'Oswald, sans-serif' }}
                       >
-                        Get Started
+                        Find a Mentor
                       </Button>
                     </>
                   )}
