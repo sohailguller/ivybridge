@@ -92,7 +92,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative h-screen flex items-end overflow-hidden">
         {/* Background Video */}
-        <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
+        <div className="fixed inset-0 w-full h-full overflow-hidden z-0">
           <video
             ref={videoRef}
             autoPlay
@@ -107,7 +107,7 @@ export default function Home() {
         </div>
 
         {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 z-0" />
+        <div className="fixed inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 z-0" />
 
         {/* Content - Bottom Left Aligned */}
         <div className="relative z-10 w-full px-6 md:px-12 lg:px-24 pb-20 md:pb-24">
