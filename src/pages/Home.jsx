@@ -139,16 +139,16 @@ export default function Home() {
       </section>
 
       {/* Universities Ticker */}
-      <div className="border-y border-gray-200 bg-[#fafafa] py-4">
-        <div className="text-center mb-4">
+      <div className="border-y border-gray-200 bg-[#fafafa] py-10">
+        <div className="text-center mb-6">
           <p className="text-xs font-sans font-bold tracking-[0.2em] uppercase text-gray-400">Mentors from</p>
         </div>
         <div className="overflow-hidden w-full">
           <div className="flex animate-scroll whitespace-nowrap items-center w-max">
             {/* Duplicating enough times to ensure smooth loop on large screens */}
             {[...universities, ...universities, ...universities, ...universities, ...universities, ...universities].map((uni, idx) => (
-              <div key={idx} className="inline-flex items-center mx-4 md:mx-8 shrink-0 h-16 overflow-hidden">
-                <img 
+              <div key={idx} className="inline-flex items-center mx-2 md:mx-4 shrink-0 h-16 overflow-hidden">
+                <img
                   src={uni.logo} 
                   alt={uni.name} 
                   className="h-full w-auto object-contain scale-125 transition-all duration-300"
@@ -165,7 +165,7 @@ export default function Home() {
           100% { transform: translateX(-50%); }
         }
         .animate-scroll {
-          animation: scroll 15s linear infinite;
+          animation: scroll 40s linear infinite;
           will-change: transform;
         }
         .animate-scroll:hover {
