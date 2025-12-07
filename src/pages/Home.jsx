@@ -217,9 +217,9 @@ export default function Home() {
       {/* Features - Redesigned with Dashboard Image */}
       <section className="py-24 bg-white overflow-hidden">
         <div className="w-full px-6 md:px-12 lg:px-24">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid lg:grid-cols-12 gap-8 items-center">
             {/* Left Side: Content & Features List */}
-            <div>
+            <div className="lg:col-span-4">
               <div className="mb-10">
                 <h2 className="text-3xl md:text-4xl font-normal mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
                   Everything You Need to Succeed
@@ -229,23 +229,20 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="space-y-8">
+              <div className="space-y-4">
                 {features.map((feature, index) =>
-                  <div key={index} className="flex gap-5 group">
-                    <div className="w-14 h-14 bg-[#E6EFEA] rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-[#FE6C3A] group-hover:text-white transition-colors duration-300">
-                      <feature.icon className="w-6 h-6 text-[#0D3B33] group-hover:text-white transition-colors duration-300" />
+                  <div key={index} className="flex gap-4 items-center group">
+                    <div className="w-10 h-10 bg-[#E6EFEA] rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-[#FE6C3A] group-hover:text-white transition-colors duration-300">
+                      <feature.icon className="w-5 h-5 text-[#0D3B33] group-hover:text-white transition-colors duration-300" />
                     </div>
-                    <div>
-                      <h3 className="text-xl font-bold mb-2 text-[#0D3B33]">{feature.title}</h3>
-                      <p className="text-gray-600 leading-relaxed">{feature.description}</p>
-                    </div>
+                    <h3 className="text-base font-bold text-[#0D3B33]">{feature.title}</h3>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Right Side: Dashboard Screenshot */}
-            <div className="relative mt-12 lg:mt-0">
+            <div className="relative mt-12 lg:mt-0 lg:col-span-8">
               {/* Decorative elements */}
               <div className="absolute -top-10 -right-10 w-64 h-64 bg-[#FE6C3A]/5 rounded-full blur-3xl"></div>
               <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-[#0D3B33]/5 rounded-full blur-3xl"></div>
@@ -262,16 +259,6 @@ export default function Home() {
                   alt="Student Dashboard Interface"
                   className="w-full h-auto object-cover"
                 />
-                
-                {/* Floating Badge */}
-                <div className="absolute bottom-8 left-8 bg-white/90 backdrop-blur-md p-4 rounded-lg shadow-lg border border-gray-100 max-w-xs">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                    <span className="text-xs font-bold text-[#0D3B33] uppercase tracking-wider">Next Session</span>
-                  </div>
-                  <p className="font-semibold text-sm mb-1">Essay Review with Sarah</p>
-                  <p className="text-xs text-gray-500">Tomorrow at 4:00 PM</p>
-                </div>
               </div>
             </div>
           </div>
