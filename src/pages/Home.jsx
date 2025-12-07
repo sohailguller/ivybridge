@@ -146,11 +146,11 @@ export default function Home() {
         <div className="overflow-hidden">
           <div className="flex animate-scroll whitespace-nowrap items-center">
             {[...universities, ...universities, ...universities, ...universities].map((uni, idx) => (
-              <div key={idx} className="inline-flex items-center mx-8 md:mx-12">
+              <div key={idx} className="inline-flex items-center mx-8 md:mx-12 shrink-0">
                 <img 
                   src={uni.logo} 
                   alt={uni.name} 
-                  className="h-10 md:h-12 w-auto object-contain opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+                  className="h-12 md:h-16 w-auto object-contain transition-all duration-300"
                 />
               </div>
             ))}
