@@ -16,6 +16,19 @@ export default function Home() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const videoRef = useRef(null);
+  const parallaxRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (parallaxRef.current) {
+        const scrolled = window.scrollY;
+        parallaxRef.current.style.transform = `translateY(${scrolled * 0.5}px)`;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleTimeUpdate = () => {
     // Loop 0.4 seconds before end to avoid black screen at the end
@@ -92,7 +105,10 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative h-screen flex items-end overflow-hidden">
         {/* Background Video */}
-        <div className="absolute inset-0 w-full h-full overflow-hidden">
+        <div 
+          ref={parallaxRef} 
+          className="absolute inset-0 w-full h-full overflow-hidden will-change-transform"
+        >
           <video
             ref={videoRef}
             autoPlay
