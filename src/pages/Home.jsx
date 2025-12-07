@@ -41,7 +41,15 @@ export default function Home() {
   };
 
   const universities = [
-    "Harvard", "Yale", "Princeton", "Columbia", "Brown", "Dartmouth", "Cornell", "Penn", "Stanford"
+    { name: "Harvard", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/bd962c17c_6c895e7efa47946d1c38ce6708738b2e.png" },
+    { name: "Yale", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/bd05af430_b0e2c73ddee682723b94be44d649efed.png" },
+    { name: "Princeton", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/b4846c341_3be0c75087fab2b95c19f47961a8e836.png" },
+    { name: "Columbia", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/5a15421e7_Columbia-University-Logo-500x281.png" },
+    { name: "Brown", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/21bd68040_073ed53307201e36c0e63d0a2bf08cf5.png" },
+    { name: "Dartmouth", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/d54095ab4_Dartmouth-Logo-before-2018.png" },
+    { name: "Cornell", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/8d245439e_075a87e86282d666b1c6dc97f2f7f870.png" },
+    { name: "Penn", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/870a3abd2_969ca20ef6492d9cf4f3217248711afe.png" },
+    { name: "Stanford", logo: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/cc89dbca0_815d6f6856083d96a7b6c374208c2a9f.png" }
   ];
 
   const features = [
@@ -131,13 +139,22 @@ export default function Home() {
       </section>
 
       {/* Universities Ticker */}
-      <div className="border-y border-gray-200 py-6 overflow-hidden bg-[#fafafa]">
-        <div className="flex animate-scroll whitespace-nowrap">
-          {[...universities, ...universities, ...universities, ...universities].map((uni, idx) => (
-            <div key={idx} className="inline-flex items-center mx-12">
-              <span className="text-3xl font-bold text-[#1a1a1a] font-serif opacity-40">{uni}</span>
-            </div>
-          ))}
+      <div className="border-y border-gray-200 bg-[#fafafa] py-8">
+        <div className="text-center mb-6">
+          <p className="text-xs font-sans font-bold tracking-[0.2em] uppercase text-gray-400">Mentors from</p>
+        </div>
+        <div className="overflow-hidden">
+          <div className="flex animate-scroll whitespace-nowrap items-center">
+            {[...universities, ...universities, ...universities, ...universities].map((uni, idx) => (
+              <div key={idx} className="inline-flex items-center mx-8 md:mx-12">
+                <img 
+                  src={uni.logo} 
+                  alt={uni.name} 
+                  className="h-10 md:h-12 w-auto object-contain opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
       <style>{`
