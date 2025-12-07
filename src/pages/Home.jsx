@@ -165,7 +165,7 @@ export default function Home() {
           100% { transform: translateX(-50%); }
         }
         .animate-scroll {
-          animation: scroll 40s linear infinite;
+          animation: scroll 60s linear infinite;
           will-change: transform;
         }
         .animate-scroll:hover {
