@@ -146,21 +146,21 @@ export default function Layout({ children, currentPageName }) {
       {/* Navigation */}
       <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${
         isTransparent 
-          ? 'bg-transparent border-transparent' 
-          : 'bg-white/95 backdrop-blur-sm border-b border-[#F3F4F6] shadow-sm'
+          ? 'bg-transparent border-transparent py-4' 
+          : 'bg-white/80 backdrop-blur-md border-b border-[#F3F4F6] shadow-sm py-0'
       }`}>
         <div className="w-full px-6 md:px-12 lg:px-24">
-          <div className="flex justify-between items-center h-20">
+          <div className={`flex justify-between items-center transition-all duration-300 ${isTransparent ? 'h-24' : 'h-16'}`}>
             {/* Left: Desktop Navigation Links */}
             <div className="hidden md:flex items-center gap-8 flex-1">
               {navItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`text-sm font-medium transition-colors ${
+                  className={`font-medium transition-all duration-300 ${
                     isTransparent 
-                      ? 'text-white/90 hover:text-white' 
-                      : `hover:text-[#00204E] ${location.pathname === item.path ? 'text-[#00204E] font-semibold' : 'text-[#00204E]/70'}`
+                      ? 'text-lg text-white/90 hover:text-white' 
+                      : `text-sm hover:text-[#00204E] ${location.pathname === item.path ? 'text-[#00204E] font-semibold' : 'text-[#00204E]/70'}`
                   }`}
                   >
                   {item.name}
@@ -173,7 +173,7 @@ export default function Layout({ children, currentPageName }) {
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/65bfd119d_Untitleddesign3.png"
                 alt="IvyBridge"
-                className={`h-20 transition-all duration-300 ${isTransparent ? 'brightness-0 invert' : ''}`}
+                className={`transition-all duration-300 ${isTransparent ? 'h-28 brightness-0 invert' : 'h-14'}`}
               />
             </Link>
 
@@ -183,19 +183,24 @@ export default function Layout({ children, currentPageName }) {
                 <>
                   {user ? (
                     <>
-                      <NotificationCenter userId={user.id} />
+                      <NotificationCenter 
+                        userId={user.id} 
+                        triggerClassName={isTransparent ? "text-white hover:bg-white/10" : "text-gray-500 hover:bg-gray-100"}
+                      />
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className={`flex items-center gap-3 ${
+                          <Button variant="ghost" className={`flex items-center gap-3 transition-all duration-300 ${
                             isTransparent ? 'text-white hover:bg-white/10' : 'text-[#00204E] hover:bg-[#F3F4F6]'
                           }`}>
-                            <Avatar className={`w-9 h-9 border-2 ${isTransparent ? 'border-white' : 'border-[#00204E]'}`}>
+                            <Avatar className={`transition-all duration-300 ${isTransparent ? 'w-10 h-10' : 'w-8 h-8'}`}>
                               <AvatarImage src={user.profile_photo_url} />
                               <AvatarFallback className="bg-[#F3F4F6] text-[#00204E] font-bold">
                                 {user.full_name?.charAt(0) || user.email?.charAt(0)}
                               </AvatarFallback>
                             </Avatar>
-                            <span className="text-sm font-medium">{user.full_name || user.email}</span>
+                            <span className={`font-medium transition-all duration-300 ${isTransparent ? 'text-lg' : 'text-sm'}`}>
+                              {user.full_name || user.email}
+                            </span>
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
