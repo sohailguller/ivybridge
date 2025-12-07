@@ -74,20 +74,16 @@ export default function Home() {
       <section className="relative h-screen flex items-end overflow-hidden">
         {/* Background Video */}
         <div className="absolute inset-0 w-full h-full overflow-hidden">
-          <iframe
-            src="https://player.cloudinary.com/embed/?cloud_name=dihudketx&public_id=copy_1B6020D0-9018-4FE7-AA40-A66AFE768D32_alwvzo&profile=cld-default&autoplay=true&loop=true&muted=true&controls=false"
-            className="absolute top-1/2 left-1/2 min-w-full min-h-full w-auto h-auto grayscale-[20%]"
-            style={{
-              border: 'none',
-              pointerEvents: 'none',
-              transform: 'translate(-50%, -50%) scale(1.5)',
-              width: '177.77vh',
-              height: '56.25vw',
-              minWidth: '100%',
-              minHeight: '100%'
-            }}
-            allow="autoplay; fullscreen"
-          />
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute top-1/2 left-1/2 min-w-full min-h-full w-auto h-auto object-cover transform -translate-x-1/2 -translate-y-1/2"
+          >
+            <source src="https://res.cloudinary.com/dihudketx/video/upload/v1765143452/copy_3DA13314-C273-4245-AFA8-1CCBE4594A58_ckciis.mp4" type="video/mp4" />
+            <source src="https://res.cloudinary.com/dihudketx/video/upload/v1765143452/copy_3DA13314-C273-4245-AFA8-1CCBE4594A58_ckciis.mov" type="video/quicktime" />
+          </video>
         </div>
 
         {/* Overlay */}
