@@ -92,7 +92,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative h-screen flex items-end overflow-hidden">
         {/* Background Video */}
-        <div className="fixed inset-0 w-full h-full overflow-hidden z-0">
+        <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
           <video
             ref={videoRef}
             autoPlay
@@ -107,7 +107,7 @@ export default function Home() {
         </div>
 
         {/* Overlay */}
-        <div className="fixed inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 z-0" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 z-0" />
 
         {/* Content - Bottom Left Aligned */}
         <div className="relative z-10 w-full px-6 md:px-12 lg:px-24 pb-20 md:pb-24">
@@ -217,8 +217,8 @@ export default function Home() {
 
       {/* Features Section */}
       <section className="relative z-10 py-24 bg-[#f4f4f4] px-6 md:px-12">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
-          <div>
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-5 gap-16 items-center">
+          <div className="lg:col-span-2">
             <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight">
               Everything You Need <br/>
               <span className="text-[#800000]">To Succeed</span>
@@ -242,7 +242,7 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="rounded-xl overflow-hidden shadow-2xl border border-gray-200 bg-white">
+          <div className="lg:col-span-3 rounded-xl overflow-hidden shadow-2xl border border-gray-200 bg-white transform transition-transform hover:scale-[1.02] duration-500">
             <div className="bg-gray-100 px-4 py-3 flex gap-2 border-b border-gray-200">
               <div className="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E]"></div>
               <div className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123]"></div>
