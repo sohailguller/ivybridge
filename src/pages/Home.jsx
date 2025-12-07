@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
@@ -15,6 +15,17 @@ import {
 export default function Home() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const videoRef = useRef(null);
+
+  const handleTimeUpdate = () => {
+    // Loop 0.4 seconds before end to avoid black screen at the end
+    if (videoRef.current && videoRef.current.duration) {
+      if (videoRef.current.currentTime >= videoRef.current.duration - 0.4) {
+        videoRef.current.currentTime = 0;
+        videoRef.current.play();
+      }
+    }
+  };
   
   useEffect(() => {
     loadUser();
@@ -75,10 +86,11 @@ export default function Home() {
         {/* Background Video */}
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <video
+            ref={videoRef}
             autoPlay
-            loop
             muted
             playsInline
+            onTimeUpdate={handleTimeUpdate}
             className="absolute top-1/2 left-1/2 min-w-full min-h-full w-auto h-auto object-cover transform -translate-x-1/2 -translate-y-1/2"
           >
             <source src="https://res.cloudinary.com/dihudketx/video/upload/v1765143452/copy_3DA13314-C273-4245-AFA8-1CCBE4594A58_ckciis.mp4" type="video/mp4" />
