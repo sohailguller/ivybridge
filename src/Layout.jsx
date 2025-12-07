@@ -30,6 +30,15 @@ export default function Layout({ children, currentPageName }) {
   const [user, setUser] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     loadUser();
@@ -65,6 +74,9 @@ export default function Layout({ children, currentPageName }) {
     { name: "Browse Mentors", path: createPageUrl("BrowseMentors") },
     { name: "Become a Mentor", path: createPageUrl("ApplyAsMentor") },
   ];
+
+  const isHomePage = location.pathname === createPageUrl("Home");
+  const isTransparent = isHomePage && !isScrolled;
 
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
@@ -132,7 +144,11 @@ export default function Layout({ children, currentPageName }) {
       `}</style>
 
       {/* Navigation */}
-      <nav className="bg-white border-b border-[#F3F4F6] sticky top-0 z-50 backdrop-blur-sm bg-white/95 shadow-sm">
+      <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${
+        isTransparent 
+          ? 'bg-transparent border-transparent' 
+          : 'bg-white/95 backdrop-blur-sm border-b border-[#F3F4F6] shadow-sm'
+      }`}>
         <div className="w-full px-6 md:px-12 lg:px-24">
           <div className="flex justify-between items-center h-20">
             {/* Left: Desktop Navigation Links */}
@@ -141,8 +157,10 @@ export default function Layout({ children, currentPageName }) {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`text-sm font-medium transition-colors hover:text-[#00204E] ${
-                    location.pathname === item.path ? 'text-[#00204E] font-semibold' : 'text-[#00204E]/70'
+                  className={`text-sm font-medium transition-colors ${
+                    isTransparent 
+                      ? 'text-white/90 hover:text-white' 
+                      : `hover:text-[#00204E] ${location.pathname === item.path ? 'text-[#00204E] font-semibold' : 'text-[#00204E]/70'}`
                   }`}
                   >
                   {item.name}
@@ -155,7 +173,7 @@ export default function Layout({ children, currentPageName }) {
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/65bfd119d_Untitleddesign3.png"
                 alt="IvyBridge"
-                className="h-20"
+                className={`h-20 transition-all duration-300 ${isTransparent ? 'brightness-0 invert' : ''}`}
               />
             </Link>
 
@@ -168,8 +186,10 @@ export default function Layout({ children, currentPageName }) {
                       <NotificationCenter userId={user.id} />
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="flex items-center gap-3 hover:bg-[#F3F4F6]">
-                            <Avatar className="w-9 h-9 border-2 border-[#00204E]">
+                          <Button variant="ghost" className={`flex items-center gap-3 ${
+                            isTransparent ? 'text-white hover:bg-white/10' : 'text-[#00204E] hover:bg-[#F3F4F6]'
+                          }`}>
+                            <Avatar className={`w-9 h-9 border-2 ${isTransparent ? 'border-white' : 'border-[#00204E]'}`}>
                               <AvatarImage src={user.profile_photo_url} />
                               <AvatarFallback className="bg-[#F3F4F6] text-[#00204E] font-bold">
                                 {user.full_name?.charAt(0) || user.email?.charAt(0)}
@@ -200,13 +220,19 @@ export default function Layout({ children, currentPageName }) {
                       <Button
                         variant="ghost"
                         onClick={() => base44.auth.redirectToLogin(location.pathname)}
-                        className="text-sm font-medium hover:bg-[#F3F4F6] text-[#00204E]"
+                        className={`text-sm font-medium ${
+                          isTransparent ? 'text-white hover:bg-white/10' : 'text-[#00204E] hover:bg-[#F3F4F6]'
+                        }`}
                         >
                         Sign In
                       </Button>
                       <Button
                         onClick={() => base44.auth.redirectToLogin(location.pathname)}
-                        className="bg-[#00204E] hover:bg-[#00204E]/90 text-white rounded-full px-6 font-medium"
+                        className={`${
+                          isTransparent 
+                            ? 'bg-white text-[#00204E] hover:bg-white/90' 
+                            : 'bg-[#00204E] text-white hover:bg-[#00204E]/90'
+                        } rounded-full px-6 font-medium transition-colors`}
                         >
                         Find a Mentor
                       </Button>
@@ -219,7 +245,9 @@ export default function Layout({ children, currentPageName }) {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-[#F3F4F6]"
+              className={`md:hidden p-2 rounded-lg ${
+                isTransparent ? 'text-white hover:bg-white/10' : 'text-[#00204E] hover:bg-[#F3F4F6]'
+              }`}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
