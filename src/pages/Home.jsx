@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { 
   ArrowRight, 
   CheckCircle,
-  TrendingUp,
-  Award,
-  Users,
-  BookOpen
+  MessageSquare,
+  Calendar,
+  Shield,
+  Star
 } from "lucide-react";
 
 export default function Home() {
@@ -30,40 +30,29 @@ export default function Home() {
   };
 
   const universities = [
-    { name: "Harvard", rate: "4.5%" },
-    { name: "Stanford", rate: "3.9%" },
-    { name: "Columbia", rate: "3.7%" },
-    { name: "Yale", rate: "4.6%" },
-    { name: "Brown", rate: "5.0%" },
-    { name: "Princeton", rate: "5.8%" },
-    { name: "Dartmouth", rate: "6.2%" },
-    { name: "Cornell", rate: "8.7%" }
+    "Harvard", "Yale", "Princeton", "Columbia", "Brown", "Dartmouth", "Cornell", "Penn", "Stanford"
   ];
 
-  const mentors = [
+  const features = [
     {
-      name: "Chad Faber",
-      role: "Senior Mentor",
-      bg: "Harvard '25",
-      img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&q=80" 
+      icon: MessageSquare,
+      title: "1-on-1 Mentorship",
+      description: "Direct access to current Ivy League students through secure messaging and video calls"
     },
     {
-      name: "Hannah Skaran",
-      role: "Senior Mentor",
-      bg: "Yale '24",
-      img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&q=80"
+      icon: Calendar,
+      title: "Flexible Scheduling",
+      description: "Book sessions at your convenience with integrated calendar and meeting tools"
     },
     {
-      name: "Jose Magana",
-      role: "Senior Mentor",
-      bg: "Stanford '26",
-      img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&q=80"
+      icon: CheckCircle,
+      title: "Task Management",
+      description: "Stay organized with personalized to-do lists and application milestone tracking"
     },
     {
-      name: "Susan Chan",
-      role: "Senior Mentor",
-      bg: "Princeton '25",
-      img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&q=80"
+      icon: Shield,
+      title: "Verified Mentors",
+      description: "All mentors are verified current students with transcripts and university confirmation"
     }
   ];
 
@@ -79,54 +68,22 @@ export default function Home() {
         h1, h2, h3, h4, h5, h6, .font-serif {
           font-family: 'Playfair Display', serif;
         }
-
-        .ticker-wrap {
-          width: 100%;
-          overflow: hidden;
-          background-color: #fff;
-          padding-top: 1rem;
-          padding-bottom: 1rem;
-          border-top: 1px solid #eee;
-          border-bottom: 1px solid #eee;
-        }
-
-        .ticker {
-          display: flex;
-          animation: ticker 30s linear infinite;
-        }
-
-        @keyframes ticker {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-100%); }
-        }
       `}</style>
 
       {/* Hero Section */}
-      <section className="pt-20 pb-16 px-6 md:px-12 lg:px-24 text-center max-w-6xl mx-auto">
+      <section className="pt-24 pb-20 px-6 md:px-12 lg:px-24 text-center max-w-6xl mx-auto">
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-[1.1] tracking-tight text-black">
-          In the 2024/5 Early round, IvyBridge students earned admission to:
+          Your Insider Path<br className="hidden md:block" /> to the Ivy League
         </h1>
         
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 my-16 opacity-90">
-          <div className="text-3xl md:text-4xl font-bold text-[#800000]">Harvard*</div>
-          <div className="text-3xl md:text-4xl font-bold text-[#800000]">Stanford</div>
-          <div className="text-3xl md:text-4xl font-bold text-[#800000]">Columbia</div>
-          <div className="text-3xl md:text-4xl font-bold text-[#800000]">Yale</div>
-          <div className="text-3xl md:text-4xl font-bold text-[#800000]">Princeton</div>
-          <div className="text-3xl md:text-4xl font-bold text-[#800000]">MIT</div>
-          <div className="text-3xl md:text-4xl font-bold text-[#800000]">Penn</div>
-          <div className="text-3xl md:text-4xl font-bold text-[#800000]">Cornell*</div>
-        </div>
-
-        <p className="text-xl md:text-2xl text-gray-600 font-light max-w-3xl mx-auto mb-12 font-sans">
-          The world's leading peer-to-peer college admissions platform. 
-          Connect directly with verified mentors who have walked the path you want to take.
+        <p className="text-xl md:text-2xl text-gray-600 font-light max-w-3xl mx-auto mb-12 font-sans leading-relaxed">
+          Don't just apply. Stand out. Get personalized 1-on-1 guidance from verified students who have already cracked the code.
         </p>
 
         <div className="flex flex-col sm:flex-row justify-center gap-6">
           <Button 
-            onClick={() => navigate(createPageUrl("BrowseMentors"))}
-            className="bg-[#1a1a1a] text-white hover:bg-[#333] rounded-none px-10 py-6 text-lg font-sans tracking-wide uppercase"
+            onClick={() => user ? navigate(createPageUrl("BrowseMentors")) : base44.auth.redirectToLogin(createPageUrl("BrowseMentors"))}
+            className="bg-[#1a1a1a] text-white hover:bg-[#333] rounded-none px-10 py-6 text-lg font-sans tracking-wide uppercase transition-transform hover:-translate-y-1"
           >
             Find Your Mentor
           </Button>
@@ -140,175 +97,160 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-20 bg-[#f9f9f9]">
-        <div className="container mx-auto px-6 md:px-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-black uppercase tracking-widest">
-            The IvyBridge Track Record
-          </h2>
-          <p className="text-center text-gray-500 font-sans mb-16 max-w-2xl mx-auto">
-            Our mentors help students beat the odds. Compare the national acceptance rates with our students' success.
-          </p>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12">
-            {universities.map((uni, idx) => (
-              <div key={idx} className="text-center group cursor-default">
-                <div className="text-sm font-sans font-bold text-gray-400 mb-2 uppercase tracking-wider">National Rate</div>
-                <div className="text-5xl md:text-6xl font-bold text-[#1a1a1a] mb-2 group-hover:text-[#800000] transition-colors">
-                  {uni.rate}
-                </div>
-                <div className="text-lg font-serif font-bold text-black border-t border-gray-200 pt-4 mt-2 inline-block min-w-[120px]">
-                  {uni.name}
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          <div className="text-center mt-16">
-            <p className="font-sans text-sm text-gray-500 italic">
-              * Based on verified acceptance letters from our mentor network's past mentees.
-            </p>
-          </div>
+      {/* Universities Ticker */}
+      <div className="border-y border-gray-200 py-6 overflow-hidden bg-[#fafafa]">
+        <div className="flex animate-scroll whitespace-nowrap">
+          {[...universities, ...universities, ...universities, ...universities].map((uni, idx) => (
+            <div key={idx} className="inline-flex items-center mx-12">
+              <span className="text-3xl font-bold text-[#1a1a1a] font-serif opacity-40">{uni}</span>
+            </div>
+          ))}
         </div>
-      </section>
+      </div>
+      <style>{`
+        @keyframes scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-scroll {
+          animation: scroll 30s linear infinite;
+        }
+      `}</style>
 
-      {/* Philosophy Section */}
+      {/* How It Works */}
       <section className="py-24 px-6 md:px-12 bg-white">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
-          <div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight">
-              IT’S NOT JUST ABOUT <br/>
-              <span className="text-[#800000]">GRADES & SCORES</span>
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="text-[#800000] font-sans font-bold tracking-widest text-sm uppercase mb-3 block">The Process</span>
+            <h2 className="text-4xl md:text-5xl font-bold text-black">
+              Your Journey to Acceptance
             </h2>
-            <div className="space-y-6 font-sans text-lg text-gray-700 leading-relaxed">
-              <p>
-                It’s about presenting compelling, truthful narratives in essays and activities that showcase a 
-                <span className="font-bold text-black"> singular hook</span>, rather than well-roundedness.
-              </p>
-              <p>
-                IvyBridge mentors help you avoid the common pitfalls of the college admissions process. 
-                We don't just edit essays; we help you craft a story that admissions officers can't ignore.
-              </p>
-              
-              <ul className="space-y-3 mt-8">
-                {[
-                  "Write compelling college essays that wow admissions officers",
-                  "Demonstrate a singular hook rather than well-roundedness",
-                  "Select the right universities to which to apply",
-                  "Strategize on an Early Decision/Early Action plan"
-                ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-[#800000] flex-shrink-0 mt-1" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          <div className="relative">
-            <div className="absolute -top-4 -left-4 w-full h-full border-2 border-[#1a1a1a]"></div>
-            <img 
-              src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80" 
-              alt="Student studying" 
-              className="relative z-10 w-full h-auto grayscale contrast-125"
-            />
-            <div className="absolute -bottom-8 -right-8 bg-white p-6 shadow-xl max-w-xs z-20 border border-gray-100 hidden md:block">
-              <p className="font-serif italic text-xl">"They don't call us the Ivy Whisperers for nothing."</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Mentors Section */}
-      <section className="py-20 bg-[#f4f4f4]">
-        <div className="container mx-auto px-6">
-          <div className="flex justify-between items-end mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-widest">
-              Meet Your Mentors
-            </h2>
-            <Link to={createPageUrl("BrowseMentors")} className="hidden md:flex items-center text-[#800000] font-sans font-bold hover:underline">
-              View All Mentors <ArrowRight className="w-4 h-4 ml-2" />
-            </Link>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-6">
-            {mentors.map((mentor, idx) => (
-              <div key={idx} className="bg-white p-6 group hover:shadow-lg transition-all duration-300">
-                <div className="mb-6 overflow-hidden">
-                  <img 
-                    src={mentor.img} 
-                    alt={mentor.name}
-                    className="w-full h-64 object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500"
-                  />
-                </div>
-                <h3 className="text-2xl font-bold mb-1 group-hover:text-[#800000] transition-colors">
-                  {mentor.name}
-                </h3>
-                <p className="font-sans text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">
-                  {mentor.bg}
-                </p>
-                <p className="font-serif text-gray-600 italic">
-                  {mentor.role}
-                </p>
-              </div>
-            ))}
-          </div>
-          
-          <div className="mt-10 text-center md:hidden">
-            <Link to={createPageUrl("BrowseMentors")} className="inline-flex items-center text-[#800000] font-sans font-bold hover:underline">
-              View All Mentors <ArrowRight className="w-4 h-4 ml-2" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Blog/News Section */}
-      <section className="py-20 bg-white px-6 md:px-12">
-        <div className="max-w-6xl mx-auto border-t-4 border-black pt-12">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12">
-            <h2 className="text-3xl font-bold uppercase tracking-widest flex items-center gap-4">
-              <BookOpen className="w-8 h-8" />
-              The IvyBridge Daily
-            </h2>
-            <div className="mt-4 md:mt-0 font-serif italic text-xl text-gray-500">
-              "Way To Tell It Like It Is, IvyBridge."
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-12">
+          <div className="grid md:grid-cols-3 gap-12 text-center">
             {[
               {
-                title: "Harvard GPA Requirements 2025",
-                date: "December 6, 2024",
-                img: "https://images.unsplash.com/photo-1590579491624-f98f36d4c763?w=500&q=80"
+                step: "01",
+                title: "Choose Your Mentor",
+                desc: "Browse our curated network of verified Ivy League students. Filter by university, major, and expertise."
               },
               {
-                title: "The Death of Affirmative Action",
-                date: "November 28, 2024",
-                img: "https://images.unsplash.com/photo-1544531586-fde5298cdd40?w=500&q=80"
+                step: "02",
+                title: "Start the Partnership",
+                desc: "Unlock direct access via chat and video calls. Build a roadmap and get real-time feedback."
               },
               {
-                title: "Why You Should Apply Early Decision",
-                date: "November 15, 2024",
-                img: "https://images.unsplash.com/photo-1525921429624-479b6a26d84d?w=500&q=80"
+                step: "03",
+                title: "Craft Your Story",
+                desc: "Submit an application that stands out. Walk into interviews with confidence and insider knowledge."
               }
-            ].map((post, i) => (
-              <div key={i} className="group cursor-pointer">
-                <div className="mb-4 overflow-hidden">
-                  <img 
-                    src={post.img} 
-                    alt={post.title} 
-                    className="w-full h-52 object-cover transform group-hover:scale-105 transition-transform duration-500"
-                  />
+            ].map((item, idx) => (
+              <div key={idx} className="group p-8 border border-transparent hover:border-gray-100 hover:shadow-lg transition-all duration-300 bg-white">
+                <div className="text-6xl font-serif font-bold text-[#e0e0e0] group-hover:text-[#800000] transition-colors mb-6">
+                  {item.step}
                 </div>
-                <h3 className="text-xl font-bold mb-2 group-hover:text-[#800000] transition-colors leading-tight">
-                  {post.title}
-                </h3>
-                <p className="font-sans text-xs text-gray-400 uppercase tracking-widest">
-                  {post.date}
+                <h3 className="text-2xl font-bold mb-4 font-serif">{item.title}</h3>
+                <p className="text-gray-600 font-sans leading-relaxed">
+                  {item.desc}
                 </p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-24 bg-[#f4f4f4] px-6 md:px-12">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+          <div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight">
+              Everything You Need <br/>
+              <span className="text-[#800000]">To Succeed</span>
+            </h2>
+            <p className="font-sans text-lg text-gray-600 mb-10 leading-relaxed">
+              Comprehensive tools and support for your college journey, all in one place.
+              Manage your applications, schedule meetings, and track your progress effortlessly.
+            </p>
+            
+            <div className="space-y-6">
+              {features.map((feature, index) => (
+                <div key={index} className="flex gap-4 items-start group">
+                  <div className="mt-1">
+                    <feature.icon className="w-6 h-6 text-[#800000]" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-1 font-serif group-hover:text-[#800000] transition-colors">{feature.title}</h3>
+                    <p className="text-gray-600 font-sans text-sm">{feature.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="relative">
+            <div className="absolute -top-4 -right-4 w-full h-full border-2 border-[#1a1a1a]"></div>
+            <img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/61f59ec74_Screenshot2025-12-06at104504PM.png" 
+              alt="Dashboard Preview" 
+              className="relative z-10 w-full h-auto shadow-2xl grayscale hover:grayscale-0 transition-all duration-500"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className="py-24 px-6 md:px-12 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">Invest in Your Future</h2>
+            <p className="text-gray-600 font-sans text-lg">Transparent pricing for world-class guidance</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Monthly */}
+            <div className="border border-gray-200 p-10 hover:border-[#800000] transition-colors duration-300 bg-white group">
+              <h3 className="text-3xl font-serif font-bold mb-2">Monthly</h3>
+              <div className="flex items-baseline gap-1 mb-8">
+                <span className="text-5xl font-bold">$425</span>
+                <span className="text-gray-500 font-sans">/mo</span>
+              </div>
+              <ul className="space-y-4 mb-10 font-sans text-gray-700">
+                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> Unlimited 1-on-1 messaging</li>
+                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> Monthly video sessions</li>
+                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> Essay reviews & feedback</li>
+                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> 12-month commitment</li>
+              </ul>
+              <Button 
+                onClick={() => navigate(createPageUrl("BrowseMentors"))}
+                className="w-full bg-white text-[#1a1a1a] border border-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white rounded-none py-6 font-sans uppercase tracking-widest transition-all"
+              >
+                Get Started
+              </Button>
+            </div>
+
+            {/* Annual */}
+            <div className="border-2 border-[#1a1a1a] p-10 bg-[#1a1a1a] text-white relative transform md:-translate-y-4 shadow-xl">
+              <div className="absolute top-0 right-0 bg-[#800000] text-white text-xs font-bold px-3 py-1 uppercase tracking-widest">
+                Best Value
+              </div>
+              <h3 className="text-3xl font-serif font-bold mb-2">Annual</h3>
+              <div className="flex items-baseline gap-1 mb-8">
+                <span className="text-5xl font-bold">$5,000</span>
+                <span className="text-gray-400 font-sans">/year</span>
+              </div>
+              <ul className="space-y-4 mb-10 font-sans text-gray-300">
+                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> All Monthly features included</li>
+                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> Priority mentor matching</li>
+                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> Save $100 annually</li>
+                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> Guaranteed placement</li>
+              </ul>
+              <Button 
+                onClick={() => navigate(createPageUrl("BrowseMentors"))}
+                className="w-full bg-[#800000] hover:bg-[#a00000] text-white border border-transparent rounded-none py-6 font-sans uppercase tracking-widest transition-all shadow-lg hover:shadow-xl"
+              >
+                Get Started
+              </Button>
+            </div>
           </div>
         </div>
       </section>
@@ -317,18 +259,26 @@ export default function Home() {
       <section className="py-32 bg-[#1a1a1a] text-white text-center px-6">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
-            TOWARD THE CONQUEST <br/> OF ADMISSION
+            Ready to Start <br/> Your Journey?
           </h2>
           <p className="font-sans text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
-            If you’re interested in IvyBridge's mentorship, 
-            sign up today and we’ll match you with the perfect mentor.
+            Join hundreds of ambitious students who turned their Ivy League dreams into reality with personalized mentorship.
           </p>
-          <Button 
-            onClick={() => navigate(createPageUrl("BrowseMentors"))}
-            className="bg-[#800000] hover:bg-[#a00000] text-white rounded-none px-16 py-8 text-xl font-sans tracking-widest uppercase transition-all duration-300 transform hover:-translate-y-1"
-          >
-            Get Started
-          </Button>
+          <div className="flex flex-col sm:flex-row justify-center gap-6">
+            <Button 
+              onClick={() => navigate(createPageUrl("BrowseMentors"))}
+              className="bg-[#800000] hover:bg-[#a00000] text-white rounded-none px-16 py-8 text-xl font-sans tracking-widest uppercase transition-all duration-300 transform hover:-translate-y-1"
+            >
+              Find Your Mentor
+            </Button>
+            <Button 
+              onClick={() => navigate(createPageUrl("ApplyAsMentor"))}
+              variant="outline"
+              className="bg-transparent border-white text-white hover:bg-white hover:text-black rounded-none px-16 py-8 text-xl font-sans tracking-widest uppercase"
+            >
+              Become a Mentor
+            </Button>
+          </div>
         </div>
       </section>
     </div>
