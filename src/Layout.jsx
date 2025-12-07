@@ -155,8 +155,8 @@ export default function Layout({ children, currentPageName }) {
             <div className="hidden md:flex items-center gap-8 flex-1">
               {navItems.map((item) => (
                 <Link
-                  key={item.path}
-                  to={item.path}
+                  key={item.path || idx}
+                  to={item.path || "#"}
                   className={`font-medium transition-all duration-300 ${
                     isTransparent 
                       ? 'text-lg text-white/90 hover:text-white' 
