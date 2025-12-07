@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -229,7 +228,7 @@ export default function AdminDashboard() {
       <div className="w-full px-6 md:px-12 lg:px-24">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+          <h1 className="text-3xl font-bold mb-2">
             Admin Dashboard
           </h1>
           <p className="text-gray-600">Manage mentors, monitor activity, and oversee platform operations</p>

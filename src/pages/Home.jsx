@@ -109,7 +109,7 @@ export default function Home() {
         {/* Content - Bottom Left Aligned */}
         <div className="relative w-full px-6 md:px-12 lg:px-24 pb-20 md:pb-32">
           <div className="max-w-3xl">
-            <h1 className="text-white mb-6 text-5xl md:text-6xl lg:text-7xl font-normal leading-tight" style={{ fontFamily: 'Georgia, serif', letterSpacing: '-0.02em', textTransform: 'none' }}>
+            <h1 className="text-white mb-6 text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight">
               Your Insider Path to the Ivy League
             </h1>
 
@@ -171,7 +171,7 @@ export default function Home() {
         <div className="w-full px-6 md:px-12 lg:px-24">
           <div className="text-center mb-16">
             <span className="text-[#FE6C3A] font-bold tracking-widest text-sm uppercase mb-2 block">The Process</span>
-            <h2 className="text-4xl md:text-5xl font-normal mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#0D3B33] tracking-tight">
               Your Journey to Acceptance
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto text-lg">A structured, personalized approach designed to maximize your admissions chances.</p>
@@ -217,25 +217,26 @@ export default function Home() {
       {/* Features - Redesigned with Dashboard Image */}
       <section className="py-24 bg-white overflow-hidden">
         <div className="w-full px-6 md:px-12 lg:px-24">
-          <div className="max-w-4xl mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-[#0D3B33] tracking-tight" style={{ fontFamily: 'Georgia, serif' }}>
+          <div className="max-w-4xl mx-auto text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-[#0D3B33] tracking-tight">
               Everything You Need to Succeed
             </h2>
           </div>
 
-          <div className="grid lg:grid-cols-12 gap-12 items-center">
+          <div className="grid lg:grid-cols-12 gap-16 items-center">
             {/* Left Side: Content & Features List */}
-            <div className="lg:col-span-5">
+            <div className="lg:col-span-5 order-2 lg:order-1">
               <div className="mb-8">
-                <p className="text-gray-600 text-lg leading-relaxed mb-8">
+                <p className="text-gray-600 text-lg leading-relaxed mb-10">
                   Comprehensive tools and support for your college journey, all in one place.
                   Manage your applications, schedule meetings, and track your progress effortlessly.
                 </p>
-                <p className="text-xs font-bold text-gray-400 tracking-wider uppercase mb-5">Key Features</p>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {features.map((feature, index) =>
-                    <div key={index} className="flex gap-3 items-center">
-                      <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0" />
+                    <div key={index} className="flex gap-4 items-center">
+                      <div className="bg-[#0D3B33]/5 p-2 rounded-full">
+                        <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0" />
+                      </div>
                       <span className="text-lg font-medium text-[#0D3B33]">{feature.title}</span>
                     </div>
                   )}
@@ -244,18 +245,13 @@ export default function Home() {
             </div>
 
             {/* Right Side: Dashboard Screenshot */}
-            <div className="relative mt-12 lg:mt-0 lg:col-span-7">
-              {/* Decorative elements */}
-              <div className="absolute -top-10 -right-10 w-64 h-64 bg-[#FE6C3A]/5 rounded-full blur-3xl"></div>
-              <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-[#0D3B33]/5 rounded-full blur-3xl"></div>
-              
-              <div className="relative rounded-xl overflow-hidden shadow-lg border border-gray-200 bg-white transform hover:scale-[1.01] transition-transform duration-500">
-                <div className="bg-gray-50 border-b border-gray-200 px-4 py-3 flex gap-2">
+            <div className="lg:col-span-7 order-1 lg:order-2">
+              <div className="relative rounded-2xl overflow-hidden shadow-xl border border-black/5 bg-white">
+                <div className="bg-gray-50/50 border-b border-gray-100 px-4 py-3 flex gap-2">
                   <div className="w-3 h-3 rounded-full bg-[#FF5F57]"></div>
                   <div className="w-3 h-3 rounded-full bg-[#FEBC2E]"></div>
                   <div className="w-3 h-3 rounded-full bg-[#28C840]"></div>
                 </div>
-                {/* Dashboard Placeholder Image */}
                 <img
                   src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/61f59ec74_Screenshot2025-12-06at104504PM.png"
                   alt="Student Dashboard Interface"
@@ -273,7 +269,7 @@ export default function Home() {
       <section className="py-16 bg-white border-t-4 border-t-[#FE6C3A]">
         <div className="w-full px-6 md:px-12 lg:px-24">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+            <h2 className="text-3xl font-bold mb-3 text-[#0D3B33]">
               Simple, Transparent Pricing
             </h2>
             <p className="text-gray-600">Choose the plan that works best for you</p>
@@ -375,7 +371,7 @@ export default function Home() {
       {/* CTA Section */}
       <section className="py-16 bg-[#0D3B33] text-white">
         <div className="w-full px-6 md:px-12 lg:px-24 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Ready to Start Your Journey?
           </h2>
           <p className="text-lg mb-6 opacity-90">

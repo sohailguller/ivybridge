@@ -69,27 +69,28 @@ export default function Layout({ children, currentPageName }) {
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Crimson+Pro:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
         :root {
           --primary: #0D3B33;
           --secondary: #E6EFEA;
           --accent: #FE6C3A;
           --background: #FAFAFA;
-          --text: #222222;
+          --text: #1a1a1a;
         }
 
         body {
-          font-family: 'Crimson Pro', Georgia, serif;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
           color: var(--text);
-          line-height: 1.7;
+          line-height: 1.6;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
         }
 
         h1, h2, h3, h4, h5, h6 {
-          font-family: 'Oswald', sans-serif;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
+          font-family: 'Inter', sans-serif;
+          font-weight: 600;
+          letter-spacing: -0.02em;
         }
 
         .btn-primary {
@@ -136,11 +137,10 @@ export default function Layout({ children, currentPageName }) {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`text-sm font-semibold transition-colors hover:text-[#FE6C3A] uppercase tracking-wider ${
-                    location.pathname === item.path ? 'text-[#FE6C3A]' : 'text-[#0D3B33]'
+                  className={`text-sm font-medium transition-colors hover:text-[#0D3B33] ${
+                    location.pathname === item.path ? 'text-[#0D3B33] font-semibold' : 'text-[#0D3B33]/70'
                   }`}
-                  style={{ fontFamily: 'Oswald, sans-serif' }}
-                >
+                  >
                   {item.name}
                 </Link>
               ))}
@@ -171,7 +171,7 @@ export default function Layout({ children, currentPageName }) {
                                 {user.full_name?.charAt(0) || user.email?.charAt(0)}
                               </AvatarFallback>
                             </Avatar>
-                            <span className="text-sm font-semibold" style={{ fontFamily: 'Oswald, sans-serif' }}>{user.full_name || user.email}</span>
+                            <span className="text-sm font-medium">{user.full_name || user.email}</span>
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
@@ -196,16 +196,14 @@ export default function Layout({ children, currentPageName }) {
                       <Button
                         variant="ghost"
                         onClick={() => base44.auth.redirectToLogin(location.pathname)}
-                        className="text-sm font-semibold hover:bg-[#E6EFEA] uppercase tracking-wider text-[#0D3B33]"
-                        style={{ fontFamily: 'Oswald, sans-serif' }}
-                      >
+                        className="text-sm font-medium hover:bg-[#E6EFEA] text-[#0D3B33]"
+                        >
                         Sign In
                       </Button>
                       <Button
                         onClick={() => base44.auth.redirectToLogin(location.pathname)}
-                        className="bg-[#FE6C3A] hover:bg-[#FF7B4A] text-white rounded-lg px-6 uppercase tracking-wider font-semibold"
-                        style={{ fontFamily: 'Oswald, sans-serif' }}
-                      >
+                        className="bg-[#0D3B33] hover:bg-[#0D3B33]/90 text-white rounded-full px-6 font-medium"
+                        >
                         Find a Mentor
                       </Button>
                     </>
@@ -233,12 +231,11 @@ export default function Layout({ children, currentPageName }) {
                   key={item.path}
                   to={item.path}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-4 py-3 rounded-lg text-sm font-semibold uppercase tracking-wider ${
+                  className={`block px-4 py-3 rounded-lg text-sm font-medium ${
                     location.pathname === item.path
-                      ? 'bg-[#FE6C3A]/10 text-[#FE6C3A]'
-                      : 'text-[#0D3B33] hover:bg-[#E6EFEA]'
+                      ? 'bg-[#0D3B33]/5 text-[#0D3B33]'
+                      : 'text-[#0D3B33]/70 hover:bg-[#E6EFEA]'
                   }`}
-                  style={{ fontFamily: 'Oswald, sans-serif' }}
                 >
                   {item.name}
                 </Link>
@@ -250,8 +247,7 @@ export default function Layout({ children, currentPageName }) {
                       <Link
                         to={getDashboardUrl()}
                         onClick={() => setMobileMenuOpen(false)}
-                        className="block px-4 py-3 rounded-lg text-sm font-semibold text-[#0D3B33] hover:bg-[#E6EFEA] uppercase tracking-wider"
-                        style={{ fontFamily: 'Oswald, sans-serif' }}
+                        className="block px-4 py-3 rounded-lg text-sm font-medium text-[#0D3B33] hover:bg-[#E6EFEA]"
                       >
                         <LayoutDashboard className="w-4 h-4 inline mr-2" />
                         Dashboard
@@ -261,8 +257,7 @@ export default function Layout({ children, currentPageName }) {
                           handleLogout();
                           setMobileMenuOpen(false);
                         }}
-                        className="w-full text-left px-4 py-3 rounded-lg text-sm font-semibold text-red-600 hover:bg-red-50 uppercase tracking-wider"
-                        style={{ fontFamily: 'Oswald, sans-serif' }}
+                        className="w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50"
                       >
                         <LogOut className="w-4 h-4 inline mr-2" />
                         Logout
@@ -274,8 +269,7 @@ export default function Layout({ children, currentPageName }) {
                         base44.auth.redirectToLogin(location.pathname);
                         setMobileMenuOpen(false);
                       }}
-                      className="w-full bg-[#FE6C3A] hover:bg-[#FF7B4A] text-white rounded-lg uppercase tracking-wider font-semibold"
-                      style={{ fontFamily: 'Oswald, sans-serif' }}
+                      className="w-full bg-[#0D3B33] hover:bg-[#0D3B33]/90 text-white rounded-full font-medium"
                     >
                       Get Started
                     </Button>
@@ -310,7 +304,7 @@ export default function Layout({ children, currentPageName }) {
               </p>
             </div>
             <div>
-              <h3 className="font-bold mb-3 text-[#0D3B33] text-sm" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>PLATFORM</h3>
+              <h3 className="font-semibold mb-3 text-[#0D3B33] text-sm">PLATFORM</h3>
               <ul className="space-y-2 text-[#0D3B33]/70 text-sm">
                 <li><Link to={createPageUrl("BrowseMentors")} className="hover:text-[#FE6C3A] transition-colors hover:underline">Find a Mentor</Link></li>
                 <li><Link to={createPageUrl("ApplyAsMentor")} className="hover:text-[#FE6C3A] transition-colors hover:underline">Become a Mentor</Link></li>
@@ -318,7 +312,7 @@ export default function Layout({ children, currentPageName }) {
               </ul>
             </div>
             <div>
-              <h3 className="font-bold mb-3 text-[#0D3B33] text-sm" style={{ fontFamily: 'Oswald, sans-serif', letterSpacing: '0.05em' }}>SUPPORT</h3>
+              <h3 className="font-semibold mb-3 text-[#0D3B33] text-sm">SUPPORT</h3>
               <ul className="space-y-2 text-[#0D3B33]/70 text-sm">
                 <li><a href="#" className="hover:text-[#FE6C3A] transition-colors hover:underline">Help Center</a></li>
                 <li><a href="#" className="hover:text-[#FE6C3A] transition-colors hover:underline">Terms of Service</a></li>

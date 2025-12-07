@@ -143,7 +143,7 @@ export default function BrowseMentors() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="w-full px-6 md:px-12 lg:px-24">
         <div className="mb-8 border-b border-gray-200 pb-6">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2 text-[#0D3B33]">
             Find Your Perfect Mentor
           </h1>
           <p className="text-gray-600">

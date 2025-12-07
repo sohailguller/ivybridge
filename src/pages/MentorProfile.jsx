@@ -265,7 +265,7 @@ export default function MentorProfile() {
           {/* Name and Info */}
           <div className="px-8 pb-6">
             <div className="mb-4">
-              <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+              <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]">
                 {mentorUser?.full_name || mentorUser?.email || 'Mentor Profile'}
               </h1>
               <div className="flex items-center gap-2 text-gray-600 mb-3">
@@ -319,7 +319,7 @@ export default function MentorProfile() {
           <div className="md:col-span-2 space-y-6">
             {/* About Me */}
             <div className="bg-white border border-gray-200 rounded shadow-sm p-6 border-l-4 border-l-[#FE6C3A]">
-              <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+              <h2 className="text-xl font-bold mb-4 text-[#0D3B33]">
                 About Me
               </h2>
               <p className="text-gray-700 leading-relaxed whitespace-pre-line">
@@ -329,7 +329,7 @@ export default function MentorProfile() {
 
             {/* Personal Questions - FAQ Style */}
             <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
-              <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+              <h2 className="text-xl font-bold mb-4 text-[#0D3B33]">
                 Get to Know Me
               </h2>
               <p className="text-sm text-gray-600 mb-6">
@@ -381,7 +381,7 @@ export default function MentorProfile() {
 
             {/* What You'll Get */}
             <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
-              <h2 className="text-xl font-bold mb-4 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+              <h2 className="text-xl font-bold mb-4 text-[#0D3B33]">
                 What You'll Get
               </h2>
               <ul className="space-y-3">
@@ -414,7 +414,7 @@ export default function MentorProfile() {
 
             {reviews.length > 0 && (
               <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
-                <h2 className="text-xl font-bold mb-6 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+                <h2 className="text-xl font-bold mb-6 text-[#0D3B33]">
                   Student Reviews
                 </h2>
                 <div className="space-y-6">

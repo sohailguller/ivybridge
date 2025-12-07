@@ -322,7 +322,7 @@ export default function ApplyAsMentor() {
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
-            <h2 className="text-2xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+            <h2 className="text-2xl font-bold mb-3 text-[#0D3B33]">
               Application Submitted!
             </h2>
             <p className="text-gray-600 mb-6 text-sm">
@@ -345,7 +345,7 @@ export default function ApplyAsMentor() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="w-full px-6 md:px-12 lg:px-24">
         <div className="text-center mb-8 border-b border-gray-200 pb-6">
-          <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+          <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]">
             Become a Mentor
           </h1>
           <p className="text-gray-600">
@@ -391,7 +391,7 @@ export default function ApplyAsMentor() {
               {currentSection === 1 && (
                 <div className="space-y-6">
                   <div className="border-b border-gray-200 pb-4">
-                    <h2 className="text-xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>Basic Information</h2>
+                    <h2 className="text-xl font-bold mb-1 text-[#0D3B33]">Basic Information</h2>
                     <p className="text-sm text-gray-600">Tell us about your university and academic background</p>
                   </div>
 
@@ -477,7 +477,7 @@ export default function ApplyAsMentor() {
               {currentSection === 2 && (
                 <div className="space-y-6">
                   <div className="border-b border-gray-200 pb-4">
-                    <h2 className="text-xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>Your Expertise</h2>
+                    <h2 className="text-xl font-bold mb-1 text-[#0D3B33]">Your Expertise</h2>
                     <p className="text-sm text-gray-600">Select the areas where you can help students</p>
                   </div>
 
@@ -544,7 +544,7 @@ export default function ApplyAsMentor() {
               {currentSection === 3 && (
                 <div className="space-y-6">
                   <div className="border-b border-gray-200 pb-4">
-                    <h2 className="text-xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>Get Personal</h2>
+                    <h2 className="text-xl font-bold mb-1 text-[#0D3B33]">Get Personal</h2>
                     <p className="text-sm text-gray-600">
                       Help students get to know you better with these thoughtful responses (250 words max each)
                     </p>
@@ -614,7 +614,7 @@ export default function ApplyAsMentor() {
               {currentSection === 4 && (
                 <div className="space-y-6">
                   <div className="border-b border-gray-200 pb-4">
-                    <h2 className="text-xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>Verification & Setup</h2>
+                    <h2 className="text-xl font-bold mb-1 text-[#0D3B33]">Verification & Setup</h2>
                     <p className="text-sm text-gray-600">Upload required documents and set up your scheduling</p>
                   </div>
 

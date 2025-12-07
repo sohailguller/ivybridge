@@ -149,7 +149,7 @@ export default function MentorDashboard() {
         <div className="max-w-md bg-white border border-gray-200 rounded shadow-sm p-8">
           <div className="text-center">
             <AlertCircle className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-            <h2 className="text-2xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+            <h2 className="text-2xl font-bold mb-3 text-[#0D3B33]">
               Complete Your Profile
             </h2>
             <p className="text-gray-600 mb-4 text-sm">
@@ -175,7 +175,7 @@ export default function MentorDashboard() {
             <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Clock className="w-8 h-8 text-yellow-600" />
             </div>
-            <h2 className="text-2xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+            <h2 className="text-2xl font-bold mb-3 text-[#0D3B33]">
               Application Under Review
             </h2>
             <p className="text-gray-600 mb-4 text-sm">
@@ -204,7 +204,7 @@ export default function MentorDashboard() {
         <div className="max-w-md bg-white border border-gray-200 rounded shadow-sm p-8">
           <div className="text-center">
             <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
-            <h2 className="text-2xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+            <h2 className="text-2xl font-bold mb-3 text-[#0D3B33]">
               Application Not Approved
             </h2>
             <p className="text-gray-600 text-sm mb-6">
@@ -230,7 +230,7 @@ export default function MentorDashboard() {
         <div className="mb-6 border-b border-gray-200 pb-4">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <h1 className="text-2xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+              <h1 className="text-2xl font-bold mb-1 text-[#0D3B33]">
                 Mentor Dashboard
               </h1>
               <p className="text-gray-600 text-sm">Manage your students and track your mentorship</p>
