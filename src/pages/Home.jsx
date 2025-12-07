@@ -289,24 +289,24 @@ export default function Home() {
             </div>
 
             {/* Annual */}
-            <div className="border-2 border-[#1a1a1a] p-10 bg-[#1a1a1a] text-white relative transform md:-translate-y-4 shadow-xl">
-              <div className="absolute top-0 right-0 bg-[#800000] text-white text-xs font-bold px-3 py-1 uppercase tracking-widest">
+            <div className="border-2 border-[#00204E] p-10 bg-[#00204E] text-white relative transform md:-translate-y-4 shadow-xl">
+              <div className="absolute top-0 right-0 bg-[#C90000] text-white text-xs font-bold px-3 py-1 uppercase tracking-widest">
                 Best Value
               </div>
-              <h3 className="text-3xl font-serif font-bold mb-2">Annual</h3>
+              <h3 className="text-3xl font-serif font-bold mb-2 text-white">Annual</h3>
               <div className="flex items-baseline gap-1 mb-8">
-                <span className="text-5xl font-bold">$5,000</span>
-                <span className="text-gray-400 font-sans">/year</span>
+                <span className="text-5xl font-bold text-white">$5,000</span>
+                <span className="text-gray-300 font-sans">/year</span>
               </div>
-              <ul className="space-y-4 mb-10 font-sans text-gray-300">
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> All Monthly features included</li>
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> Priority mentor matching</li>
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> Save $100 annually</li>
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> Guaranteed placement</li>
+              <ul className="space-y-4 mb-10 font-sans text-gray-200">
+                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#C90000]"/> All Monthly features included</li>
+                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#C90000]"/> Priority mentor matching</li>
+                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#C90000]"/> Save $100 annually</li>
+                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#C90000]"/> Guaranteed placement</li>
               </ul>
               <Button 
                 onClick={() => navigate(createPageUrl("BrowseMentors"))}
-                className="w-full bg-[#800000] hover:bg-[#a00000] text-white border border-transparent rounded-none py-6 font-sans uppercase tracking-widest transition-all shadow-lg hover:shadow-xl"
+                className="w-full bg-[#C90000] hover:bg-[#a00000] text-white border border-transparent rounded-none py-6 font-sans uppercase tracking-widest transition-all shadow-lg hover:shadow-xl"
               >
                 Get Started
               </Button>
@@ -316,25 +316,31 @@ export default function Home() {
       </section>
 
       {/* CTA Footer */}
-      <section className="py-32 bg-[#1a1a1a] text-white text-center px-6">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
+      <section className="py-32 bg-[#00204E] text-white text-center px-6 relative overflow-hidden">
+        {/* Decorative background element */}
+        <div className="absolute inset-0 opacity-10 pointer-events-none">
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#C90000] rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 right-0 w-64 h-64 bg-white rounded-full blur-3xl"></div>
+        </div>
+        
+        <div className="max-w-4xl mx-auto relative z-10">
+          <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight text-white">
             Ready to Start <br/> Your Journey?
           </h2>
-          <p className="font-sans text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
+          <p className="font-sans text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
             Join hundreds of ambitious students who turned their Ivy League dreams into reality with personalized mentorship.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-6">
             <Button 
               onClick={() => navigate(createPageUrl("BrowseMentors"))}
-              className="bg-[#800000] hover:bg-[#a00000] text-white rounded-none px-16 py-8 text-xl font-sans tracking-widest uppercase transition-all duration-300 transform hover:-translate-y-1"
+              className="bg-[#C90000] hover:bg-[#a00000] text-white rounded-none px-16 py-8 text-xl font-sans tracking-widest uppercase transition-all duration-300 transform hover:-translate-y-1 shadow-lg"
             >
               Find Your Mentor
             </Button>
             <Button 
               onClick={() => navigate(createPageUrl("ApplyAsMentor"))}
               variant="outline"
-              className="bg-transparent border-white text-white hover:bg-white hover:text-black rounded-none px-16 py-8 text-xl font-sans tracking-widest uppercase"
+              className="bg-transparent border-white text-white hover:bg-white hover:text-[#00204E] rounded-none px-16 py-8 text-xl font-sans tracking-widest uppercase transition-all duration-300"
             >
               Become a Mentor
             </Button>
