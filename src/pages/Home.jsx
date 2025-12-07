@@ -289,20 +289,20 @@ export default function Home() {
             </div>
 
             {/* Annual */}
-            <div className="border-2 border-[#00204E] p-10 bg-[#00204E] text-white relative transform md:-translate-y-4 shadow-xl">
-              <div className="absolute top-0 right-0 bg-[#C90000] text-white text-xs font-bold px-3 py-1 uppercase tracking-widest">
+            <div className="border-2 border-[#00204E] p-10 bg-white text-[#1a1a1a] relative transform md:-translate-y-4 shadow-xl">
+              <div className="absolute top-4 right-4 bg-[#C90000] text-white text-xs font-bold px-3 py-1 uppercase tracking-widest">
                 Best Value
               </div>
-              <h3 className="text-3xl font-serif font-bold mb-2 text-white">Annual</h3>
+              <h3 className="text-3xl font-serif font-bold mb-2">Annual</h3>
               <div className="flex items-baseline gap-1 mb-8">
-                <span className="text-5xl font-bold text-white">$5,000</span>
-                <span className="text-gray-300 font-sans">/year</span>
+                <span className="text-5xl font-bold">$5,000</span>
+                <span className="text-gray-500 font-sans">/year</span>
               </div>
-              <ul className="space-y-4 mb-10 font-sans text-gray-200">
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#C90000]"/> All Monthly features included</li>
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#C90000]"/> Priority mentor matching</li>
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#C90000]"/> Save $100 annually</li>
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#C90000]"/> Guaranteed placement</li>
+              <ul className="space-y-4 mb-10 font-sans text-gray-700">
+                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> All Monthly features included</li>
+                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> Priority mentor matching</li>
+                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> Save $100 annually</li>
+                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> Guaranteed placement</li>
               </ul>
               <Button 
                 onClick={() => navigate(createPageUrl("BrowseMentors"))}
