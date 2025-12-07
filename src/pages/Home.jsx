@@ -356,9 +356,8 @@ export default function Home() {
                 </ul>
 
                 <Button
-                  className="w-full bg-[#C90000] hover:bg-[#FF7B4A] text-white rounded py-5"
+                  className="w-full bg-[#C90000] hover:bg-[#A00000] text-white rounded-none py-6 text-lg border border-transparent hover:border-white/20 transition-all duration-300"
                   onClick={() => navigate(createPageUrl("BrowseMentors"))}>
-
                   Get Started
                 </Button>
               </div>
