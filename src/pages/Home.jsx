@@ -16,19 +16,6 @@ export default function Home() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const videoRef = useRef(null);
-  const parallaxRef = useRef(null);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (parallaxRef.current) {
-        const scrolled = window.scrollY;
-        parallaxRef.current.style.transform = `translateY(${scrolled * 0.5}px)`;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const handleTimeUpdate = () => {
     // Loop 0.4 seconds before end to avoid black screen at the end
@@ -89,14 +76,14 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-[#1a1a1a] font-serif">
+    <div className="min-h-screen text-[#1a1a1a] font-serif">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap');
-        
+
         body {
           font-family: 'Lato', sans-serif;
         }
-        
+
         h1, h2, h3, h4, h5, h6, .font-serif {
           font-family: 'Playfair Display', serif;
         }
@@ -105,10 +92,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative h-screen flex items-end overflow-hidden">
         {/* Background Video */}
-        <div 
-          ref={parallaxRef} 
-          className="absolute inset-0 w-full h-full overflow-hidden will-change-transform"
-        >
+        <div className="fixed inset-0 w-full h-full overflow-hidden z-0">
           <video
             ref={videoRef}
             autoPlay
@@ -123,10 +107,10 @@ export default function Home() {
         </div>
 
         {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+        <div className="fixed inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 z-0" />
 
         {/* Content - Bottom Left Aligned */}
-        <div className="relative w-full px-6 md:px-12 lg:px-24 pb-20 md:pb-24">
+        <div className="relative z-10 w-full px-6 md:px-12 lg:px-24 pb-20 md:pb-24">
           <div className="max-w-3xl">
             <h1 className="text-white mb-6 text-5xl md:text-6xl lg:text-7xl font-semibold leading-tight tracking-tight font-serif drop-shadow-lg">
               Your Insider Path <br /> to the Ivy League
@@ -155,7 +139,7 @@ export default function Home() {
       </section>
 
       {/* Universities Ticker */}
-      <div className="border-y border-gray-200 bg-[#fafafa] py-10">
+      <div className="relative z-10 border-y border-gray-200 bg-[#fafafa] py-10">
         <div className="text-center mb-6">
           <p className="text-xs font-sans font-bold tracking-[0.2em] uppercase text-gray-400">Mentors from</p>
         </div>
@@ -190,7 +174,7 @@ export default function Home() {
       `}</style>
 
       {/* How It Works */}
-      <section className="py-24 px-6 md:px-12 bg-white">
+      <section className="relative z-10 py-24 px-6 md:px-12 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <span className="text-[#800000] font-sans font-bold tracking-widest text-sm uppercase mb-3 block">The Process</span>
@@ -232,7 +216,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 bg-[#f4f4f4] px-6 md:px-12">
+      <section className="relative z-10 py-24 bg-[#f4f4f4] px-6 md:px-12">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
           <div>
             <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight">
@@ -274,7 +258,7 @@ export default function Home() {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-24 px-6 md:px-12 bg-white">
+      <section className="relative z-10 py-24 px-6 md:px-12 bg-white">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">Invest in Your Future</h2>
