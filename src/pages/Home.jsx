@@ -174,7 +174,7 @@ export default function Home() {
       `}</style>
 
       {/* How It Works */}
-      <section className="relative z-10 py-24 px-6 md:px-12 bg-white">
+      <section id="how-it-works" className="relative z-10 py-24 px-6 md:px-12 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <span className="text-[#800000] font-sans font-bold tracking-widest text-sm uppercase mb-3 block">The Process</span>
