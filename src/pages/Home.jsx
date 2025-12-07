@@ -237,12 +237,16 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="relative">
-            <div className="absolute -top-4 -right-4 w-full h-full border-2 border-[#1a1a1a]"></div>
+          <div className="rounded-xl overflow-hidden shadow-2xl border border-gray-200 bg-white">
+            <div className="bg-gray-100 px-4 py-3 flex gap-2 border-b border-gray-200">
+              <div className="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E]"></div>
+              <div className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123]"></div>
+              <div className="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29]"></div>
+            </div>
             <img 
               src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/61f59ec74_Screenshot2025-12-06at104504PM.png" 
               alt="Dashboard Preview" 
-              className="relative z-10 w-full h-auto shadow-2xl grayscale hover:grayscale-0 transition-all duration-500"
+              className="w-full h-auto"
             />
           </div>
         </div>
