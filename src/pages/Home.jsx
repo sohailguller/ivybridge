@@ -64,12 +64,12 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white font-sans">
       {/* Hero Section */}
-      <section className="relative h-[90vh] flex items-end overflow-hidden">
+      <section className="relative h-[85vh] flex items-center justify-center overflow-hidden bg-[#00204E]">
         {/* Background Video */}
-        <div className="absolute inset-0 w-full h-full overflow-hidden">
+        <div className="absolute inset-0 w-full h-full overflow-hidden opacity-60">
           <iframe
             src="https://player.cloudinary.com/embed/?cloud_name=dihudketx&public_id=copy_1B6020D0-9018-4FE7-AA40-A66AFE768D32_alwvzo&profile=cld-default&autoplay=true&loop=true&muted=true&controls=false"
-            className="absolute top-1/2 left-1/2 min-w-full min-h-full w-auto h-auto"
+            className="absolute top-1/2 left-1/2 min-w-full min-h-full w-auto h-auto grayscale-[30%]"
             style={{
               border: 'none',
               pointerEvents: 'none',
@@ -83,36 +83,34 @@ export default function Home() {
           />
         </div>
 
-        {/* Darker Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#00204E]/90 via-[#00204E]/40 to-black/20" />
+        {/* Refined Overlay for better contrast and control */}
+        <div className="absolute inset-0 bg-[#00204E]/70 mix-blend-multiply" />
+        <div className="absolute inset-0 bg-black/20" />
 
-        {/* Content - Bottom Left Aligned */}
-        <div className="relative w-full px-6 md:px-12 lg:px-24 pb-20 md:pb-32">
-          <div className="max-w-3xl">
-            <h1 className="text-white mb-6 text-6xl md:text-7xl lg:text-8xl font-medium leading-[1.1] tracking-tight font-serif">
-              Your Insider Path to the Ivy League
-            </h1>
+        {/* Content - Centered & Minimal */}
+        <div className="relative z-10 w-full max-w-5xl px-6 text-center">
+          <h1 className="text-white mb-8 text-5xl md:text-7xl lg:text-8xl font-medium leading-[1.1] tracking-tight font-serif drop-shadow-xl">
+            Your Insider Path<br className="hidden md:block" /> to the Ivy League
+          </h1>
 
-            <p className="text-xl md:text-2xl text-white/90 leading-relaxed max-w-2xl mb-12 font-light">
-              Don't just apply. Stand out. Get personalized 1-on-1 guidance from verified students who have already cracked the code.
-            </p>
+          <p className="text-xl md:text-2xl text-white/90 leading-relaxed max-w-2xl mx-auto mb-12 font-light drop-shadow-md">
+            Don't just apply. Stand out. Get personalized 1-on-1 guidance from verified students who have already cracked the code.
+          </p>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button
-                size="lg"
-                className="bg-[#C90000] hover:bg-[#A00000] text-white rounded-none px-10 py-7 text-lg font-medium shadow-xl hover:shadow-2xl transition-all duration-300"
-                onClick={() => user ? navigate(createPageUrl("BrowseMentors")) : base44.auth.redirectToLogin(createPageUrl("BrowseMentors"))}>
-                Find Your Mentor
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="rounded-none px-10 py-7 text-lg font-medium bg-white/10 backdrop-blur-md border border-white/50 text-white hover:bg-white hover:text-[#00204E] transition-all duration-300"
-                onClick={() => navigate(createPageUrl("ApplyAsMentor"))}>
-                Become a Mentor
-              </Button>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
+            <Button
+              size="lg"
+              className="bg-[#C90000] hover:bg-[#A00000] text-white rounded-none px-12 py-8 text-lg font-bold uppercase tracking-wider shadow-xl hover:translate-y-[-2px] transition-all duration-300"
+              onClick={() => user ? navigate(createPageUrl("BrowseMentors")) : base44.auth.redirectToLogin(createPageUrl("BrowseMentors"))}>
+              Find Your Mentor
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="rounded-none px-12 py-8 text-lg font-bold uppercase tracking-wider bg-transparent border-2 border-white text-white hover:bg-white hover:text-[#00204E] transition-all duration-300"
+              onClick={() => navigate(createPageUrl("ApplyAsMentor"))}>
+              Become a Mentor
+            </Button>
           </div>
         </div>
       </section>
