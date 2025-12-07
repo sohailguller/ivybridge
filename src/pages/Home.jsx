@@ -109,10 +109,7 @@ export default function Home() {
         {/* Content - Bottom Left Aligned */}
         <div className="relative w-full px-6 md:px-12 lg:px-24 pb-20 md:pb-32">
           <div className="max-w-3xl">
-            <div className="inline-block bg-[#FE6C3A] text-white text-xs font-bold px-3 py-1 rounded-sm mb-6 tracking-widest uppercase">
-              Launching Soon
-            </div>
-            <h1 className="text-white mb-6 text-5xl md:text-6xl lg:text-7xl font-normal leading-tight" style={{ fontFamily: 'Georgia, serif', letterSpacing: '-0.02em' }}>
+            <h1 className="text-white mb-6 text-5xl md:text-6xl lg:text-7xl font-normal leading-tight" style={{ fontFamily: 'Georgia, serif', letterSpacing: '-0.02em', textTransform: 'none' }}>
               Your Insider Path to the Ivy League
             </h1>
 
