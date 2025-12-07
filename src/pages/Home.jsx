@@ -217,8 +217,8 @@ export default function Home() {
 
       {/* Features Section */}
       <section className="relative z-10 py-24 bg-[#f4f4f4] px-6 md:px-12">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-5 gap-16 items-center">
-          <div className="lg:col-span-2">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+          <div>
             <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight">
               Everything You Need <br/>
               <span className="text-[#800000]">To Succeed</span>
@@ -242,7 +242,7 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="lg:col-span-3 rounded-xl overflow-hidden shadow-2xl border border-gray-200 bg-white transform transition-transform hover:scale-[1.02] duration-500">
+          <div className="rounded-xl overflow-hidden shadow-2xl border border-gray-200 bg-white">
             <div className="bg-gray-100 px-4 py-3 flex gap-2 border-b border-gray-200">
               <div className="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E]"></div>
               <div className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123]"></div>
