@@ -127,7 +127,7 @@ export default function BrowseMentors() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-md bg-white border border-gray-200 rounded shadow-sm p-8 text-center">
           <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
-          <h2 className="text-xl font-bold mb-2 text-[#0D3B33]">Error Loading Mentors</h2>
+          <h2 className="text-xl font-bold mb-2 text-[#00204E]">Error Loading Mentors</h2>
           <p className="text-gray-600 text-sm mb-4">
             We're having trouble loading the mentor list. Please try refreshing the page.
           </p>
@@ -143,7 +143,7 @@ export default function BrowseMentors() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="w-full px-6 md:px-12 lg:px-24">
         <div className="mb-8 border-b border-gray-200 pb-6">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2 text-[#0D3B33]">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2 text-[#00204E]">
             Find Your Perfect Mentor
           </h1>
           <p className="text-gray-600">
@@ -213,7 +213,7 @@ export default function BrowseMentors() {
         ) : filteredMentors.length === 0 ? (
           <div className="bg-white border border-gray-200 rounded shadow-sm p-12 text-center">
             <Users className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <h3 className="text-xl font-bold mb-2 text-[#0D3B33]">No mentors found</h3>
+            <h3 className="text-xl font-bold mb-2 text-[#00204E]">No mentors found</h3>
             <p className="text-gray-600">Try adjusting your filters or search query</p>
           </div>
         ) : (
@@ -242,19 +242,19 @@ export default function BrowseMentors() {
                     <div className="-mt-12 mb-4">
                       <Avatar className="w-24 h-24 border-4 border-white shadow-lg ring-2 ring-gray-100">
                         <AvatarImage src={mentor.profile_photo_url || user?.profile_photo_url} />
-                        <AvatarFallback className="bg-[#E6EFEA] text-2xl text-[#0D3B33]">
+                        <AvatarFallback className="bg-[#F3F4F6] text-2xl text-[#00204E]">
                           {user?.full_name?.charAt(0) || 'M'}
                         </AvatarFallback>
                       </Avatar>
                     </div>
 
-                    <h3 className="text-lg font-bold mb-1 text-[#0D3B33]">{user?.full_name || user?.email || 'Mentor Profile'}</h3>
+                    <h3 className="text-lg font-bold mb-1 text-[#00204E]">{user?.full_name || user?.email || 'Mentor Profile'}</h3>
                     <div className="flex items-center gap-2 text-xs text-gray-600 mb-2">
                       <GraduationCap className="w-4 h-4" />
                       <span>{mentor.university} • {mentor.year}</span>
                     </div>
 
-                    <Badge className="bg-[#E6EFEA] text-[#0D3B33] border-0 mb-3 text-xs">
+                    <Badge className="bg-[#F3F4F6] text-[#00204E] border-0 mb-3 text-xs">
                       {mentor.major}
                     </Badge>
 
@@ -296,8 +296,8 @@ export default function BrowseMentors() {
 
                           return (
                             <>
-                              <Star className="w-4 h-4 fill-[#FE6C3A] text-[#FE6C3A]" />
-                              <span className="font-medium text-[#0D3B33]">{rating.toFixed(1)}</span>
+                              <Star className="w-4 h-4 fill-[#C90000] text-[#C90000]" />
+                              <span className="font-medium text-[#00204E]">{rating.toFixed(1)}</span>
                               <span className="text-gray-400 text-xs">({count})</span>
                             </>
                           );

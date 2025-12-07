@@ -69,18 +69,18 @@ export default function Layout({ children, currentPageName }) {
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
 
         :root {
-          --primary: #0D3B33;
-          --secondary: #E6EFEA;
-          --accent: #FE6C3A;
-          --background: #FAFAFA;
-          --text: #1a1a1a;
+          --primary: #00204E;
+          --secondary: #F3F4F6;
+          --accent: #C90000;
+          --background: #FFFFFF;
+          --text: #1F2937;
         }
 
         body {
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+          font-family: 'Inter', sans-serif;
           color: var(--text);
           line-height: 1.6;
           -webkit-font-smoothing: antialiased;
@@ -88,9 +88,13 @@ export default function Layout({ children, currentPageName }) {
         }
 
         h1, h2, h3, h4, h5, h6 {
-          font-family: 'Inter', sans-serif;
+          font-family: 'Crimson Pro', serif;
           font-weight: 600;
-          letter-spacing: -0.02em;
+          color: var(--primary);
+        }
+
+        .serif {
+          font-family: 'Crimson Pro', serif;
         }
 
         .btn-primary {
@@ -128,7 +132,7 @@ export default function Layout({ children, currentPageName }) {
       `}</style>
 
       {/* Navigation */}
-      <nav className="bg-white border-b border-[#E6EFEA] sticky top-0 z-50 backdrop-blur-sm bg-white/95 shadow-sm">
+      <nav className="bg-white border-b border-[#F3F4F6] sticky top-0 z-50 backdrop-blur-sm bg-white/95 shadow-sm">
         <div className="w-full px-6 md:px-12 lg:px-24">
           <div className="flex justify-between items-center h-20">
             {/* Left: Desktop Navigation Links */}
@@ -137,8 +141,8 @@ export default function Layout({ children, currentPageName }) {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`text-sm font-medium transition-colors hover:text-[#0D3B33] ${
-                    location.pathname === item.path ? 'text-[#0D3B33] font-semibold' : 'text-[#0D3B33]/70'
+                  className={`text-sm font-medium transition-colors hover:text-[#00204E] ${
+                    location.pathname === item.path ? 'text-[#00204E] font-semibold' : 'text-[#00204E]/70'
                   }`}
                   >
                   {item.name}
@@ -164,10 +168,10 @@ export default function Layout({ children, currentPageName }) {
                       <NotificationCenter userId={user.id} />
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="flex items-center gap-3 hover:bg-[#E6EFEA]">
-                            <Avatar className="w-9 h-9 border-2 border-[#0D3B33]">
+                          <Button variant="ghost" className="flex items-center gap-3 hover:bg-[#F3F4F6]">
+                            <Avatar className="w-9 h-9 border-2 border-[#00204E]">
                               <AvatarImage src={user.profile_photo_url} />
-                              <AvatarFallback className="bg-[#E6EFEA] text-[#0D3B33] font-bold">
+                              <AvatarFallback className="bg-[#F3F4F6] text-[#00204E] font-bold">
                                 {user.full_name?.charAt(0) || user.email?.charAt(0)}
                               </AvatarFallback>
                             </Avatar>
@@ -196,13 +200,13 @@ export default function Layout({ children, currentPageName }) {
                       <Button
                         variant="ghost"
                         onClick={() => base44.auth.redirectToLogin(location.pathname)}
-                        className="text-sm font-medium hover:bg-[#E6EFEA] text-[#0D3B33]"
+                        className="text-sm font-medium hover:bg-[#F3F4F6] text-[#00204E]"
                         >
                         Sign In
                       </Button>
                       <Button
                         onClick={() => base44.auth.redirectToLogin(location.pathname)}
-                        className="bg-[#0D3B33] hover:bg-[#0D3B33]/90 text-white rounded-full px-6 font-medium"
+                        className="bg-[#00204E] hover:bg-[#00204E]/90 text-white rounded-full px-6 font-medium"
                         >
                         Find a Mentor
                       </Button>
@@ -215,7 +219,7 @@ export default function Layout({ children, currentPageName }) {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-[#E6EFEA]"
+              className="md:hidden p-2 rounded-lg hover:bg-[#F3F4F6]"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -224,7 +228,7 @@ export default function Layout({ children, currentPageName }) {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-[#E6EFEA] bg-white">
+          <div className="md:hidden border-t border-[#F3F4F6] bg-white">
             <div className="px-4 py-4 space-y-3">
               {navItems.map((item) => (
                 <Link
@@ -233,8 +237,8 @@ export default function Layout({ children, currentPageName }) {
                   onClick={() => setMobileMenuOpen(false)}
                   className={`block px-4 py-3 rounded-lg text-sm font-medium ${
                     location.pathname === item.path
-                      ? 'bg-[#0D3B33]/5 text-[#0D3B33]'
-                      : 'text-[#0D3B33]/70 hover:bg-[#E6EFEA]'
+                      ? 'bg-[#00204E]/5 text-[#00204E]'
+                      : 'text-[#00204E]/70 hover:bg-[#F3F4F6]'
                   }`}
                 >
                   {item.name}
@@ -247,7 +251,7 @@ export default function Layout({ children, currentPageName }) {
                       <Link
                         to={getDashboardUrl()}
                         onClick={() => setMobileMenuOpen(false)}
-                        className="block px-4 py-3 rounded-lg text-sm font-medium text-[#0D3B33] hover:bg-[#E6EFEA]"
+                        className="block px-4 py-3 rounded-lg text-sm font-medium text-[#00204E] hover:bg-[#F3F4F6]"
                       >
                         <LayoutDashboard className="w-4 h-4 inline mr-2" />
                         Dashboard
@@ -269,7 +273,7 @@ export default function Layout({ children, currentPageName }) {
                         base44.auth.redirectToLogin(location.pathname);
                         setMobileMenuOpen(false);
                       }}
-                      className="w-full bg-[#0D3B33] hover:bg-[#0D3B33]/90 text-white rounded-full font-medium"
+                      className="w-full bg-[#00204E] hover:bg-[#00204E]/90 text-white rounded-full font-medium"
                     >
                       Get Started
                     </Button>
@@ -287,7 +291,7 @@ export default function Layout({ children, currentPageName }) {
       </main>
 
       {/* Footer */}
-      <footer className="bg-[#E6EFEA] border-t border-[#0D3B33]/10 mt-20">
+      <footer className="bg-[#F3F4F6] border-t border-[#00204E]/10 mt-20">
         <div className="w-full px-6 md:px-12 lg:px-24 py-12">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
@@ -298,16 +302,16 @@ export default function Layout({ children, currentPageName }) {
                   className="h-14 object-contain object-left"
                 />
               </div>
-              <p className="text-[#0D3B33]/70 leading-relaxed max-w-md text-sm">
+              <p className="text-[#00204E]/70 leading-relaxed max-w-md text-sm">
                 Connecting ambitious international students with verified Ivy League mentors
                 for personalized admissions guidance and ongoing support.
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-3 text-[#0D3B33] text-sm">PLATFORM</h3>
-              <ul className="space-y-2 text-[#0D3B33]/70 text-sm">
-                <li><Link to={createPageUrl("BrowseMentors")} className="hover:text-[#FE6C3A] transition-colors hover:underline">Find a Mentor</Link></li>
-                <li><Link to={createPageUrl("ApplyAsMentor")} className="hover:text-[#FE6C3A] transition-colors hover:underline">Become a Mentor</Link></li>
+              <h3 className="font-semibold mb-3 text-[#00204E] text-sm">PLATFORM</h3>
+              <ul className="space-y-2 text-[#00204E]/70 text-sm">
+                <li><Link to={createPageUrl("BrowseMentors")} className="hover:text-[#C90000] transition-colors hover:underline">Find a Mentor</Link></li>
+                <li><Link to={createPageUrl("ApplyAsMentor")} className="hover:text-[#C90000] transition-colors hover:underline">Become a Mentor</Link></li>
                 <li>
                   <a 
                     href={location.pathname === createPageUrl("Home") ? "#how-it-works" : `${createPageUrl("Home")}#how-it-works`}
@@ -320,7 +324,7 @@ export default function Layout({ children, currentPageName }) {
                         }
                       }
                     }}
-                    className="hover:text-[#FE6C3A] transition-colors hover:underline cursor-pointer"
+                    className="hover:text-[#C90000] transition-colors hover:underline cursor-pointer"
                   >
                     How It Works
                   </a>
@@ -328,15 +332,15 @@ export default function Layout({ children, currentPageName }) {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold mb-3 text-[#0D3B33] text-sm">SUPPORT</h3>
-              <ul className="space-y-2 text-[#0D3B33]/70 text-sm">
-                <li><a href="mailto:contact@ivybridge.xyz" className="hover:text-[#FE6C3A] transition-colors hover:underline">Help</a></li>
-                <li><Link to={createPageUrl("TermsOfService")} className="hover:text-[#FE6C3A] transition-colors hover:underline">Terms of Service</Link></li>
-                <li><Link to={createPageUrl("PrivacyPolicy")} className="hover:text-[#FE6C3A] transition-colors hover:underline">Privacy Policy</Link></li>
+              <h3 className="font-semibold mb-3 text-[#00204E] text-sm">SUPPORT</h3>
+              <ul className="space-y-2 text-[#00204E]/70 text-sm">
+                <li><a href="mailto:contact@ivybridge.xyz" className="hover:text-[#C90000] transition-colors hover:underline">Help</a></li>
+                <li><Link to={createPageUrl("TermsOfService")} className="hover:text-[#C90000] transition-colors hover:underline">Terms of Service</Link></li>
+                <li><Link to={createPageUrl("PrivacyPolicy")} className="hover:text-[#C90000] transition-colors hover:underline">Privacy Policy</Link></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-[#0D3B33]/10 mt-8 pt-6 text-center text-xs text-[#0D3B33]/50">
+          <div className="border-t border-[#00204E]/10 mt-8 pt-6 text-center text-xs text-[#00204E]/50">
             © 2025 IvyBridge. All rights reserved.
           </div>
         </div>

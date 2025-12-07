@@ -256,7 +256,7 @@ export default function MentorProfile() {
           <div className="-mt-20 mb-4 px-8">
             <Avatar className="w-36 h-36 border-4 border-white shadow-lg">
               <AvatarImage src={mentor.profile_photo_url || mentorUser?.profile_photo_url} />
-              <AvatarFallback className="bg-[#E6EFEA] text-5xl text-[#0D3B33]">
+              <AvatarFallback className="bg-[#F3F4F6] text-5xl text-[#00204E]">
                 {mentorUser?.full_name?.charAt(0) || 'M'}
               </AvatarFallback>
             </Avatar>
@@ -265,14 +265,14 @@ export default function MentorProfile() {
           {/* Name and Info */}
           <div className="px-8 pb-6">
             <div className="mb-4">
-              <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]">
+              <h1 className="text-3xl font-bold mb-2 text-[#00204E]">
                 {mentorUser?.full_name || mentorUser?.email || 'Mentor Profile'}
               </h1>
               <div className="flex items-center gap-2 text-gray-600 mb-3">
                 <GraduationCap className="w-5 h-5" />
                 <span className="text-base">{mentor.university} • {mentor.year}</span>
               </div>
-              <Badge className="bg-[#E6EFEA] text-[#0D3B33] border-0 text-sm px-3 py-1">
+              <Badge className="bg-[#F3F4F6] text-[#00204E] border-0 text-sm px-3 py-1">
                 {mentor.major}
               </Badge>
             </div>
@@ -286,7 +286,7 @@ export default function MentorProfile() {
                   [...Array(5)].map((_, i) => (
                     <Star key={i} className={`w-5 h-5 ${
                       i < Math.round(Number(averageRating))
-                        ? 'fill-[#FE6C3A] text-[#FE6C3A]'
+                        ? 'fill-[#C90000] text-[#C90000]'
                         : 'text-gray-300'
                     }`} />
                   ))
@@ -318,8 +318,8 @@ export default function MentorProfile() {
         <div className="grid md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-6">
             {/* About Me */}
-            <div className="bg-white border border-gray-200 rounded shadow-sm p-6 border-l-4 border-l-[#FE6C3A]">
-              <h2 className="text-xl font-bold mb-4 text-[#0D3B33]">
+            <div className="bg-white border border-gray-200 rounded shadow-sm p-6 border-l-4 border-l-[#C90000]">
+              <h2 className="text-xl font-bold mb-4 text-[#00204E]">
                 About Me
               </h2>
               <p className="text-gray-700 leading-relaxed whitespace-pre-line">
@@ -329,7 +329,7 @@ export default function MentorProfile() {
 
             {/* Personal Questions - FAQ Style */}
             <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
-              <h2 className="text-xl font-bold mb-4 text-[#0D3B33]">
+              <h2 className="text-xl font-bold mb-4 text-[#00204E]">
                 Get to Know Me
               </h2>
               <p className="text-sm text-gray-600 mb-6">
@@ -347,14 +347,14 @@ export default function MentorProfile() {
                       open={isOpen}
                       onOpenChange={() => setOpenFAQ(isOpen ? null : item.id)}
                     >
-                      <div className="border border-gray-200 rounded-lg overflow-hidden hover:border-[#FE6C3A] transition-colors">
+                      <div className="border border-gray-200 rounded-lg overflow-hidden hover:border-[#C90000] transition-colors">
                         <CollapsibleTrigger className="w-full">
                           <div className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer">
                             <div className="flex items-center gap-3 flex-1 text-left">
-                              <div className="w-8 h-8 bg-[#E6EFEA] rounded-full flex items-center justify-center flex-shrink-0">
-                                <Icon className="w-4 h-4 text-[#0D3B33]" />
+                              <div className="w-8 h-8 bg-[#F3F4F6] rounded-full flex items-center justify-center flex-shrink-0">
+                                <Icon className="w-4 h-4 text-[#00204E]" />
                               </div>
-                              <span className="font-semibold text-[#0D3B33] text-sm">
+                              <span className="font-semibold text-[#00204E] text-sm">
                                 {item.question}
                               </span>
                             </div>
@@ -381,32 +381,32 @@ export default function MentorProfile() {
 
             {/* What You'll Get */}
             <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
-              <h2 className="text-xl font-bold mb-4 text-[#0D3B33]">
+              <h2 className="text-xl font-bold mb-4 text-[#00204E]">
                 What You'll Get
               </h2>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-[#00204E] flex-shrink-0 mt-0.5" />
                   <span className="text-gray-700">Unlimited 1-on-1 messaging</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-[#00204E] flex-shrink-0 mt-0.5" />
                   <span className="text-gray-700">Monthly video sessions</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-[#00204E] flex-shrink-0 mt-0.5" />
                   <span className="text-gray-700">Essay reviews & feedback</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-[#00204E] flex-shrink-0 mt-0.5" />
                   <span className="text-gray-700">Application milestone tracking</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-[#00204E] flex-shrink-0 mt-0.5" />
                   <span className="text-gray-700">Interview preparation</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-[#0D3B33] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-[#00204E] flex-shrink-0 mt-0.5" />
                   <span className="text-gray-700">Monthly progress reports</span>
                 </li>
               </ul>
@@ -414,7 +414,7 @@ export default function MentorProfile() {
 
             {reviews.length > 0 && (
               <div className="bg-white border border-gray-200 rounded shadow-sm p-6">
-                <h2 className="text-xl font-bold mb-6 text-[#0D3B33]">
+                <h2 className="text-xl font-bold mb-6 text-[#00204E]">
                   Student Reviews
                 </h2>
                 <div className="space-y-6">
@@ -425,19 +425,19 @@ export default function MentorProfile() {
                         <div className="flex items-start gap-4">
                           <Avatar className="w-12 h-12">
                             <AvatarImage src={student?.profile_photo_url} />
-                            <AvatarFallback className="bg-[#E6EFEA] text-[#0D3B33]">
+                            <AvatarFallback className="bg-[#F3F4F6] text-[#00204E]">
                               {student?.full_name?.charAt(0) || 'S'}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex-1">
                             <div className="flex items-center justify-between mb-2">
                               <div>
-                                <p className="font-semibold text-[#0D3B33]">{student?.full_name?.split(' ')[0] || 'Student'}</p>
+                                <p className="font-semibold text-[#00204E]">{student?.full_name?.split(' ')[0] || 'Student'}</p>
                                 <div className="flex items-center gap-1">
                                   {[...Array(5)].map((_, i) => (
                                     <Star key={i} className={`w-4 h-4 ${
                                       i < review.rating
-                                        ? 'fill-[#FE6C3A] text-[#FE6C3A]'
+                                        ? 'fill-[#C90000] text-[#C90000]'
                                         : 'text-gray-300'
                                     }`} />
                                   ))}
@@ -461,10 +461,10 @@ export default function MentorProfile() {
           </div>
 
           <div className="space-y-6">
-            <div className="bg-white border-2 border-[#FE6C3A] rounded shadow-sm p-6">
+            <div className="bg-white border-2 border-[#C90000] rounded shadow-sm p-6">
               <div className="text-center mb-4">
                 <div className="text-sm font-medium text-gray-600 mb-1">Monthly Plan</div>
-                <div className="text-3xl font-bold mb-1 text-[#0D3B33]">$425</div>
+                <div className="text-3xl font-bold mb-1 text-[#00204E]">$425</div>
                 <div className="text-sm text-gray-600 mb-2">per month</div>
                 <div className="text-xs text-gray-500 mb-4">12-month commitment • Non-cancellable</div>
               </div>
@@ -478,14 +478,14 @@ export default function MentorProfile() {
               <div className="border-t border-gray-200 pt-4 mb-4"></div>
               <div className="text-center">
                 <div className="text-sm font-medium text-gray-600 mb-1">Annual Plan</div>
-                <div className="text-3xl font-bold mb-1 text-[#0D3B33]">$5,000</div>
+                <div className="text-3xl font-bold mb-1 text-[#00204E]">$5,000</div>
                 <div className="text-sm text-gray-600 mb-2">one-time payment</div>
                 <div className="text-xs text-gray-500 mb-4">Save $100</div>
               </div>
               <Button
                 onClick={() => handleSubscribe('annual', 5000)}
                 disabled={isMentor || isSubscribing}
-                className="w-full bg-[#FE6C3A] hover:bg-[#FF7B4A] text-white rounded py-5"
+                className="w-full bg-[#C90000] hover:bg-[#FF7B4A] text-white rounded py-5"
               >
                 {isSubscribing ? 'Processing...' : 'Subscribe Annually'}
               </Button>
@@ -493,26 +493,26 @@ export default function MentorProfile() {
 
             <div className="bg-gray-50 border border-gray-200 rounded shadow-sm p-6">
               <div className="text-center mb-4">
-                <div className="text-3xl font-bold text-[#0D3B33] mb-1">
+                <div className="text-3xl font-bold text-[#00204E] mb-1">
                   {typeof mentor.total_students === 'number' ? mentor.total_students : 0}
                 </div>
                 <div className="text-sm text-gray-600">Current Students</div>
               </div>
               <div className="border-t border-gray-200 pt-4 text-center">
                 {averageRating === "New" ? (
-                  <div className="text-lg font-bold text-[#0D3B33] mb-1">New</div>
+                  <div className="text-lg font-bold text-[#00204E] mb-1">New</div>
                 ) : (
                   <>
                                           {averageRating === "New" ? (
-                        <div className="text-lg font-bold text-[#0D3B33] mb-1">New</div>
+                        <div className="text-lg font-bold text-[#00204E] mb-1">New</div>
                       ) : (
-                        <div className="text-2xl font-bold mb-1 text-[#0D3B33]">{averageRating}</div>
+                        <div className="text-2xl font-bold mb-1 text-[#00204E]">{averageRating}</div>
                       )}
                     <div className="flex justify-center gap-1 mb-2">
                       {[...Array(5)].map((_, i) => (
                         <Star key={i} className={`w-4 h-4 ${
                           i < Math.round(Number(averageRating))
-                            ? 'fill-[#FE6C3A] text-[#FE6C3A]'
+                            ? 'fill-[#C90000] text-[#C90000]'
                             : 'text-gray-300'
                         }`} />
                       ))}

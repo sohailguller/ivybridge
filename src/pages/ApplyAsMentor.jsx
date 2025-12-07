@@ -307,7 +307,7 @@ export default function ApplyAsMentor() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FE6C3A] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C90000] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
@@ -322,7 +322,7 @@ export default function ApplyAsMentor() {
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
-            <h2 className="text-2xl font-bold mb-3 text-[#0D3B33]">
+            <h2 className="text-2xl font-bold mb-3 text-[#00204E]">
               Application Submitted!
             </h2>
             <p className="text-gray-600 mb-6 text-sm">
@@ -345,7 +345,7 @@ export default function ApplyAsMentor() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="w-full px-6 md:px-12 lg:px-24">
         <div className="text-center mb-8 border-b border-gray-200 pb-6">
-          <h1 className="text-3xl font-bold mb-2 text-[#0D3B33]">
+          <h1 className="text-3xl font-bold mb-2 text-[#00204E]">
             Become a Mentor
           </h1>
           <p className="text-gray-600">
@@ -358,14 +358,14 @@ export default function ApplyAsMentor() {
             {[1, 2, 3, 4].map((section) => (
               <div key={section} className="flex items-center">
                 <div className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm ${
-                  currentSection === section ? 'bg-[#FE6C3A] text-white' :
-                  currentSection > section ? 'bg-[#0D3B33] text-white' :
+                  currentSection === section ? 'bg-[#C90000] text-white' :
+                  currentSection > section ? 'bg-[#00204E] text-white' :
                   'bg-gray-200 text-gray-500'
                 }`}>
                   {currentSection > section ? <CheckCircle className="w-4 h-4" /> : section}
                 </div>
                 {section < 4 && (
-                  <div className={`w-12 h-1 mx-2 ${currentSection > section ? 'bg-[#0D3B33]' : 'bg-gray-200'}`} />
+                  <div className={`w-12 h-1 mx-2 ${currentSection > section ? 'bg-[#00204E]' : 'bg-gray-200'}`} />
                 )}
               </div>
             ))}
@@ -391,7 +391,7 @@ export default function ApplyAsMentor() {
               {currentSection === 1 && (
                 <div className="space-y-6">
                   <div className="border-b border-gray-200 pb-4">
-                    <h2 className="text-xl font-bold mb-1 text-[#0D3B33]">Basic Information</h2>
+                    <h2 className="text-xl font-bold mb-1 text-[#00204E]">Basic Information</h2>
                     <p className="text-sm text-gray-600">Tell us about your university and academic background</p>
                   </div>
 
@@ -477,7 +477,7 @@ export default function ApplyAsMentor() {
               {currentSection === 2 && (
                 <div className="space-y-6">
                   <div className="border-b border-gray-200 pb-4">
-                    <h2 className="text-xl font-bold mb-1 text-[#0D3B33]">Your Expertise</h2>
+                    <h2 className="text-xl font-bold mb-1 text-[#00204E]">Your Expertise</h2>
                     <p className="text-sm text-gray-600">Select the areas where you can help students</p>
                   </div>
 
@@ -499,7 +499,7 @@ export default function ApplyAsMentor() {
                     <Label>Areas of Expertise * (Select at least one)</Label>
                     {expertiseOptions.map((category, idx) => (
                       <div key={idx} className="border border-gray-200 rounded p-4">
-                        <h3 className="font-semibold mb-3 text-sm text-[#0D3B33]">{category.category}</h3>
+                        <h3 className="font-semibold mb-3 text-sm text-[#00204E]">{category.category}</h3>
                         <div className="space-y-2">
                           {category.options.map((option, optIdx) => (
                             <div key={optIdx} className="flex items-start space-x-2">
@@ -524,7 +524,7 @@ export default function ApplyAsMentor() {
                       <div className="flex flex-wrap gap-2 p-4 bg-gray-50 border border-gray-200 rounded">
                         <span className="text-sm font-medium w-full mb-1">Selected ({formData.expertise_areas.length}):</span>
                         {formData.expertise_areas.map((area, idx) => (
-                          <Badge key={idx} className="bg-[#E6EFEA] text-[#0D3B33] border-0">
+                          <Badge key={idx} className="bg-[#F3F4F6] text-[#00204E] border-0">
                             {area}
                             <button
                               type="button"
@@ -544,7 +544,7 @@ export default function ApplyAsMentor() {
               {currentSection === 3 && (
                 <div className="space-y-6">
                   <div className="border-b border-gray-200 pb-4">
-                    <h2 className="text-xl font-bold mb-1 text-[#0D3B33]">Get Personal</h2>
+                    <h2 className="text-xl font-bold mb-1 text-[#00204E]">Get Personal</h2>
                     <p className="text-sm text-gray-600">
                       Help students get to know you better with these thoughtful responses (250 words max each)
                     </p>
@@ -614,13 +614,13 @@ export default function ApplyAsMentor() {
               {currentSection === 4 && (
                 <div className="space-y-6">
                   <div className="border-b border-gray-200 pb-4">
-                    <h2 className="text-xl font-bold mb-1 text-[#0D3B33]">Verification & Setup</h2>
+                    <h2 className="text-xl font-bold mb-1 text-[#00204E]">Verification & Setup</h2>
                     <p className="text-sm text-gray-600">Upload required documents and set up your scheduling</p>
                   </div>
 
                   <div className="space-y-2">
                     <Label>Profile Photo</Label>
-                    <div className="border border-gray-200 rounded p-4 text-center hover:border-[#FE6C3A] transition-colors">
+                    <div className="border border-gray-200 rounded p-4 text-center hover:border-[#C90000] transition-colors">
                       {formData.profile_photo_url ? (
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
@@ -664,7 +664,7 @@ export default function ApplyAsMentor() {
 
                   <div className="space-y-2">
                     <Label>University Transcript *</Label>
-                    <div className="border border-gray-200 rounded p-4 text-center hover:border-[#FE6C3A] transition-colors">
+                    <div className="border border-gray-200 rounded p-4 text-center hover:border-[#C90000] transition-colors">
                       {formData.transcript_url ? (
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
