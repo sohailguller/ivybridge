@@ -289,7 +289,7 @@ export default function Home() {
             </div>
 
             {/* Annual */}
-            <div className="border-2 border-[#00204E] p-10 bg-white text-[#1a1a1a] relative transform md:-translate-y-4 shadow-xl">
+            <div className="border border-gray-200 p-10 hover:border-[#800000] transition-colors duration-300 bg-white group relative transform md:-translate-y-4 shadow-xl">
               <div className="absolute top-4 right-4 bg-[#C90000] text-white text-xs font-bold px-3 py-1 uppercase tracking-widest">
                 Best Value
               </div>
@@ -315,38 +315,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA Footer */}
-      <section className="py-32 bg-[#00204E] text-white text-center px-6 relative overflow-hidden">
-        {/* Decorative background element */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#C90000] rounded-full blur-3xl"></div>
-          <div className="absolute top-1/2 right-0 w-64 h-64 bg-white rounded-full blur-3xl"></div>
-        </div>
-        
-        <div className="max-w-4xl mx-auto relative z-10">
-          <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight text-white">
-            Ready to Start <br/> Your Journey?
-          </h2>
-          <p className="font-sans text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
-            Join hundreds of ambitious students who turned their Ivy League dreams into reality with personalized mentorship.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-6">
-            <Button 
-              onClick={() => navigate(createPageUrl("BrowseMentors"))}
-              className="bg-[#C90000] hover:bg-[#a00000] text-white rounded-none px-16 py-8 text-xl font-sans tracking-widest uppercase transition-all duration-300 transform hover:-translate-y-1 shadow-lg"
-            >
-              Find Your Mentor
-            </Button>
-            <Button 
-              onClick={() => navigate(createPageUrl("ApplyAsMentor"))}
-              variant="outline"
-              className="bg-transparent border-white text-white hover:bg-white hover:text-[#00204E] rounded-none px-16 py-8 text-xl font-sans tracking-widest uppercase transition-all duration-300"
-            >
-              Become a Mentor
-            </Button>
-          </div>
-        </div>
-      </section>
+
     </div>
   );
 }
