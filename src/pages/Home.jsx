@@ -139,8 +139,8 @@ export default function Home() {
       </section>
 
       {/* Universities Ticker */}
-      <div className="border-y border-gray-200 bg-[#fafafa] py-16">
-        <div className="text-center mb-10">
+      <div className="border-y border-gray-200 bg-[#fafafa] py-8">
+        <div className="text-center mb-6">
           <p className="text-xs font-sans font-bold tracking-[0.2em] uppercase text-gray-400">Mentors from</p>
         </div>
         <div className="overflow-hidden w-full">
@@ -165,7 +165,7 @@ export default function Home() {
           100% { transform: translateX(-50%); }
         }
         .animate-scroll {
-          animation: scroll 60s linear infinite;
+          animation: scroll 20s linear infinite;
           will-change: transform;
         }
         .animate-scroll:hover {
