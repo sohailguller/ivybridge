@@ -75,7 +75,9 @@ export default function Layout({ children, currentPageName }) {
     { name: "Become a Mentor", path: createPageUrl("ApplyAsMentor") },
   ];
 
-  const isHomePage = location.pathname === createPageUrl("Home");
+  // Ensure isHomePage handles root path correctly
+  const homeUrl = createPageUrl("Home");
+  const isHomePage = location.pathname === homeUrl || location.pathname === '/' || location.pathname === '';
   const isTransparent = isHomePage && !isScrolled;
 
   return (
@@ -323,8 +325,8 @@ export default function Layout({ children, currentPageName }) {
         {children}
       </main>
 
-      {/* Footer */}
-      <footer className="bg-[#F3F4F6] border-t border-[#00204E]/10 mt-20">
+      {/* Footer - relative z-10 ensures it covers fixed video background */}
+      <footer className="relative z-10 bg-[#F3F4F6] border-t border-[#00204E]/10 mt-20">
         <div className="w-full px-6 md:px-12 lg:px-24 py-12">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
