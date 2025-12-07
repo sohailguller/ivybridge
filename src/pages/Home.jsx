@@ -258,7 +258,7 @@ export default function Home() {
                 </div>
                 {/* Dashboard Placeholder Image */}
                 <img
-                  src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1974&auto=format&fit=crop"
+                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6907e2e184793f3cf5bb348d/674cccd3f_Screenshot2025-12-06at103331PM.png"
                   alt="Student Dashboard Interface"
                   className="w-full h-auto object-cover"
                 />
