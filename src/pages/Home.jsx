@@ -167,7 +167,7 @@ export default function Home() {
       `}</style>
 
       {/* How It Works - Redesigned */}
-      <section className="py-24 bg-white">
+      <section id="how-it-works" className="py-24 bg-white">
         <div className="w-full px-6 md:px-12 lg:px-24">
           <div className="text-center mb-16">
             <span className="text-[#FE6C3A] font-bold tracking-widest text-sm uppercase mb-2 block">The Process</span>
@@ -369,31 +369,49 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-[#0D3B33] text-white">
-        <div className="w-full px-6 md:px-12 lg:px-24 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+      <section className="py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[#0D3B33]">
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#FE6C3A] rounded-full blur-[100px] opacity-20"></div>
+          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-[#FE6C3A] rounded-full blur-[100px] opacity-10"></div>
+        </div>
+        
+        <div className="w-full px-6 md:px-12 lg:px-24 relative z-10 text-center">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white tracking-tight">
             Ready to Start Your Journey?
           </h2>
-          <p className="text-lg mb-6 opacity-90">
-            Join hundreds of students who got personalized guidance from Ivy League mentors
+          <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
+            Join hundreds of ambitious students who turned their Ivy League dreams into reality with personalized mentorship.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
             <Button
               size="lg"
-              className="btn-primary text-white rounded px-8 py-5"
+              className="bg-[#FE6C3A] hover:bg-[#FF7B4A] text-white rounded-full px-10 py-7 text-lg font-medium shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
               onClick={() => navigate(createPageUrl("BrowseMentors"))}>
-
-              Browse Mentors
-              <ArrowRight className="w-4 h-4 ml-2" />
+              Find Your Mentor
+              <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
             <Button
               size="lg"
               variant="outline"
-              className="border-2 border-white text-white hover:bg-white/10 rounded px-8 py-5"
+              className="border-2 border-white/30 bg-white/10 backdrop-blur-sm text-white hover:bg-white hover:text-[#0D3B33] rounded-full px-10 py-7 text-lg font-medium transition-all duration-300"
               onClick={() => navigate(createPageUrl("ApplyAsMentor"))}>
-
               Become a Mentor
             </Button>
+          </div>
+          <div className="mt-12 flex justify-center items-center gap-8 opacity-60">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-[#FE6C3A]" />
+              <span className="text-white text-sm">Verified Mentors</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-[#FE6C3A]" />
+              <span className="text-white text-sm">Secure Platform</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-[#FE6C3A]" />
+              <span className="text-white text-sm">Satisfaction Guaranteed</span>
+            </div>
           </div>
         </div>
       </section>

@@ -6,6 +6,8 @@ import StudentDashboard from './pages/StudentDashboard';
 import MentorDashboard from './pages/MentorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import Settings from './pages/Settings';
+import TermsOfService from './pages/TermsOfService';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import __Layout from './Layout.jsx';
 
 
@@ -18,6 +20,8 @@ export const PAGES = {
     "MentorDashboard": MentorDashboard,
     "AdminDashboard": AdminDashboard,
     "Settings": Settings,
+    "TermsOfService": TermsOfService,
+    "PrivacyPolicy": PrivacyPolicy,
 }
 
 export const pagesConfig = {

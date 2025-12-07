@@ -308,15 +308,31 @@ export default function Layout({ children, currentPageName }) {
               <ul className="space-y-2 text-[#0D3B33]/70 text-sm">
                 <li><Link to={createPageUrl("BrowseMentors")} className="hover:text-[#FE6C3A] transition-colors hover:underline">Find a Mentor</Link></li>
                 <li><Link to={createPageUrl("ApplyAsMentor")} className="hover:text-[#FE6C3A] transition-colors hover:underline">Become a Mentor</Link></li>
-                <li><Link to={createPageUrl("Home")} className="hover:text-[#FE6C3A] transition-colors hover:underline">How It Works</Link></li>
+                <li>
+                  <a 
+                    href={location.pathname === createPageUrl("Home") ? "#how-it-works" : `${createPageUrl("Home")}#how-it-works`}
+                    onClick={(e) => {
+                      if (location.pathname === createPageUrl("Home")) {
+                        e.preventDefault();
+                        const element = document.getElementById('how-it-works');
+                        if (element) {
+                          element.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }
+                    }}
+                    className="hover:text-[#FE6C3A] transition-colors hover:underline cursor-pointer"
+                  >
+                    How It Works
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-3 text-[#0D3B33] text-sm">SUPPORT</h3>
               <ul className="space-y-2 text-[#0D3B33]/70 text-sm">
-                <li><a href="#" className="hover:text-[#FE6C3A] transition-colors hover:underline">Help Center</a></li>
-                <li><a href="#" className="hover:text-[#FE6C3A] transition-colors hover:underline">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-[#FE6C3A] transition-colors hover:underline">Privacy Policy</a></li>
+                <li><a href="mailto:contact@ivybridge.xyz" className="hover:text-[#FE6C3A] transition-colors hover:underline">Help</a></li>
+                <li><Link to={createPageUrl("TermsOfService")} className="hover:text-[#FE6C3A] transition-colors hover:underline">Terms of Service</Link></li>
+                <li><Link to={createPageUrl("PrivacyPolicy")} className="hover:text-[#FE6C3A] transition-colors hover:underline">Privacy Policy</Link></li>
               </ul>
             </div>
           </div>
