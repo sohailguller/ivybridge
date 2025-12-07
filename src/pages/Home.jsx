@@ -94,28 +94,26 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
 
         {/* Content - Bottom Left Aligned */}
-        <div className="relative w-full px-6 md:px-12 lg:px-24 pb-24 md:pb-32">
-          <div className="max-w-4xl">
-            <h1 className="text-white mb-8 text-6xl md:text-7xl lg:text-9xl font-bold leading-[0.9] tracking-tighter font-serif">
+        <div className="relative w-full px-6 md:px-12 lg:px-24 pb-20 md:pb-24">
+          <div className="max-w-3xl">
+            <h1 className="text-white mb-6 text-5xl md:text-6xl lg:text-7xl font-semibold leading-tight tracking-tight font-serif drop-shadow-lg">
               Your Insider Path <br /> to the Ivy League
             </h1>
 
-            <p className="text-xl md:text-2xl text-white/90 leading-relaxed max-w-2xl mb-12 font-sans font-light">
+            <p className="text-lg md:text-xl text-white/90 leading-relaxed max-w-xl mb-10 font-sans font-light drop-shadow-md">
               Don't just apply. Stand out. Get personalized 1-on-1 guidance from verified students who have already cracked the code.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-5">
+            <div className="flex flex-col sm:flex-row gap-4">
               <Button
-                size="lg"
-                className="bg-[#C90000] hover:bg-[#A00000] text-white rounded-none px-12 py-8 text-lg font-sans font-bold uppercase tracking-widest shadow-xl transition-all duration-300"
+                className="bg-[#C90000] hover:bg-[#A00000] text-white rounded-none px-8 py-6 text-sm font-sans font-bold uppercase tracking-widest shadow-lg transition-all duration-300"
                 onClick={() => user ? navigate(createPageUrl("BrowseMentors")) : base44.auth.redirectToLogin(createPageUrl("BrowseMentors"))}>
                 Find Your Mentor
-                <ArrowRight className="w-5 h-5 ml-3" />
+                <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button
-                size="lg"
                 variant="outline"
-                className="rounded-none px-12 py-8 text-lg font-sans font-bold uppercase tracking-widest border-2 border-white text-white bg-transparent hover:bg-white hover:text-black transition-all duration-300"
+                className="rounded-none px-8 py-6 text-sm font-sans font-bold uppercase tracking-widest border border-white text-white bg-transparent hover:bg-white hover:text-black transition-all duration-300"
                 onClick={() => navigate(createPageUrl("ApplyAsMentor"))}>
                 Become a Mentor
               </Button>
