@@ -321,7 +321,7 @@ export default function Layout({ children, currentPageName }) {
       </nav>
 
       {/* Main Content */}
-      <main className="min-h-[calc(100vh-80px)]">
+      <main className={`min-h-[calc(100vh-80px)] ${!isHomePage ? 'pt-24' : ''}`}>
         {children}
       </main>
 
