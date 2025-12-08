@@ -86,16 +86,18 @@ export default function Layout({ children, currentPageName }) {
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap');
 
         :root {
-          --primary: #00204E;
-          --secondary: #F3F4F6;
-          --accent: #C90000;
-          --background: #FFFFFF;
-          --text: #1F2937;
+          --primary: 215.4 100% 15.3%;
+          --secondary: 210 40% 96.1%;
+          --accent: 0 100% 39.4%;
+          --background: 0 0% 100%;
+          --text: 220 26% 17%;
+          --foreground: 220 26% 17%;
+          --primary-foreground: 0 0% 100%;
         }
 
         body {
           font-family: 'Lato', sans-serif;
-          color: var(--text);
+          color: hsl(var(--text));
           line-height: 1.6;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
@@ -104,7 +106,7 @@ export default function Layout({ children, currentPageName }) {
         h1, h2, h3, h4, h5, h6 {
           font-family: 'Playfair Display', serif;
           font-weight: 700;
-          color: var(--primary);
+          color: hsl(var(--primary));
         }
 
         .serif {
@@ -112,7 +114,7 @@ export default function Layout({ children, currentPageName }) {
         }
 
         .btn-primary {
-          background-color: var(--accent);
+          background-color: hsl(var(--accent));
           transition: all 0.3s ease;
           box-shadow: 0 2px 4px rgba(254, 108, 58, 0.2);
         }
