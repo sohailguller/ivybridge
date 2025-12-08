@@ -174,8 +174,8 @@ export default function Home() {
       `}</style>
 
       {/* How It Works */}
-      <section id="how-it-works" className="relative z-10 py-24 px-6 md:px-12 bg-white">
-        <div className="max-w-[1600px] mx-auto">
+      <section id="how-it-works" className="relative z-10 py-24 px-8 md:px-16 lg:px-24 bg-white">
+        <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-16">
             <span className="text-[#800000] font-sans font-bold tracking-widest text-sm uppercase mb-3 block">The Process</span>
             <h2 className="text-4xl md:text-5xl font-bold text-black">
@@ -216,8 +216,8 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="relative z-10 py-24 bg-[#f4f4f4] px-6 md:px-12">
-        <div className="max-w-[1800px] mx-auto grid lg:grid-cols-12 gap-16 xl:gap-24 items-center">
+      <section className="relative z-10 py-24 bg-[#f4f4f4] px-8 md:px-16 lg:px-24">
+        <div className="max-w-[1400px] mx-auto grid lg:grid-cols-12 gap-12 xl:gap-20 items-center">
           <div className="lg:col-span-5">
             <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight">
               Everything You Need <br/>
@@ -258,8 +258,8 @@ export default function Home() {
       </section>
 
       {/* Pricing Section */}
-      <section className="relative z-10 py-24 px-6 md:px-12 bg-white">
-        <div className="max-w-[1600px] mx-auto">
+      <section className="relative z-10 py-24 px-8 md:px-16 lg:px-24 bg-white">
+        <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">Invest in Your Future</h2>
             <p className="text-gray-600 font-sans text-lg">Transparent pricing for world-class guidance</p>
@@ -298,10 +298,10 @@ export default function Home() {
                 <span className="text-gray-500 font-sans">/year</span>
               </div>
               <ul className="space-y-4 mb-10 font-sans text-gray-700">
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> All Monthly features included</li>
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> Priority mentor matching</li>
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> Save $100 annually</li>
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> Guaranteed placement</li>
+                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> Unlimited 1-on-1 messaging</li>
+                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> Monthly video sessions</li>
+                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> Essay reviews & feedback</li>
+                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-[#800000]"/> 12-month commitment</li>
               </ul>
               <Button 
                 onClick={() => navigate(createPageUrl("BrowseMentors"))}
