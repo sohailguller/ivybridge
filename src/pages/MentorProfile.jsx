@@ -220,12 +220,12 @@ export default function MentorProfile() {
   const universityBg = universityImages[mentor.university] || universityImages.Harvard;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="w-full px-6 md:px-12 lg:px-24">
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-[1400px] mx-auto px-8 md:px-16 lg:px-24">
         <Button
           variant="ghost"
           onClick={() => navigate(createPageUrl("BrowseMentors"))}
-          className="mb-6 hover:bg-gray-100 rounded"
+          className="mb-8 hover:bg-gray-100 rounded-none font-sans font-medium uppercase tracking-wide text-xs"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to All Mentors
@@ -240,10 +240,10 @@ export default function MentorProfile() {
         )}
 
         {/* LinkedIn-style Banner Section */}
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6 overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-none shadow-lg mb-8 overflow-hidden">
           {/* University Banner Image */}
           <div
-            className="h-48 bg-cover bg-center relative"
+            className="h-64 bg-cover bg-center relative"
             style={{
               backgroundImage: `url(${universityBg})`,
               backgroundPosition: 'center 35%'
@@ -461,34 +461,40 @@ export default function MentorProfile() {
           </div>
 
           <div className="space-y-6">
-            <div className="bg-white border-2 border-[#C90000] rounded shadow-sm p-6">
-              <div className="text-center mb-4">
-                <div className="text-sm font-medium text-gray-600 mb-1">Monthly Plan</div>
-                <div className="text-3xl font-bold mb-1 text-[#00204E]">$425</div>
-                <div className="text-sm text-gray-600 mb-2">per month</div>
-                <div className="text-xs text-gray-500 mb-4">12-month commitment • Non-cancellable</div>
+            <div className="bg-white border-2 border-[#C90000] rounded-none shadow-xl p-8 sticky top-24">
+              <div className="text-center mb-6">
+                <h3 className="font-serif text-xl font-bold mb-2">Monthly Plan</h3>
+                <div className="flex items-baseline justify-center gap-1 mb-2">
+                  <span className="text-4xl font-bold text-[#00204E]">$425</span>
+                  <span className="text-gray-500 font-sans">/mo</span>
+                </div>
+                <div className="text-xs text-gray-500 mb-6 font-sans uppercase tracking-wider">12-month commitment</div>
+
+                <Button
+                  onClick={() => handleSubscribe('monthly', 425)}
+                  disabled={isMentor || isSubscribing}
+                  className="w-full bg-white text-[#1a1a1a] border border-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white rounded-none py-6 font-sans font-bold uppercase tracking-widest transition-all mb-6"
+                >
+                  {isSubscribing ? 'Processing...' : 'Subscribe Monthly'}
+                </Button>
               </div>
-              <Button
-                onClick={() => handleSubscribe('monthly', 425)}
-                disabled={isMentor || isSubscribing}
-                className="w-full btn-primary text-white rounded py-5 mb-4"
-              >
-                {isSubscribing ? 'Processing...' : 'Subscribe Monthly'}
-              </Button>
-              <div className="border-t border-gray-200 pt-4 mb-4"></div>
-              <div className="text-center">
-                <div className="text-sm font-medium text-gray-600 mb-1">Annual Plan</div>
-                <div className="text-3xl font-bold mb-1 text-[#00204E]">$5,000</div>
-                <div className="text-sm text-gray-600 mb-2">one-time payment</div>
-                <div className="text-xs text-gray-500 mb-4">Save $100</div>
+
+              <div className="border-t border-gray-200 pt-6 text-center">
+                <h3 className="font-serif text-xl font-bold mb-2">Annual Plan</h3>
+                <div className="flex items-baseline justify-center gap-1 mb-2">
+                  <span className="text-4xl font-bold text-[#00204E]">$5,000</span>
+                  <span className="text-gray-500 font-sans">/year</span>
+                </div>
+                <div className="text-xs text-gray-500 mb-6 font-sans uppercase tracking-wider">Best Value</div>
+
+                <Button
+                  onClick={() => handleSubscribe('annual', 5000)}
+                  disabled={isMentor || isSubscribing}
+                  className="w-full bg-[#C90000] hover:bg-[#A00000] text-white border border-transparent rounded-none py-6 font-sans font-bold uppercase tracking-widest transition-all"
+                >
+                  {isSubscribing ? 'Processing...' : 'Subscribe Annually'}
+                </Button>
               </div>
-              <Button
-                onClick={() => handleSubscribe('annual', 5000)}
-                disabled={isMentor || isSubscribing}
-                className="w-full bg-[#C90000] hover:bg-[#FF7B4A] text-white rounded py-5"
-              >
-                {isSubscribing ? 'Processing...' : 'Subscribe Annually'}
-              </Button>
             </div>
 
             <div className="bg-gray-50 border border-gray-200 rounded shadow-sm p-6">

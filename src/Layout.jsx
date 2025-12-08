@@ -83,7 +83,7 @@ export default function Layout({ children, currentPageName }) {
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap');
 
         :root {
           --primary: #00204E;
@@ -94,7 +94,7 @@ export default function Layout({ children, currentPageName }) {
         }
 
         body {
-          font-family: 'Inter', sans-serif;
+          font-family: 'Lato', sans-serif;
           color: var(--text);
           line-height: 1.6;
           -webkit-font-smoothing: antialiased;
@@ -102,13 +102,13 @@ export default function Layout({ children, currentPageName }) {
         }
 
         h1, h2, h3, h4, h5, h6 {
-          font-family: 'Crimson Pro', serif;
-          font-weight: 600;
+          font-family: 'Playfair Display', serif;
+          font-weight: 700;
           color: var(--primary);
         }
 
         .serif {
-          font-family: 'Crimson Pro', serif;
+          font-family: 'Playfair Display', serif;
         }
 
         .btn-primary {

@@ -140,18 +140,18 @@ export default function BrowseMentors() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="w-full px-6 md:px-12 lg:px-24">
-        <div className="mb-8 border-b border-gray-200 pb-6">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2 text-[#00204E]">
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-[1400px] mx-auto px-8 md:px-16 lg:px-24">
+        <div className="mb-12 border-b border-gray-200 pb-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-[#00204E] font-serif">
             Find Your Perfect Mentor
           </h1>
-          <p className="text-gray-600">
-            Browse verified Ivy League students ready to guide you through your admissions journey
+          <p className="text-gray-600 font-sans text-lg max-w-2xl mx-auto">
+            Browse verified Ivy League students ready to guide you through your admissions journey.
           </p>
-        </div>
+          </div>
 
-        <div className="bg-white border border-gray-200 rounded shadow-sm mb-6 p-4">
+          <div className="bg-white border border-gray-200 rounded-none shadow-sm mb-8 p-6">
           <div className="grid md:grid-cols-4 gap-4">
             <div className="md:col-span-2 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -225,9 +225,9 @@ export default function BrowseMentors() {
               return (
                 <div
                   key={mentor.id}
-                  className="bg-white border border-gray-200 rounded shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden"
+                  className="bg-white border border-gray-200 rounded-none hover:shadow-lg hover:border-[#800000] transition-all duration-300 cursor-pointer overflow-hidden group"
                   onClick={() => navigate(createPageUrl(`MentorProfile?id=${mentor.id}`))}
-                >
+                  >
                   <div
                     className="h-20 bg-cover bg-center relative"
                     style={{
@@ -305,7 +305,7 @@ export default function BrowseMentors() {
                       </div>
                     </div>
 
-                    <Button className="w-full btn-primary text-white rounded text-sm py-2">
+                    <Button className="w-full bg-[#C90000] hover:bg-[#A00000] text-white rounded-none py-3 text-sm font-sans font-bold uppercase tracking-widest transition-all">
                       View Profile
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>

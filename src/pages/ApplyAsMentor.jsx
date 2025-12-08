@@ -342,14 +342,14 @@ export default function ApplyAsMentor() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="w-full px-6 md:px-12 lg:px-24">
-        <div className="text-center mb-8 border-b border-gray-200 pb-6">
-          <h1 className="text-3xl font-bold mb-2 text-[#00204E]">
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-[1400px] mx-auto px-8 md:px-16 lg:px-24">
+        <div className="text-center mb-12 border-b border-gray-200 pb-8">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-[#00204E] font-serif">
             Become a Mentor
           </h1>
-          <p className="text-gray-600">
-            Share your Ivy League experience and help aspiring students achieve their dreams
+          <p className="text-gray-600 font-sans text-lg max-w-2xl mx-auto">
+            Share your Ivy League experience and help aspiring students achieve their dreams.
           </p>
         </div>
 
@@ -385,8 +385,8 @@ export default function ApplyAsMentor() {
           </Alert>
         )}
 
-        <div className="bg-white border border-gray-200 rounded shadow-sm">
-          <div className="p-6">
+        <div className="bg-white border border-gray-200 rounded-none shadow-lg">
+          <div className="p-8 md:p-12">
             <form onSubmit={handleSubmit}>
               {currentSection === 1 && (
                 <div className="space-y-6">
@@ -743,21 +743,21 @@ export default function ApplyAsMentor() {
                     type="button"
                     onClick={() => setCurrentSection(currentSection + 1)}
                     disabled={!canProceedToNextSection()}
-                    className="btn-primary text-white rounded"
+                    className="bg-[#C90000] hover:bg-[#A00000] text-white rounded-none px-8 py-3 font-sans font-bold uppercase tracking-widest"
                   >
                     Next
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
-                ) : (
+                  ) : (
                   <Button
                     type="submit"
                     disabled={isSubmitting || !canProceedToNextSection()}
-                    className="btn-primary text-white rounded"
+                    className="bg-[#C90000] hover:bg-[#A00000] text-white rounded-none px-8 py-3 font-sans font-bold uppercase tracking-widest"
                   >
                     {isSubmitting ? "Submitting..." : "Submit Application"}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
-                )}
+                  )}
               </div>
             </form>
           </div>
