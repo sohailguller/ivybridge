@@ -136,7 +136,7 @@ export default function MentorDashboard() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FE6C3A] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C90000] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading your dashboard...</p>
         </div>
       </div>
@@ -149,14 +149,14 @@ export default function MentorDashboard() {
         <div className="max-w-md bg-white border border-gray-200 rounded shadow-sm p-8">
           <div className="text-center">
             <AlertCircle className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-            <h2 className="text-2xl font-bold mb-3 text-[#0D3B33]">
+            <h2 className="text-2xl font-bold mb-3 text-[#00204E]">
               Complete Your Profile
             </h2>
             <p className="text-gray-600 mb-4 text-sm">
               You need to complete your mentor application first.
             </p>
             <Button 
-              className="btn-primary text-white rounded"
+              className="bg-[#C90000] hover:bg-[#A00000] text-white rounded-none font-sans font-bold uppercase tracking-widest"
               onClick={() => navigate(createPageUrl("ApplyAsMentor"))}
             >
               Apply as Mentor
@@ -175,7 +175,7 @@ export default function MentorDashboard() {
             <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Clock className="w-8 h-8 text-yellow-600" />
             </div>
-            <h2 className="text-2xl font-bold mb-3 text-[#0D3B33]">
+            <h2 className="text-2xl font-bold mb-3 text-[#00204E]">
               Application Under Review
             </h2>
             <p className="text-gray-600 mb-4 text-sm">
@@ -204,7 +204,7 @@ export default function MentorDashboard() {
         <div className="max-w-md bg-white border border-gray-200 rounded shadow-sm p-8">
           <div className="text-center">
             <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
-            <h2 className="text-2xl font-bold mb-3 text-[#0D3B33]">
+            <h2 className="text-2xl font-bold mb-3 text-[#00204E]">
               Application Not Approved
             </h2>
             <p className="text-gray-600 text-sm mb-6">
@@ -225,12 +225,12 @@ export default function MentorDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="w-full px-6 md:px-12 lg:px-24">
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-[1400px] mx-auto px-8 md:px-16 lg:px-24">
         <div className="mb-6 border-b border-gray-200 pb-4">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <h1 className="text-2xl font-bold mb-1 text-[#0D3B33]">
+              <h1 className="text-3xl md:text-4xl font-bold mb-2 text-[#00204E] font-serif">
                 Mentor Dashboard
               </h1>
               <p className="text-gray-600 text-sm">Manage your students and track your mentorship</p>
@@ -285,11 +285,11 @@ export default function MentorDashboard() {
         )}
 
         <div className="grid md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white border-l-4 border-l-[#FE6C3A] border border-gray-200 rounded shadow-sm p-4">
+          <div className="bg-white border-l-4 border-l-[#C90000] border border-gray-200 rounded shadow-sm p-4">
             <div className="flex items-center justify-between mb-2">
-              <Users className="w-6 h-6 text-[#FE6C3A]" />
+              <Users className="w-6 h-6 text-[#C90000]" />
             </div>
-            <div className="text-2xl font-bold mb-1 text-[#0D3B33]">{students.length}</div>
+            <div className="text-2xl font-bold mb-1 text-[#00204E]">{students.length}</div>
             <div className="text-xs text-gray-600">Active Students</div>
           </div>
 
@@ -297,15 +297,15 @@ export default function MentorDashboard() {
             <div className="flex items-center justify-between mb-2">
               <DollarSign className="w-6 h-6 text-green-500" />
             </div>
-            <div className="text-2xl font-bold mb-1 text-[#0D3B33]">${monthlyRevenue.toFixed(0)}</div>
+            <div className="text-2xl font-bold mb-1 text-[#00204E]">${monthlyRevenue.toFixed(0)}</div>
             <div className="text-xs text-gray-600">Your Earnings (70%)</div>
           </div>
 
           <div className="bg-white border border-gray-200 rounded shadow-sm p-4">
             <div className="flex items-center justify-between mb-2">
-              <CheckCircle className="w-6 h-6 text-[#0D3B33]" />
+              <CheckCircle className="w-6 h-6 text-[#00204E]" />
             </div>
-            <div className="text-2xl font-bold mb-1 text-[#0D3B33]">{allTasks.length}</div>
+            <div className="text-2xl font-bold mb-1 text-[#00204E]">{allTasks.length}</div>
             <div className="text-xs text-gray-600">Tasks Assigned</div>
           </div>
 
@@ -313,20 +313,20 @@ export default function MentorDashboard() {
             <div className="flex items-center justify-between mb-2">
               <MessageSquare className="w-6 h-6 text-gray-400" />
             </div>
-            <div className="text-2xl font-bold mb-1 text-[#0D3B33]">Active</div>
+            <div className="text-2xl font-bold mb-1 text-[#00204E]">Active</div>
             <div className="text-xs text-gray-600">Profile Status</div>
           </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-white border border-gray-200 rounded p-1 shadow-sm">
-            <TabsTrigger value="overview" className="rounded data-[state=active]:bg-[#FE6C3A] data-[state=active]:text-white text-sm">
+            <TabsTrigger value="overview" className="rounded data-[state=active]:bg-[#C90000] data-[state=active]:text-white text-sm">
               Overview
             </TabsTrigger>
-            <TabsTrigger value="students" className="rounded data-[state=active]:bg-[#FE6C3A] data-[state=active]:text-white text-sm">
+            <TabsTrigger value="students" className="rounded data-[state=active]:bg-[#C90000] data-[state=active]:text-white text-sm">
               Students
             </TabsTrigger>
-            <TabsTrigger value="chat" className="rounded data-[state=active]:bg-[#FE6C3A] data-[state=active]:text-white text-sm">
+            <TabsTrigger value="chat" className="rounded data-[state=active]:bg-[#C90000] data-[state=active]:text-white text-sm">
               Messages
             </TabsTrigger>
           </TabsList>
@@ -335,9 +335,9 @@ export default function MentorDashboard() {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white border border-gray-200 rounded shadow-sm">
                 <div className="p-4 border-b border-gray-200">
-                  <h3 className="font-bold flex items-center justify-between text-[#0D3B33]">
+                  <h3 className="font-bold flex items-center justify-between text-[#00204E]">
                     <span className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-[#FE6C3A]" />
+                      <Users className="w-4 h-4 text-[#C90000]" />
                       Your Students
                     </span>
                     <Badge className="text-xs">{students.length}</Badge>
@@ -346,7 +346,7 @@ export default function MentorDashboard() {
                 <div className="p-4 space-y-4">
                   {studentsLoading ? (
                     <div className="text-center py-6 text-gray-500">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FE6C3A] mx-auto mb-2"></div>
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#C90000] mx-auto mb-2"></div>
                       <p className="text-sm">Loading students...</p>
                     </div>
                   ) : students.length === 0 ? (
@@ -373,7 +373,7 @@ export default function MentorDashboard() {
 
               <div className="bg-white border border-gray-200 rounded shadow-sm">
                 <div className="p-4 border-b border-gray-200">
-                  <h3 className="font-bold flex items-center gap-2 text-[#0D3B33]">
+                  <h3 className="font-bold flex items-center gap-2 text-[#00204E]">
                     <DollarSign className="w-4 h-4 text-green-500" />
                     Earnings Overview
                   </h3>
@@ -381,7 +381,7 @@ export default function MentorDashboard() {
                 <div className="p-4 space-y-4">
                   <div>
                     <div className="text-sm text-gray-600 mb-1">Total Revenue</div>
-                    <div className="text-2xl font-bold text-[#0D3B33]">${totalRevenue.toFixed(2)}</div>
+                    <div className="text-2xl font-bold text-[#00204E]">${totalRevenue.toFixed(2)}</div>
                   </div>
                   <div className="border-t border-gray-200 pt-4">
                     <div className="text-sm text-gray-600 mb-1">Your Share (70%)</div>
@@ -421,7 +421,7 @@ export default function MentorDashboard() {
                         <div className="flex items-center gap-3 mb-4">
                           <Avatar className="w-12 h-12">
                             <AvatarImage src={student.profile_photo_url} />
-                            <AvatarFallback className="bg-[#E6EFEA] text-lg text-[#0D3B33]">
+                            <AvatarFallback className="bg-[#F3F4F6] text-lg text-[#00204E]">
                               {student.full_name?.charAt(0) || 'S'}
                             </AvatarFallback>
                           </Avatar>

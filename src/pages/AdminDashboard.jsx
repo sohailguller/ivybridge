@@ -216,7 +216,7 @@ export default function AdminDashboard() {
     return (
       <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF6B5C] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C90000] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading admin dashboard...</p>
         </div>
       </div>
@@ -224,11 +224,11 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] py-8">
-      <div className="w-full px-6 md:px-12 lg:px-24">
+    <div className="min-h-screen bg-[#FAFAFA] py-12">
+      <div className="max-w-[1400px] mx-auto px-8 md:px-16 lg:px-24">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2 text-[#00204E] font-serif">
             Admin Dashboard
           </h1>
           <p className="text-gray-600">Manage mentors, monitor activity, and oversee platform operations</p>
@@ -236,12 +236,12 @@ export default function AdminDashboard() {
 
         {/* Quick Stats */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <Card className="rounded-2xl border-0 shadow-lg bg-gradient-to-br from-[#FF6B5C] to-[#E55A4C] text-white">
+          <Card className="rounded-2xl border-0 shadow-lg bg-gradient-to-br from-[#C90000] to-[#A00000] text-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-3">
                 <Users className="w-8 h-8 opacity-80" />
                 {pendingMentors.length > 0 && (
-                  <Badge className="bg-white text-[#FF6B5C]">{pendingMentors.length}</Badge>
+                  <Badge className="bg-white text-[#C90000]">{pendingMentors.length}</Badge>
                 )}
               </div>
               <div className="text-3xl font-bold mb-1">{approvedMentors.length}</div>
@@ -286,25 +286,25 @@ export default function AdminDashboard() {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-white border rounded-2xl p-1 shadow-sm">
-            <TabsTrigger value="overview" className="rounded-xl data-[state=active]:bg-[#FF6B5C] data-[state=active]:text-white">
+            <TabsTrigger value="overview" className="rounded-xl data-[state=active]:bg-[#C90000] data-[state=active]:text-white">
               Overview
             </TabsTrigger>
-            <TabsTrigger value="mentors" className="rounded-xl data-[state=active]:bg-[#FF6B5C] data-[state=active]:text-white">
+            <TabsTrigger value="mentors" className="rounded-xl data-[state=active]:bg-[#C90000] data-[state=active]:text-white">
               Mentor Applications
               {pendingMentors.length > 0 && (
                 <Badge className="ml-2 bg-red-500 text-white">{pendingMentors.length}</Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="payouts" className="rounded-xl data-[state=active]:bg-[#FF6B5C] data-[state=active]:text-white">
+            <TabsTrigger value="payouts" className="rounded-xl data-[state=active]:bg-[#C90000] data-[state=active]:text-white">
               Payouts
             </TabsTrigger>
-            <TabsTrigger value="reports" className="rounded-xl data-[state=active]:bg-[#FF6B5C] data-[state=active]:text-white">
+            <TabsTrigger value="reports" className="rounded-xl data-[state=active]:bg-[#C90000] data-[state=active]:text-white">
               Reports
               {pendingReports > 0 && (
                 <Badge className="ml-2 bg-red-500 text-white">{pendingReports}</Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="rounded-xl data-[state=active]:bg-[#FF6B5C] data-[state=active]:text-white">
+            <TabsTrigger value="analytics" className="rounded-xl data-[state=active]:bg-[#C90000] data-[state=active]:text-white">
               Analytics
             </TabsTrigger>
           </TabsList>
@@ -333,7 +333,7 @@ export default function AdminDashboard() {
                             <div className="flex items-center gap-3">
                               <Avatar>
                                 <AvatarImage src={mentor.profile_photo_url} />
-                                <AvatarFallback className="bg-[#B3E5FC]">
+                                <AvatarFallback className="bg-[#F3F4F6]">
                                   {mentorUser?.full_name?.charAt(0) || 'M'}
                                 </AvatarFallback>
                               </Avatar>
@@ -430,7 +430,7 @@ export default function AdminDashboard() {
                               <div className="flex items-center gap-4">
                                 <Avatar className="w-16 h-16">
                                   <AvatarImage src={mentor.profile_photo_url} />
-                                  <AvatarFallback className="bg-[#B3E5FC]">
+                                  <AvatarFallback className="bg-[#F3F4F6]">
                                     {mentorUser?.full_name?.charAt(0) || 'M'}
                                   </AvatarFallback>
                                 </Avatar>
@@ -492,7 +492,7 @@ export default function AdminDashboard() {
                             <div className="flex items-center gap-3">
                               <Avatar className="w-10 h-10">
                                 <AvatarImage src={mentor.profile_photo_url} />
-                                <AvatarFallback className="bg-[#B3E5FC]">
+                                <AvatarFallback className="bg-[#F3F4F6]">
                                   {mentorUser?.full_name?.charAt(0) || 'M'}
                                 </AvatarFallback>
                               </Avatar>
@@ -628,7 +628,7 @@ export default function AdminDashboard() {
                       <span className="font-bold text-xl">${totalRevenue.toFixed(2)}</span>
                     </div>
                     <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div className="h-full bg-[#FF6B5C]" style={{ width: '100%' }} />
+                      <div className="h-full bg-[#C90000]" style={{ width: '100%' }} />
                     </div>
                   </div>
                   <div>
@@ -646,7 +646,7 @@ export default function AdminDashboard() {
                       <span className="font-bold text-xl">${(totalRevenue * 0.7).toFixed(2)}</span>
                     </div>
                     <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div className="h-full bg-[#B3E5FC]" style={{ width: '70%' }} />
+                      <div className="h-full bg-[#F3F4F6]" style={{ width: '70%' }} />
                     </div>
                   </div>
                 </CardContent>
@@ -687,7 +687,7 @@ export default function AdminDashboard() {
         <Dialog open={mentorReviewDialogOpen} onOpenChange={setMentorReviewDialogOpen}>
           <DialogContent className="max-w-4xl max-h-[90vh] bg-white">
             <DialogHeader className="border-b border-gray-200 pb-4">
-              <DialogTitle className="text-xl font-bold text-[#0D3B33]">
+              <DialogTitle className="text-xl font-bold text-[#00204E]">
                 Mentor Application Review
               </DialogTitle>
               <DialogDescription className="text-gray-600">
@@ -699,7 +699,7 @@ export default function AdminDashboard() {
               <div className="space-y-6 py-4">
                 {/* Basic Information Section */}
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                  <h3 className="font-bold text-base mb-4 flex items-center gap-2 text-[#0D3B33]">
+                  <h3 className="font-bold text-base mb-4 flex items-center gap-2 text-[#00204E]">
                     <GraduationCap className="w-5 h-5 text-[#FE6C3A]" />
                     Basic Information
                   </h3>
@@ -730,7 +730,7 @@ export default function AdminDashboard() {
                 {/* Profile Photo */}
                 {selectedMentor.profile_photo_url && (
                   <div className="bg-white border border-gray-200 rounded-lg p-6">
-                    <h3 className="font-bold text-sm mb-4 text-[#0D3B33]">Profile Photo</h3>
+                    <h3 className="font-bold text-sm mb-4 text-[#00204E]">Profile Photo</h3>
                     <img 
                       src={selectedMentor.profile_photo_url} 
                       alt="Profile" 
@@ -741,16 +741,16 @@ export default function AdminDashboard() {
 
                 {/* Bio */}
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
-                  <h3 className="font-bold text-sm mb-3 text-[#0D3B33]">About</h3>
+                  <h3 className="font-bold text-sm mb-3 text-[#00204E]">About</h3>
                   <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{selectedMentor.bio}</p>
                 </div>
 
                 {/* Expertise Areas */}
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
-                  <h3 className="font-bold text-sm mb-3 text-[#0D3B33]">Areas of Expertise</h3>
+                  <h3 className="font-bold text-sm mb-3 text-[#00204E]">Areas of Expertise</h3>
                   <div className="flex flex-wrap gap-2">
                     {selectedMentor.expertise_areas?.map((area, idx) => (
-                      <Badge key={idx} className="bg-[#E6EFEA] text-[#0D3B33] border-0 text-xs">
+                      <Badge key={idx} className="bg-[#E6EFEA] text-[#00204E] border-0 text-xs">
                         {area}
                       </Badge>
                     ))}
@@ -759,7 +759,7 @@ export default function AdminDashboard() {
 
                 {/* Personal Essays */}
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 space-y-5">
-                  <h3 className="font-bold text-base text-[#0D3B33]">Personal Essays</h3>
+                  <h3 className="font-bold text-base text-[#00204E]">Personal Essays</h3>
                   
                   <div className="bg-white rounded-lg p-4 border border-gray-200">
                     <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide block mb-2">
@@ -799,7 +799,7 @@ export default function AdminDashboard() {
 
                 {/* Verification Documents */}
                 <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-4">
-                  <h3 className="font-bold text-base text-[#0D3B33]">Verification & Setup</h3>
+                  <h3 className="font-bold text-base text-[#00204E]">Verification & Setup</h3>
                   
                   {selectedMentor.transcript_url && (
                     <div>

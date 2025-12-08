@@ -160,7 +160,7 @@ export default function StudentDashboard() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FE6C3A] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C90000] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading your dashboard...</p>
         </div>
       </div>
@@ -172,7 +172,7 @@ export default function StudentDashboard() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-md bg-white border border-gray-200 rounded shadow-sm p-8 text-center">
           <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
-          <h2 className="text-xl font-bold mb-2 text-[#0D3B33]">Authentication Error</h2>
+          <h2 className="text-xl font-bold mb-2 text-[#00204E]">Authentication Error</h2>
           <p className="text-gray-600 text-sm mb-4">
             Unable to load your account. Please try signing in again.
           </p>
@@ -191,7 +191,7 @@ export default function StudentDashboard() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FE6C3A] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C90000] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading your subscription...</p>
         </div>
       </div>
@@ -206,7 +206,7 @@ export default function StudentDashboard() {
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertCircle className="w-8 h-8 text-gray-400" />
             </div>
-            <h2 className="text-2xl font-bold mb-3 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+            <h2 className="text-2xl font-bold mb-3 text-[#00204E]" style={{ fontFamily: 'Georgia, serif' }}>
               No Active Mentorship
             </h2>
             <p className="text-gray-600 mb-4 text-sm">
@@ -225,8 +225,8 @@ export default function StudentDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="w-full px-6 md:px-12 lg:px-24">
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-[1400px] mx-auto px-8 md:px-16 lg:px-24">
         {showSuccessAlert && (
           <Alert className="mb-6 border-green-200 bg-green-50">
             <AlertDescription className="text-green-800 flex items-center gap-2 text-sm">
@@ -248,26 +248,26 @@ export default function StudentDashboard() {
         )}
 
         <div className="mb-6 border-b border-gray-200 pb-4">
-          <h1 className="text-2xl font-bold mb-1 text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2 text-[#00204E] font-serif">
             Welcome back, {user?.full_name?.split(' ')[0] || 'Student'}!
           </h1>
           <p className="text-gray-600 text-sm">Track your progress and stay connected with your mentor</p>
         </div>
 
         <div className="grid md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white border-l-4 border-l-[#FE6C3A] border border-gray-200 rounded shadow-sm p-4">
+          <div className="bg-white border-l-4 border-l-[#C90000] border border-gray-200 rounded shadow-sm p-4">
             <div className="flex items-center justify-between mb-2">
-              <Clock className="w-6 h-6 text-[#FE6C3A]" />
+              <Clock className="w-6 h-6 text-[#C90000]" />
             </div>
-            <div className="text-2xl font-bold mb-1 text-[#0D3B33]">{activeSub.months_remaining}</div>
+            <div className="text-2xl font-bold mb-1 text-[#00204E]">{activeSub.months_remaining}</div>
             <div className="text-xs text-gray-600">Months Remaining</div>
           </div>
 
           <div className="bg-white border border-gray-200 rounded shadow-sm p-4">
             <div className="flex items-center justify-between mb-2">
-              <CheckCircle className="w-6 h-6 text-[#0D3B33]" />
+              <CheckCircle className="w-6 h-6 text-[#00204E]" />
             </div>
-            <div className="text-2xl font-bold mb-1 text-[#0D3B33]">{completedTasks.length}</div>
+            <div className="text-2xl font-bold mb-1 text-[#00204E]">{completedTasks.length}</div>
             <div className="text-xs text-gray-600">Tasks Completed</div>
           </div>
 
@@ -275,7 +275,7 @@ export default function StudentDashboard() {
             <div className="flex items-center justify-between mb-2">
               <MessageSquare className="w-6 h-6 text-gray-400" />
             </div>
-            <div className="text-2xl font-bold mb-1 text-[#0D3B33]">{activeSub.status === "active" ? "Active" : "Pending"}</div>
+            <div className="text-2xl font-bold mb-1 text-[#00204E]">{activeSub.status === "active" ? "Active" : "Pending"}</div>
             <div className="text-xs text-gray-600">Mentorship Status</div>
           </div>
 
@@ -283,7 +283,7 @@ export default function StudentDashboard() {
             <div className="flex items-center justify-between mb-2">
               <TrendingUp className="w-6 h-6 text-green-500" />
             </div>
-            <div className="text-2xl font-bold mb-1 text-[#0D3B33]">{pendingTasks.length}</div>
+            <div className="text-2xl font-bold mb-1 text-[#00204E]">{pendingTasks.length}</div>
             <div className="text-xs text-gray-600">Pending Tasks</div>
           </div>
         </div>
@@ -293,15 +293,15 @@ export default function StudentDashboard() {
             <div className="flex items-center gap-4">
               <Avatar className="w-16 h-16">
                 <AvatarImage src={mentor.profile_photo_url || mentorUser?.profile_photo_url} />
-                <AvatarFallback className="bg-[#E6EFEA] text-xl text-[#0D3B33]">
+                <AvatarFallback className="bg-[#F3F4F6] text-xl text-[#00204E]">
                   {mentorUser?.full_name?.charAt(0) || 'M'}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h3 className="text-lg font-bold text-[#0D3B33]" style={{ fontFamily: 'Georgia, serif' }}>Your Mentor</h3>
+                <h3 className="text-lg font-bold text-[#00204E] font-serif">Your Mentor</h3>
                 <p className="text-base text-gray-700 mb-1">{mentorUser?.full_name || mentorUser?.email || 'Your Mentor'}</p>
                 <div className="flex items-center gap-2 text-xs text-gray-600">
-                  <Badge className="bg-[#E6EFEA] text-[#0D3B33] border-0 text-xs">
+                  <Badge className="bg-[#F3F4F6] text-[#00204E] border-0 text-xs">
                     {mentor.university}
                   </Badge>
                   <span>•</span>
@@ -322,7 +322,7 @@ export default function StudentDashboard() {
                 </Button>
               )}
               <Button
-                className="btn-primary text-white rounded text-sm"
+                className="bg-[#C90000] hover:bg-[#A00000] text-white rounded-none text-sm font-sans font-bold uppercase tracking-widest"
                 onClick={() => setActiveTab("chat")}
               >
                 <MessageSquare className="w-4 h-4 mr-2" />
@@ -335,7 +335,7 @@ export default function StudentDashboard() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
                 <p className="text-sm font-medium text-gray-700">Subscription Plan</p>
-                <p className="text-base font-bold capitalize text-[#0D3B33]">{activeSub.plan_type} Plan</p>
+                <p className="text-base font-bold capitalize text-[#00204E]">{activeSub.plan_type} Plan</p>
                 <p className="text-xs text-gray-500">
                   {activeSub.status === "active" ? `${activeSub.months_remaining} months remaining • Non-cancellable` : "Subscription pending activation"}
                 </p>
@@ -368,19 +368,19 @@ export default function StudentDashboard() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-white border border-gray-200 rounded p-1 shadow-sm">
-            <TabsTrigger value="overview" className="rounded data-[state=active]:bg-[#FE6C3A] data-[state=active]:text-white text-sm">
+            <TabsTrigger value="overview" className="rounded data-[state=active]:bg-[#C90000] data-[state=active]:text-white text-sm">
               Overview
             </TabsTrigger>
-            <TabsTrigger value="chat" className="rounded data-[state=active]:bg-[#FE6C3A] data-[state=active]:text-white text-sm">
+            <TabsTrigger value="chat" className="rounded data-[state=active]:bg-[#C90000] data-[state=active]:text-white text-sm">
               Chat
             </TabsTrigger>
-            <TabsTrigger value="tasks" className="rounded data-[state=active]:bg-[#FE6C3A] data-[state=active]:text-white text-sm">
+            <TabsTrigger value="tasks" className="rounded data-[state=active]:bg-[#C90000] data-[state=active]:text-white text-sm">
               Tasks
             </TabsTrigger>
-            <TabsTrigger value="progress" className="rounded data-[state=active]:bg-[#FE6C3A] data-[state=active]:text-white text-sm">
+            <TabsTrigger value="progress" className="rounded data-[state=active]:bg-[#C90000] data-[state=active]:text-white text-sm">
               Progress
             </TabsTrigger>
-            <TabsTrigger value="billing" className="rounded data-[state=active]:bg-[#FE6C3A] data-[state=active]:text-white text-sm">
+            <TabsTrigger value="billing" className="rounded data-[state=active]:bg-[#C90000] data-[state=active]:text-white text-sm">
               Billing
             </TabsTrigger>
           </TabsList>
@@ -389,8 +389,8 @@ export default function StudentDashboard() {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white border border-gray-200 rounded shadow-sm">
                 <div className="p-4 border-b border-gray-200">
-                  <h3 className="font-bold flex items-center gap-2 text-[#0D3B33]">
-                    <CheckCircle className="w-4 h-4 text-[#FE6C3A]" />
+                  <h3 className="font-bold flex items-center gap-2 text-[#00204E]">
+                    <CheckCircle className="w-4 h-4 text-[#C90000]" />
                     Your Tasks
                   </h3>
                 </div>
@@ -410,8 +410,8 @@ export default function StudentDashboard() {
 
               <div className="bg-white border border-gray-200 rounded shadow-sm">
                 <div className="p-4 border-b border-gray-200">
-                  <h3 className="font-bold flex items-center gap-2 text-[#0D3B33]">
-                    <TrendingUp className="w-4 h-4 text-[#FE6C3A]" />
+                  <h3 className="font-bold flex items-center gap-2 text-[#00204E]">
+                    <TrendingUp className="w-4 h-4 text-[#C90000]" />
                     Recent Progress
                   </h3>
                 </div>
@@ -446,7 +446,7 @@ export default function StudentDashboard() {
           <TabsContent value="tasks">
             <div className="bg-white border border-gray-200 rounded shadow-sm">
               <div className="p-4 border-b border-gray-200">
-                <h3 className="font-bold text-[#0D3B33]">All Tasks</h3>
+                <h3 className="font-bold text-[#00204E]">All Tasks</h3>
               </div>
               <div className="p-4">
                 <TaskList tasks={tasks} studentView={true} />
@@ -457,7 +457,7 @@ export default function StudentDashboard() {
           <TabsContent value="progress">
             <div className="bg-white border border-gray-200 rounded shadow-sm">
               <div className="p-4 border-b border-gray-200">
-                <h3 className="font-bold text-[#0D3B33]">Progress History</h3>
+                <h3 className="font-bold text-[#00204E]">Progress History</h3>
               </div>
               <div className="p-4">
                 <ProgressTimeline notes={progressNotes} />
@@ -468,14 +468,14 @@ export default function StudentDashboard() {
           <TabsContent value="billing">
             <div className="bg-white border border-gray-200 rounded shadow-sm">
               <div className="p-4 border-b border-gray-200">
-                <h3 className="font-bold text-[#0D3B33]">Billing & Subscription</h3>
+                <h3 className="font-bold text-[#00204E]">Billing & Subscription</h3>
               </div>
               <div className="p-6 space-y-6">
                 <div className="bg-gray-50 border border-gray-200 rounded p-4">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <p className="text-sm text-gray-600">Current Plan</p>
-                      <p className="text-xl font-bold capitalize text-[#0D3B33]">{activeSub.plan_type}</p>
+                      <p className="text-xl font-bold capitalize text-[#00204E]">{activeSub.plan_type}</p>
                     </div>
                     <Badge className={`${
                       activeSub.status === "active" ? "bg-green-100 text-green-800" :
