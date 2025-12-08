@@ -169,13 +169,13 @@ export default function Home() {
           will-change: transform;
         }
         .animate-scroll:hover {
-          animation-play-state: paused;
+          animation-duration: 150s;
         }
       `}</style>
 
       {/* How It Works */}
       <section id="how-it-works" className="relative z-10 py-24 px-6 md:px-12 bg-white">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-[1600px] mx-auto">
           <div className="text-center mb-16">
             <span className="text-[#800000] font-sans font-bold tracking-widest text-sm uppercase mb-3 block">The Process</span>
             <h2 className="text-4xl md:text-5xl font-bold text-black">
@@ -217,7 +217,7 @@ export default function Home() {
 
       {/* Features Section */}
       <section className="relative z-10 py-24 bg-[#f4f4f4] px-6 md:px-12">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-12 gap-12 items-center">
+        <div className="max-w-[1800px] mx-auto grid lg:grid-cols-12 gap-16 xl:gap-24 items-center">
           <div className="lg:col-span-5">
             <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight">
               Everything You Need <br/>
@@ -242,7 +242,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="lg:col-span-7 rounded-xl overflow-hidden shadow-2xl border border-gray-200 bg-white transform transition-transform hover:scale-[1.02] duration-500">
+          <div className="lg:col-span-7 rounded-xl overflow-hidden border border-gray-200 bg-white transform transition-transform hover:scale-[1.02] duration-500">
             <div className="bg-gray-100 px-4 py-3 flex gap-2 border-b border-gray-200">
               <div className="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E]"></div>
               <div className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123]"></div>
@@ -259,7 +259,7 @@ export default function Home() {
 
       {/* Pricing Section */}
       <section className="relative z-10 py-24 px-6 md:px-12 bg-white">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-[1600px] mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">Invest in Your Future</h2>
             <p className="text-gray-600 font-sans text-lg">Transparent pricing for world-class guidance</p>
@@ -288,7 +288,7 @@ export default function Home() {
             </div>
 
             {/* Annual */}
-            <div className="border border-gray-200 p-10 hover:border-[#800000] transition-colors duration-300 bg-white group relative transform md:-translate-y-4 shadow-xl">
+            <div className="border border-gray-200 p-10 hover:border-[#800000] transition-colors duration-300 bg-white group relative transform md:-translate-y-4">
               <div className="absolute top-4 right-4 bg-[#C90000] text-white text-xs font-bold px-3 py-1 uppercase tracking-widest">
                 Best Value
               </div>
@@ -305,7 +305,7 @@ export default function Home() {
               </ul>
               <Button 
                 onClick={() => navigate(createPageUrl("BrowseMentors"))}
-                className="w-full bg-[#C90000] hover:bg-[#a00000] text-white border border-transparent rounded-none py-6 font-sans uppercase tracking-widest transition-all shadow-lg hover:shadow-xl"
+                className="w-full bg-[#C90000] hover:bg-[#a00000] text-white border border-transparent rounded-none py-6 font-sans uppercase tracking-widest transition-all"
               >
                 Get Started
               </Button>
