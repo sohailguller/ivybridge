@@ -16,6 +16,37 @@ export default function Home() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const videoRef = useRef(null);
+  const scrollerRef = useRef(null);
+  const positionRef = useRef(0);
+  const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    let animationId;
+    
+    const animate = () => {
+      if (!scrollerRef.current) return;
+      
+      // Slower speed on hover
+      const speed = isHovered ? 0.2 : 0.8; 
+      positionRef.current -= speed;
+      
+      const contentWidth = scrollerRef.current.scrollWidth;
+      // We duplicate the list 6 times, so we can safely reset after scrolling half width (3 sets)
+      // This ensures seamless looping
+      if (contentWidth > 0) {
+          const resetThreshold = contentWidth / 2;
+          if (Math.abs(positionRef.current) >= resetThreshold) {
+            positionRef.current += resetThreshold;
+          }
+      }
+      
+      scrollerRef.current.style.transform = `translateX(${positionRef.current}px)`;
+      animationId = requestAnimationFrame(animate);
+    };
+    
+    animationId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationId);
+  }, [isHovered]);
 
   const handleTimeUpdate = () => {
     // Loop 0.4 seconds before end to avoid black screen at the end
@@ -143,8 +174,15 @@ export default function Home() {
         <div className="text-center mb-6">
           <p className="text-xs font-sans font-bold tracking-[0.2em] uppercase text-gray-400">Mentors from</p>
         </div>
-        <div className="overflow-hidden w-full">
-          <div className="flex animate-scroll whitespace-nowrap items-center w-max">
+        <div 
+          className="overflow-hidden w-full"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          <div 
+            ref={scrollerRef}
+            className="flex whitespace-nowrap items-center w-max"
+          >
             {/* Duplicating enough times to ensure smooth loop on large screens */}
             {[...universities, ...universities, ...universities, ...universities, ...universities, ...universities].map((uni, idx) => (
               <div key={idx} className="inline-flex items-center mx-2 md:mx-4 shrink-0 h-16 overflow-hidden">
@@ -159,19 +197,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <style>{`
-        @keyframes scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .animate-scroll {
-          animation: scroll 60s linear infinite;
-          will-change: transform;
-        }
-        .animate-scroll:hover {
-          animation-duration: 150s;
-        }
-      `}</style>
 
       {/* How It Works */}
       <section id="how-it-works" className="relative z-10 py-24 px-8 md:px-16 lg:px-24 bg-white">
