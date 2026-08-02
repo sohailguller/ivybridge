@@ -1,0 +1,37 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "account_type": {
+      "type": "string",
+      "enum": [
+        "student",
+        "mentor"
+      ],
+      "description": "Type of account - student or mentor"
+    },
+    "mentor_profile_id": {
+      "type": "string",
+      "description": "Reference to MentorProfile if user is a mentor"
+    },
+    "phone_number": {
+      "type": "string",
+      "description": "User phone number"
+    },
+    "profile_photo_url": {
+      "type": "string",
+      "description": "Profile picture URL"
+    },
+    "stripe_customer_id": {
+      "type": "string",
+      "description": "Stripe customer ID for payments"
+    }
+  },
+  "required": [
+    "account_type",
+    "mentor_profile_id",
+    "phone_number",
+    "profile_photo_url",
+    "stripe_customer_id"
+  ]
+}

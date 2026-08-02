@@ -1,0 +1,45 @@
+{
+  "name": "ProgressNote",
+  "type": "object",
+  "properties": {
+    "subscription_id": {
+      "type": "string",
+      "description": "Related subscription"
+    },
+    "mentor_profile_id": {
+      "type": "string",
+      "description": "Mentor profile who wrote the note"
+    },
+    "student_id": {
+      "type": "string",
+      "description": "Student the note is about"
+    },
+    "note": {
+      "type": "string",
+      "description": "Progress note content"
+    },
+    "month": {
+      "type": "string",
+      "description": "Month of the note"
+    },
+    "achievements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Key achievements this period"
+    },
+    "areas_for_improvement": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Areas to work on"
+    }
+  },
+  "required": [
+    "mentor_profile_id",
+    "student_id",
+    "note"
+  ]
+}

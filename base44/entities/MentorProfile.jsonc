@@ -1,0 +1,108 @@
+{
+  "name": "MentorProfile",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "Reference to User entity"
+    },
+    "university": {
+      "type": "string",
+      "description": "Ivy League university",
+      "enum": [
+        "Harvard",
+        "Yale",
+        "Princeton",
+        "Columbia",
+        "Brown",
+        "Dartmouth",
+        "Cornell",
+        "Penn"
+      ]
+    },
+    "major": {
+      "type": "string",
+      "description": "Field of study"
+    },
+    "year": {
+      "type": "string",
+      "description": "Current year",
+      "enum": [
+        "Freshman",
+        "Sophomore",
+        "Junior",
+        "Senior"
+      ]
+    },
+    "bio": {
+      "type": "string",
+      "description": "About the mentor"
+    },
+    "expertise_areas": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Areas of expertise"
+    },
+    "greatest_achievement": {
+      "type": "string",
+      "description": "Greatest achievement"
+    },
+    "advice_to_younger_self": {
+      "type": "string",
+      "description": "Advice to younger self"
+    },
+    "dream_job": {
+      "type": "string",
+      "description": "Dream job"
+    },
+    "why_major": {
+      "type": "string",
+      "description": "Why they chose their major"
+    },
+    "lifetime_goal": {
+      "type": "string",
+      "description": "Lifetime goal"
+    },
+    "profile_photo_url": {
+      "type": "string",
+      "description": "Profile picture URL"
+    },
+    "transcript_url": {
+      "type": "string",
+      "description": "Transcript document URL"
+    },
+    "verification_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending",
+      "description": "Application status"
+    },
+    "stripe_connect_id": {
+      "type": "string",
+      "description": "Stripe Connect account ID for payouts"
+    },
+    "calendly_link": {
+      "type": "string",
+      "description": "Calendly scheduling link"
+    }
+  },
+  "required": [
+    "user_id",
+    "university",
+    "major",
+    "year",
+    "bio",
+    "calendly_link",
+    "greatest_achievement",
+    "advice_to_younger_self",
+    "dream_job",
+    "why_major",
+    "lifetime_goal"
+  ]
+}

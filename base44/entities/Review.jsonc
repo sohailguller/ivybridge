@@ -1,0 +1,38 @@
+{
+  "name": "Review",
+  "type": "object",
+  "properties": {
+    "subscription_id": {
+      "type": "string",
+      "description": "Related subscription"
+    },
+    "student_id": {
+      "type": "string",
+      "description": "Student who wrote the review"
+    },
+    "mentor_profile_id": {
+      "type": "string",
+      "description": "Mentor profile being reviewed"
+    },
+    "rating": {
+      "type": "number",
+      "description": "Rating out of 5",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "comment": {
+      "type": "string",
+      "description": "Review text"
+    },
+    "is_published": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether review is visible"
+    }
+  },
+  "required": [
+    "student_id",
+    "mentor_profile_id",
+    "rating"
+  ]
+}

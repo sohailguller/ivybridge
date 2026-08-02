@@ -1,0 +1,53 @@
+{
+  "name": "Task",
+  "type": "object",
+  "properties": {
+    "subscription_id": {
+      "type": "string",
+      "description": "Related subscription"
+    },
+    "student_id": {
+      "type": "string",
+      "description": "Student assigned to task"
+    },
+    "mentor_profile_id": {
+      "type": "string",
+      "description": "Mentor profile who assigned the task"
+    },
+    "title": {
+      "type": "string",
+      "description": "Task title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Task details"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "completed"
+      ],
+      "default": "pending"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "medium"
+    }
+  },
+  "required": [
+    "mentor_profile_id",
+    "student_id",
+    "title"
+  ]
+}

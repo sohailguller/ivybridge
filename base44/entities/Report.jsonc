@@ -1,0 +1,56 @@
+{
+  "name": "Report",
+  "type": "object",
+  "properties": {
+    "reporter_id": {
+      "type": "string",
+      "description": "User who filed the report"
+    },
+    "reported_user_id": {
+      "type": "string",
+      "description": "User being reported"
+    },
+    "report_type": {
+      "type": "string",
+      "enum": [
+        "inappropriate_content",
+        "contact_sharing",
+        "harassment",
+        "fraud",
+        "other"
+      ]
+    },
+    "description": {
+      "type": "string",
+      "description": "Report details"
+    },
+    "related_message_id": {
+      "type": "string",
+      "description": "Related chat message if applicable"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "under_review",
+        "resolved",
+        "dismissed"
+      ],
+      "default": "pending"
+    },
+    "admin_notes": {
+      "type": "string",
+      "description": "Admin notes on the report"
+    },
+    "action_taken": {
+      "type": "string",
+      "description": "Action taken by admin"
+    }
+  },
+  "required": [
+    "reporter_id",
+    "reported_user_id",
+    "report_type",
+    "description"
+  ]
+}

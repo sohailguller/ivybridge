@@ -1,0 +1,40 @@
+{
+  "name": "ChatMessage",
+  "type": "object",
+  "properties": {
+    "from_user_id": {
+      "type": "string",
+      "description": "Sender user ID"
+    },
+    "to_user_id": {
+      "type": "string",
+      "description": "Recipient user ID"
+    },
+    "subscription_id": {
+      "type": "string",
+      "description": "Related subscription"
+    },
+    "message": {
+      "type": "string",
+      "description": "Message content"
+    },
+    "attachment_url": {
+      "type": "string",
+      "description": "Attached file URL"
+    },
+    "is_read": {
+      "type": "boolean",
+      "default": false
+    },
+    "flagged": {
+      "type": "boolean",
+      "default": false,
+      "description": "Flagged for admin review"
+    }
+  },
+  "required": [
+    "from_user_id",
+    "to_user_id",
+    "message"
+  ]
+}

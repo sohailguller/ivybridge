@@ -1,0 +1,48 @@
+{
+  "name": "Notification",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "User to notify"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "message",
+        "task_assigned",
+        "progress_update",
+        "subscription",
+        "payment",
+        "system"
+      ],
+      "description": "Notification type"
+    },
+    "title": {
+      "type": "string",
+      "description": "Notification title"
+    },
+    "message": {
+      "type": "string",
+      "description": "Notification message"
+    },
+    "link": {
+      "type": "string",
+      "description": "Link to related content"
+    },
+    "is_read": {
+      "type": "boolean",
+      "default": false
+    },
+    "related_id": {
+      "type": "string",
+      "description": "ID of related entity"
+    }
+  },
+  "required": [
+    "user_id",
+    "type",
+    "title",
+    "message"
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "name": "Subscription",
+  "type": "object",
+  "properties": {
+    "student_id": {
+      "type": "string",
+      "description": "Student user ID"
+    },
+    "mentor_profile_id": {
+      "type": "string",
+      "description": "Reference to MentorProfile"
+    },
+    "plan_type": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "annual"
+      ],
+      "description": "Subscription plan type"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Payment amount"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "active",
+        "cancelled",
+        "completed"
+      ],
+      "default": "pending"
+    },
+    "stripe_subscription_id": {
+      "type": "string",
+      "description": "Stripe subscription ID"
+    },
+    "stripe_checkout_session_id": {
+      "type": "string",
+      "description": "Stripe checkout session ID"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "months_remaining": {
+      "type": "number",
+      "default": 12
+    }
+  },
+  "required": [
+    "student_id",
+    "mentor_profile_id",
+    "plan_type",
+    "amount"
+  ]
+}
