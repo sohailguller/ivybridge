@@ -4,7 +4,7 @@ My older sister went to Stanford, and having her as a mentor all through high sc
 
 Then I'd go to India and see how many people don't have that. My own cousins could at least reach out to her, but their friends wanted to get into these schools too and build a better future for themselves, and they just didn't know how or have anyone to look to. That's why I made IvyBridge.
 
-It connects students with mentors:
+It connects students with mentors at Stanford and the Ivy Leager (and other T20's too):
 
 - students browse mentors and pick one that fits
 - mentors get a dashboard for tasks and progress notes on each student
